@@ -5,3 +5,4 @@ Team members:
 Napat Karmniyanont, 
 Jia Qi (Jackie) He,
 Brian Guo
+Winson Yu
