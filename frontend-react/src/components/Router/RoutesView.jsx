@@ -5,15 +5,18 @@ import { userLoginThunk, userLogoutThunk, userSignupThunk } from "../../store/ut
 
 //Page Imports
 import TestLanding from '../Pages/TestLanding/TestLandingPage';
+import LandingPage from '../Pages/Landing/LandingPage';
 
 
 class RoutesView extends Component {
     render() {
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
+        const LandingPageComponent = () => (<LandingPage userSignup={this.props.userSignup}/>)
         return (
             <Router>
                 <Switch>
                     <Route exact path="/" render={TestLandingComponent} />
+                    <Route exact path="/login" render={LandingPageComponent} />
                 </Switch>
             </Router>
         )
