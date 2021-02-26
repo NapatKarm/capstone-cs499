@@ -13,7 +13,7 @@ class RoutesView extends Component {
     render() {
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage userSignup={this.props.userSignup}/>)
-        const HomePageComponent = () => (<HomePage/>)
+        const HomePageComponent = () => (<HomePage userData={this.props.userData}/>)
         return (
             <Router>
                 <Switch>

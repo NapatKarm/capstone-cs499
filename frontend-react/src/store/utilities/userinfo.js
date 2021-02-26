@@ -13,13 +13,16 @@
                  groupid: "vxwa6t",
                  groupmembers: [
                      {
-                         username: username
+                         username: username,
+                         role: 'Admin'
                      },
                      {
-                         username: "Monkey"
+                         username: "Monkey",
+                         role: 'Worker'
                      },
                      {
-                         username: "Chicken"
+                         username: "Chicken",
+                         role: 'Worker'
                      }
                  ]
              },
@@ -28,13 +31,16 @@
                 groupid: "ICUPLO",
                 groupmembers: [
                     {
-                        username: username
+                        username: username,
+                        role: 'Worker'
                     },
                     {
-                        username: "Smurf"
+                        username: "Smurf",
+                        role: 'Worker'
                     },
                     {
-                        username: "Thrower"
+                        username: "Thrower",
+                        role: 'Admin'
                     }
                 ]
             }
