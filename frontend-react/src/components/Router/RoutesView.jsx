@@ -11,7 +11,8 @@ import LandingPage from '../Pages/Landing/LandingPage';
 class RoutesView extends Component {
     render() {
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
-        const LandingPageComponent = () => (<LandingPage userSignup={this.props.userSignup}/>)
+        const LandingPageComponent = () => (<LandingPage userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult}/>)
+        const HomePageComponent = () => (<HomePage/>)
         return (
             <Router>
                 <Switch>
