@@ -13,12 +13,23 @@
     height: 100vh;
 }
 
+.content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
 .landingLogo {
     width: 50vh;
 }
 
 .leftSide {
-    display: flex;
+    flex-grow: 1;
+    width: 0vh;
+}
+
+.rightSide {
+    flex-grow: 1;
 }
 
 .footer {
