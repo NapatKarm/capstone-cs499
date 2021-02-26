@@ -6,6 +6,7 @@ import { userLoginThunk, userLogoutThunk, userSignupThunk } from "../../store/ut
 //Page Imports
 import TestLanding from '../Pages/TestLanding/TestLandingPage';
 import LandingPage from '../Pages/Landing/LandingPage';
+import HomePage from '../Pages/Home/HomePage';
 
 
 class RoutesView extends Component {
@@ -16,8 +17,9 @@ class RoutesView extends Component {
         return (
             <Router>
                 <Switch>
-                    <Route exact path="/" render={TestLandingComponent} />
-                    <Route exact path="/login" render={LandingPageComponent} />
+                    <Route exact path="/test" render={TestLandingComponent} />
+                    <Route exact path="/" render={LandingPageComponent} />
+                    <Route exact path="/home" render={HomePageComponent} />
                 </Switch>
             </Router>
         )
