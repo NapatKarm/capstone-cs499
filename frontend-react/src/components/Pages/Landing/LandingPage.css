@@ -1,0 +1,27 @@
+.body {
+    height: 100vh;
+    color: white;
+    background-color: #191919;
+    background-size: 100%;
+}
+
+.bgImage {
+    background: url("../../Imgs/pin-bg.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+}
+
+.landingLogo {
+    width: 50vh;
+}
+
+.leftSide {
+    display: flex;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+}
