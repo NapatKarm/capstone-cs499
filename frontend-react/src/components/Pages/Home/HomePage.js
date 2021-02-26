@@ -3,7 +3,7 @@ import { Link, withRouter } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
-class LandingPage extends Component {
+class HomePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -19,17 +19,10 @@ class LandingPage extends Component {
     render() {
         return(
             <div>
-                <h2>This is our Title</h2>
-                <p>Some two line preech about nothing at all in general</p>
-
-                {/* vvv Link page vvv*/}
-                {/* ()=>  -- stop stuff from auto running*/}
-                <Button onClick={this.signUp}>Sign Up</Button> 
-                <Link to ="/home">Business Page</Link>
-                
+                <h2>BUSINESS SIDE STUFF</h2>
             </div>
         )
     }
 }
 
-export default withRouter(LandingPage)
+export default withRouter(HomePage)
