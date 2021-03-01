@@ -16,9 +16,6 @@ admin.initializeApp({
   databaseURL: "https://c-vivid-default-rtdb.firebaseio.com"
 });
 
-const port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`App is listening on Port ${port}`));
-
 app.get('/', function (req, res) {
   res.send('hello world')
 });
@@ -50,5 +47,5 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
-module.exports = app;
+const port = process.env.PORT || 5000;
+app.listen(port, () => console.log(`App is listening on Port ${port}`));
