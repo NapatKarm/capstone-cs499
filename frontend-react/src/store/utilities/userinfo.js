@@ -1,27 +1,27 @@
- const FakeSignup = (username,password) => {
-     console.log("Received SignUp Info",username,password);
+ const FakeSignup = (firstName, lastName, email, password) => {
+     console.log("Received SignUp Info",firstName, lastName, email, password);
      return "Successfully signed up";
  }
 
- const FakeLogin = (username,password) => {
-     console.log("Received Login Info",username,password);
+ const FakeLogin = (email,password) => {
+     console.log("Received Login Info",email,password);
      let UserData = {
-         username: username,
+         email: email,
          grouplist: [
              {
                  groupname: "TEST1",
                  groupid: "vxwa6t",
                  groupmembers: [
                      {
-                         username: username,
+                         email: email,
                          role: 'Admin'
                      },
                      {
-                         username: "Monkey",
+                         email: "Monkey@gmail.com",
                          role: 'Worker'
                      },
                      {
-                         username: "Chicken",
+                         email: "Chicken@aol.com",
                          role: 'Worker'
                      }
                  ]
@@ -31,15 +31,15 @@
                 groupid: "ICUPLO",
                 groupmembers: [
                     {
-                        username: username,
+                        email: email,
                         role: 'Worker'
                     },
                     {
-                        username: "Smurf",
+                        email: "Smurf@aol.com",
                         role: 'Worker'
                     },
                     {
-                        username: "Thrower",
+                        email: "Thrower@gmail.com",
                         role: 'Admin'
                     }
                 ]
@@ -93,11 +93,11 @@ const errorCatch = (err) => {
 
 
 // Thunks
-export const userSignupThunk = (username,password) => async (dispatch) => {
+export const userSignupThunk = (firstName, lastName, email, password) => async (dispatch) => {
     let res
     try {
         // This is we will send sign up info to the backend and wait for response
-        res = await FakeSignup(username,password)
+        res = await FakeSignup(firstName, lastName, email, password)
         dispatch(userSignup(res))
     }
     catch (fetchError) {
@@ -105,11 +105,11 @@ export const userSignupThunk = (username,password) => async (dispatch) => {
     }
 }
 
-export const userLoginThunk = (username,password) => async (dispatch) => {
+export const userLoginThunk = (email,password) => async (dispatch) => {
     let res
     try {
         // This is we will send log in info to the backend and wait for response
-        res = await FakeLogin(username,password)
+        res = await FakeLogin(email,password)
         dispatch(userLogin(res))
     }
     catch (fetchError) {

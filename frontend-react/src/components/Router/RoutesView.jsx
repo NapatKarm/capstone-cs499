@@ -12,7 +12,7 @@ import HomePage from '../Pages/Home/HomePage';
 class RoutesView extends Component {
     render() {
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
-        const LandingPageComponent = () => (<LandingPage userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult}/>)
+        const LandingPageComponent = () => (<LandingPage userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
         const HomePageComponent = () => (<HomePage/>)
         return (
             <Router>
@@ -30,14 +30,15 @@ const mapState = (state) => {
     return {
         userData: state.userinfo.UserData,
         signupResult: state.userinfo.SignupResult,
-        userinfoError: state.ErrorInfo
+        userinfoError: state.ErrorInfo,
+        loggedIn: !!state.userinfo.UserData
     }
 }
 
 const mapDispatch = (dispatch) => {
     return {
-        userSignup: (username, password) => dispatch(userSignupThunk(username, password)),
-        userLogin: (username, password) => dispatch(userLoginThunk(username,password)),
+        userSignup: (firstName, lastName, email, password) => dispatch(userSignupThunk(firstName, lastName, email, password)),
+        userLogin: (email, password) => dispatch(userLoginThunk(email,password)),
         userLogout: () => dispatch(userLogoutThunk())
     }
 }

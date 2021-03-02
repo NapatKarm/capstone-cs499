@@ -4,23 +4,22 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
 import './LandingPage.css';
+import RegisterTable from './RegisterTable';
+import LoginTable from './LoginTable';
 import longLogo from '../../Imgs/long-logo.png';
-import pinBG from '../../Imgs/pin-bg.jpg';
 
 class LandingPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: "",
-            password: ""
+            rightState: "none"
         }
     }
 
-    signUp = () => {
-        this.props.userSignup(this.state.username, this.state.password)
-    }
-    logIn = () => {
-        this.props.userLogin(this.state.username, this.state.password)
+    componentDidUpdate=()=>{
+        if (this.props.loggedIn){
+            this.props.history.push("/home");
+        }
     }
 
     render() {
@@ -36,17 +35,15 @@ class LandingPage extends Component {
                             {/* vvv Link page vvv*/}
                             {/* ()=>  -- stop stuff from auto running*/}
                             <div className="mapButton">
-                                <Link to ="/">GO TO THE MAP</Link>
+                                <Button>GO TO THE MAP</Button>
                             </div>
                             <div className="actionButton">
-                                <Button onClick={this.signUp}>REGISTER</Button>
-                                <Button onClick={this.logIn}>LOGIN</Button>
+                                <Button onClick={()=>this.setState({rightState: "register"})}>REGISTER</Button>
+                                <Button onClick={()=>this.setState({rightState: "login"})}>LOGIN</Button>
                             </div>
-                            <Link to ="/home">Business Page</Link>
                         </div>
                         <div className="rightSide">
-                            <p>sendhelp</p>
-                            <p>Whyyyy</p>
+                            {this.state.rightState==="none" ? ("") : (<div>{this.state.rightState==="register" ? (<RegisterTable userSignup={this.props.userSignup}/>) : (<LoginTable userLogin={this.props.userLogin}/>)}</div>)}
                         </div>
                     </div>
                     <footer>
