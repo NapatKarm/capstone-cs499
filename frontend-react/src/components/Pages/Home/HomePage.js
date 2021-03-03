@@ -9,18 +9,20 @@ class HomePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: "",
-            password: "",
-            grouplist: []
+            userData:{},
+            businessList: []
         }
     }
     componentDidMount = () => {
         this.setState({
-            grouplist: this.props.grouplist
+            userData: this.props.userData
+        }, () => {
+            if(this.state.userData){
+                this.setState({
+                    businessList: this.state.userData.businesses
+            })
+            }
         })
-    }
-    signUp = () => {
-        this.props.userSignup(this.state.username, this.state.password)
     }
 
     render() {
@@ -32,7 +34,7 @@ class HomePage extends Component {
                         <Button>Register business</Button><Button>Join Business</Button>
                     </div>
                     <div className="managedBusinessTable">
-                        <ManagedBusinessTable grouplist={this.state.grouplist}/>
+                        <ManagedBusinessTable businessList={this.state.businessList}/>
                     </div>
                     <div className="workedBusinessTable">
 

@@ -11,15 +11,22 @@ import HomePage from '../Pages/Home/HomePage';
 
 class RoutesView extends Component {
     render() {
+        const {loggedIn} = this.props
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
-        const LandingPageComponent = () => (<LandingPage userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
-        const HomePageComponent = () => (<HomePage/>)
+        const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
+        const HomePageComponent = () => (<HomePage userData={this.props.userData}/>)
         return (
             <Router>
                 <Switch>
                     <Route exact path="/test" render={TestLandingComponent} />
                     <Route exact path="/" render={LandingPageComponent} />
-                    <Route exact path="/home" render={HomePageComponent} />
+                    {   loggedIn && (
+                            <Switch>
+                                <Route exact path="/home" render={HomePageComponent} />
+                            </Switch>
+                        )
+                    }   
+                    <Route render={LandingPageComponent} />
                 </Switch>
             </Router>
         )
@@ -31,7 +38,9 @@ const mapState = (state) => {
         userData: state.userinfo.UserData,
         signupResult: state.userinfo.SignupResult,
         userinfoError: state.ErrorInfo,
-        loggedIn: !!state.userinfo.UserData
+        loggedIn: !!state.userinfo.UserData,
+        signUpError: state.userinfo.signUpError,
+        logInError: state.userinfo.logInError
     }
 }
 

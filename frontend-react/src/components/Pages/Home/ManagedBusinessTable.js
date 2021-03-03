@@ -15,11 +15,11 @@ import { green,red,cyan } from '@material-ui/core/colors';
 
 class ManagedBusinessTable extends Component {
     state = {
-        grouplist: []
+        businessList: []
     }
     componentDidMount() {
         this.setState({
-            grouplist: this.props.grouplist,
+            businessList: this.props.businessList,
         })
     }
     render() {
@@ -32,13 +32,14 @@ class ManagedBusinessTable extends Component {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {this.props.grouplist ? (this.props.grouplist.map((group) => (
-                            <TableRow key={group.groupid}>
+                        {this.props.businessList ? (
+                            this.props.businessList.length > 0 ? (this.props.businessList.map((business) => (
+                            <TableRow key={business.business_id}>
                                 <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
                                     <StarsIcon fontSize="small" style={{ color: cyan[500] }} />
                                 </TableCell>
                                 <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
-                                    {group.groupname}
+                                    {business.businessname}
                                 </TableCell>
                                 <TableCell align="center">
                                     <div>
@@ -67,14 +68,16 @@ class ManagedBusinessTable extends Component {
                                     <Button>Details</Button>
                                 </TableCell>
                             </TableRow>
-                        ))) : (
+                        ))):(
+                            <div> Currently not in any business</div>
+                        )) : (
                                 <TableRow key="loading">
                                     <TableCell />
                                     <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
                                         <div style={{ justifyContent: "center", padding: "30px" }}><CircularProgress fontSize="small" /></div>
                                     </TableCell>
                                     <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
-                                        Loading Data...
+                                       <div> Loading Data... </div>
                             </TableCell>
                                 </TableRow>
 
