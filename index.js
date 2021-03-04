@@ -19,6 +19,7 @@ admin.initializeApp({
 
 const db = admin.firestore();
 const usersdb = db.collection('users'); 
+const busdb = db.collection('business');
 // Default testing endpoint
 app.get('/', function (req, res) {
   res.send('hello world')
@@ -76,13 +77,12 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
 });
 
 app.post('/businessRegister', async (req, res) => {     //Expected request: { businessname, businessaddr, owner, businesspass} (owner: email?)
-  if(businessMap.has(req.body.businessaddr)){           //Business already registered
+  const existing_business = usersdb.where('businessaddr', '==', req.body.businessaddr).get();
+  if(!existing_business){   //Business already registered, cannot have 2 businesses on same address
     res.status(400).send("Business Already Registered")
   }
   else{
-    businessId++;
-    businessInfo = {                                    //Business Info Structure
-      "business_id": businessId,
+    const businessInfo = {                                    //Business Info Structure
       "businessname": req.body.businessname,
       "businessaddr": req.body.businessaddr,
       "businesspass": req.body.businesspass,
@@ -93,9 +93,11 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
         "role": "admin"
       }]
     };
-    businessMap.set(req.body.businessaddr, businessInfo);           //Add business data to business 'database'
-    authMap.get(req.body.owner).businesses.push(businessInfo);      //Add business data to user 'database' under businesses
-    res.status(200).json(businessInfo);
+    try {
+    await busdb.add(businessInfo);        //Add business data to business 'database'
+    } catch(error) {
+      console.log(error);
+    }
   }
 });
 
