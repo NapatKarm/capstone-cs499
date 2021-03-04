@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import validator from 'validator';
 
 class RegisterTable extends Component {
     constructor(props) {
@@ -45,15 +46,20 @@ class RegisterTable extends Component {
     }
     handleSubmit = async (submit) => {
         submit.preventDefault()
-        console.log(this.state.password, this.state.passwordConfirm, this.state.password === this.state.passwordConfirm)
-        if (this.state.password === this.state.passwordConfirm) {
-            await this.props.userSignup(this.state.firstName, this.state.lastName, this.state.email, this.state.password)
-            if(this.props.signUpError) {
-                this.setState({errorMessage:this.props.signUpError})
+        if(validator.isEmail(this.state.email)) {
+            if (this.state.password === this.state.passwordConfirm) {
+                console.log(this.state.firstName, this.state.lastName, this.state.email, this.state.password, this.state.passwordConfirm, this.state.password === this.state.passwordConfirm)
+                await this.props.userSignup(this.state.firstName, this.state.lastName, this.state.email, this.state.password)
+                if(this.props.signUpError) {
+                    this.setState({errorMessage:this.props.signUpError})
+                }
+            } else {
+                this.setState({errorMessage: "Passwords do not match"})
             }
         } else {
-            this.setState({errorMessage: "Passwords do not match"})
+            this.setState({errorMessage: "Please enter a valid Email"})
         }
+        
     }
 
     render() {
@@ -83,7 +89,6 @@ class RegisterTable extends Component {
             </div>
         )
     }
-
 }
 
 export default RegisterTable
