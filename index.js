@@ -102,9 +102,11 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
 });
 
 app.post('/businessJoin', async (req, res) => {                     //Expected request: {email, businesspass, businessaddr, role}
-  if(!businessMap.has(req.body.businessaddr)){                      //If non-existing business
-    res.status(400).send("Business group does not exist");
+  const existing_business = usersdb.where('businessaddr', '==', req.body.businessaddr).get();
+  if(!existing_business){   // Non-existing Business
+    res.status(400).send("Business Already Registered")
   }
+  
   else if(req.body.passcode != businessMap.get(req.body.businessaddr).businesspass){        //If incorrect passcode
     res.status(400).send("Incorrect Passcode");
   }
