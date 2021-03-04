@@ -28,16 +28,15 @@ app.get('/', function (req, res) {
 //Declare Test/Temp Map
 let authMap = new Map();
 let businessMap = new Map();
-let businessId = 0;
 
 // Sign-up end point
-app.post('/signup', async (req, res) => {         //Expected request: {firstname, lastname, email, password}
+app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastname, email, password}
   const existing_user = usersdb.where('email', '==', req.body.email).get();
-  if(!existing_user.empty) {                //Email is taken
+  if(!existing_user.empty) {               //Email is taken
     res.status(422).send("Username already in use");
   }
   else{
-    const userInfo = {                                  //User Info Structure
+    const userInfo = {                     //User Info Structure
       'firstname': req.body.firstname,
       'lastname': req.body.lastname,
       'email': req.body.email,
@@ -62,15 +61,8 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
       res.status(422).send("Invalid email or password");
     }
     else {
-      // res.status(200).send()
+      res.status(200).send(existing_user.data());
     }
-    // if(authMap.has(req.body.email)){                //If existing email
-    //   if(authMap.get(req.body.email).password == req.body.password){          //If correct password
-    //     resInfo = Object.assign({}, authMap.get(req.body.email));             //delete password from data
-    //     delete resInfo.password;
-    //     res.status(200).json(resInfo);              //Response: {firstname, lastname, email, businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
-    //   }
-    // }
   } catch(error) {
     console.log(error);
   }
