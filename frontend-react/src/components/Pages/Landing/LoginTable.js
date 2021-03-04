@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import validator from 'validator'; //https://www.npmjs.com/package/validator
 
 class LoginTable extends Component {
     constructor(props) {
@@ -28,12 +29,13 @@ class LoginTable extends Component {
 
     handleSubmit = async (submit) => {
         submit.preventDefault()
-        await this.props.userLogin(this.state.email, this.state.password)
-        // if (this.state.password === this.state.passwordConfirm) {
-        //     this.props.userSignup(this.state.firstName, this.state.lastName, this.state.email, this.state.password)
-        // } else {
-        //     this.setState({errorMessage: "Passwords do not match"})
-        // }
+        console.log(this.state.email, validator.isEmail(this.state.email), this.state.password)
+        if(validator.isEmail(this.state.email)) {
+            console.log("Email validated!")
+            await this.props.userLogin(this.state.email, this.state.password)
+        } else {
+            this.setState({errorMessage: "Please enter a valid Email"})
+        }
     }
 
     render() {
@@ -46,7 +48,7 @@ class LoginTable extends Component {
                             <tr><td colSpan={2}><h1 className="loginTitle">LOG IN</h1></td></tr>
                             </thead>
                             <tbody>
-                                <tr><td className="TextField">Email:</td><td className="inputFieldR"><input type="text" className="email"  onChange={this.changeEmail}></input></td></tr>
+                                <tr><td className="TextField">Email:</td><td className="inputFieldR"><input type="text" className="email"  id="Email" onChange={this.changeEmail}></input></td></tr>
                                 <tr><td className="TextField">Password:</td><td className="inputFieldR"><input type="password" className="Password" id="password" onChange={this.changePassword}></input></td></tr>
                                 <tr><td colSpan={2} className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label for='show-password'>Show Password</label></td></tr>
                                 <tr><td className="TextField">{this.state.errorMessage}</td></tr>
@@ -60,7 +62,6 @@ class LoginTable extends Component {
             </div>
         )
     }
-
 }
 
 export default LoginTable
