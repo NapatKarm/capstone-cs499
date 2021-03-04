@@ -44,7 +44,6 @@ class RegisterTable extends Component {
     changePasswordConfirm = (event) => {
         this.setState({ passwordConfirm: event.target.value })
     }
-
     handleSubmit = async (submit) => {
         submit.preventDefault()
         if(validator.isEmail(this.state.email)) {
@@ -78,7 +77,7 @@ class RegisterTable extends Component {
                                 <tr><td className="TextField">Email:</td><td className="inputFieldR"><input type="text" className="email"  onChange={this.changeEmail}></input></td></tr>
                                 <tr><td className="TextField">Password:</td><td className="inputFieldR"><input type="password" className="Password" id="password" onChange={this.changePassword}></input></td></tr>
                                 <tr><td className="TextField">Confirm password:</td><td className="inputFieldR"><input type="password" className="confirmPassword" id="confirmPassword" onChange={this.changePasswordConfirm}></input></td></tr>
-                                <tr><td colSpan={2} className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label for='show-password'>Show Password</label></td></tr>
+                                <tr><td colSpan={2} className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label htmlFor='show-password'>Show Password</label></td></tr>
                                 <tr><td className="TextField">{this.state.errorMessage}</td></tr>
                                 <tr><td colSpan={2}><button className="registerButton">Register</button></td></tr>
                                 <tr></tr>

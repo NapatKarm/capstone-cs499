@@ -1,54 +1,4 @@
- const FakeSignup = (firstName, lastName, email, password) => {
-     console.log("Received SignUp Info",firstName, lastName, email, password);
-     return "Successfully signed up";
- }
-
- const FakeLogin = (email,password) => {
-     console.log("Received Login Info",email,password);
-     let UserData = {
-         email: email,
-         grouplist: [
-             {
-                 groupname: "TEST1",
-                 groupid: "vxwa6t",
-                 groupmembers: [
-                     {
-                         email: email,
-                         role: 'Admin'
-                     },
-                     {
-                         email: "Monkey@gmail.com",
-                         role: 'Worker'
-                     },
-                     {
-                         email: "Chicken@aol.com",
-                         role: 'Worker'
-                     }
-                 ]
-             },
-             {
-                groupname: "EXAMPLE4",
-                groupid: "ICUPLO",
-                groupmembers: [
-                    {
-                        email: email,
-                        role: 'Worker'
-                    },
-                    {
-                        email: "Smurf@aol.com",
-                        role: 'Worker'
-                    },
-                    {
-                        email: "Thrower@gmail.com",
-                        role: 'Admin'
-                    }
-                ]
-            }
-         ]
-     }
-     return UserData
- }
-
+import axios from 'axios';
 
 // Action Types
 const USER_SIGNUP = "USER_SIGNUP";
@@ -91,29 +41,68 @@ const errorCatch = (err) => {
     }
 }
 
+const signUpErrorCatch = (err) => {
+    return {
+        type: ERROR,
+        payload: {
+            signUpError: err
+        }
+    }
+}
+
+const logInErrorCatch = (err) => {
+    return {
+        type: ERROR,
+        payload: {
+            logInError: err
+        }
+    }
+}
 
 // Thunks
 export const userSignupThunk = (firstName, lastName, email, password) => async (dispatch) => {
-    let res
     try {
         // This is we will send sign up info to the backend and wait for response
-        res = await FakeSignup(firstName, lastName, email, password)
-        dispatch(userSignup(res))
+        await axios.post(`https://c-vivid-backend.herokuapp.com/signup`, {
+            firstname: firstName,
+            lastname: lastName,
+            email: email,
+            password: password
+        })
+        .then(res => {
+            console.log("Response from signup",res);
+            dispatch(userSignup(res));
+        })
+        .catch(err => {
+            console.log("Error from signup",err)
+            dispatch(signUpErrorCatch(err.response.data));
+            
+        })
     }
     catch (fetchError) {
-        dispatch(errorCatch(fetchError))
+        dispatch(signUpErrorCatch(fetchError))
     }
 }
 
 export const userLoginThunk = (email,password) => async (dispatch) => {
-    let res
     try {
         // This is we will send log in info to the backend and wait for response
-        res = await FakeLogin(email,password)
-        dispatch(userLogin(res))
+        await axios.post(`https://c-vivid-backend.herokuapp.com/signin`, {
+            email: email,
+            password: password
+        })
+        .then(res => {
+            console.log("Response from login",res.data);
+            dispatch(userLogin(res.data));
+        })
+        .catch(err => {
+            console.log("Error from login",err)
+            dispatch(logInErrorCatch(err.response.data));
+            
+        })
     }
     catch (fetchError) {
-        dispatch(errorCatch(fetchError))
+        dispatch(logInErrorCatch(fetchError))
     }
 }
 

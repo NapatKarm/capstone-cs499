@@ -33,6 +33,11 @@ class LoginTable extends Component {
         if(validator.isEmail(this.state.email)) {
             console.log("Email validated!")
             await this.props.userLogin(this.state.email, this.state.password)
+            if(this.props.logInError) {
+                this.setState({
+                    errorMessage: this.props.logInError
+                })
+            }
         } else {
             this.setState({errorMessage: "Please enter a valid Email"})
         }
@@ -50,7 +55,7 @@ class LoginTable extends Component {
                             <tbody>
                                 <tr><td className="TextField">Email:</td><td className="inputFieldR"><input type="text" className="email"  id="Email" onChange={this.changeEmail}></input></td></tr>
                                 <tr><td className="TextField">Password:</td><td className="inputFieldR"><input type="password" className="Password" id="password" onChange={this.changePassword}></input></td></tr>
-                                <tr><td colSpan={2} className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label for='show-password'>Show Password</label></td></tr>
+                                <tr><td colSpan={2} className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label htmlFor='show-password'>Show Password</label></td></tr>
                                 <tr><td className="TextField">{this.state.errorMessage}</td></tr>
                                 <tr><td colSpan={2}><button className="loginButton">Log In</button></td></tr>
                                 <tr></tr>
