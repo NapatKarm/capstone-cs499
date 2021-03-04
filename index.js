@@ -61,7 +61,7 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
       res.status(422).send("Invalid email or password");
     }
     else {
-      res.status(200).send()
+      // res.status(200).send()
     }
     // if(authMap.has(req.body.email)){                //If existing email
     //   if(authMap.get(req.body.email).password == req.body.password){          //If correct password
