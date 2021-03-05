@@ -10,7 +10,8 @@ class RegisterTable extends Component {
             email: "",
             password: "",
             passwordConfirm: "",
-            errorMessage: ""
+            errorMessage: "",
+            successfulSignup: ""
         }
     }
 
@@ -52,6 +53,8 @@ class RegisterTable extends Component {
                 await this.props.userSignup(this.state.firstName, this.state.lastName, this.state.email, this.state.password)
                 if(this.props.signUpError) {
                     this.setState({errorMessage:this.props.signUpError})
+                } else {
+                    this.setState({successfulSignup: this.props.signupResult})
                 }
             } else {
                 this.setState({errorMessage: "Passwords do not match"})
@@ -65,27 +68,36 @@ class RegisterTable extends Component {
     render() {
         return (
             <div>
-                <div className='registerPage'>
-                    <form onSubmit={this.handleSubmit} className="form">
-                        <table className='registerTable'>
-                            <thead>
-                            <tr><td colSpan={2}><h1 className="registerTitle">REGISTRATION</h1></td></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td className="TextField">First Name:</td><td className="inputFieldR"><input type="text" className="firstName" onChange={this.changeFirstName} /></td></tr>
-                                <tr><td className="TextField">Last Name:</td><td className="inputFieldR"><input type="text" className="lastName"  onChange={this.changeLastName}></input></td></tr>
-                                <tr><td className="TextField">Email:</td><td className="inputFieldR"><input type="text" className="email"  onChange={this.changeEmail}></input></td></tr>
-                                <tr><td className="TextField">Password:</td><td className="inputFieldR"><input type="password" className="Password" id="password" onChange={this.changePassword}></input></td></tr>
-                                <tr><td className="TextField">Confirm password:</td><td className="inputFieldR"><input type="password" className="confirmPassword" id="confirmPassword" onChange={this.changePasswordConfirm}></input></td></tr>
-                                <tr><td colSpan={2} className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label htmlFor='show-password'>Show Password</label></td></tr>
-                                <tr><td className="TextField">{this.state.errorMessage}</td></tr>
-                                <tr><td colSpan={2}><button className="registerButton">Register</button></td></tr>
-                                <tr></tr>
-                            </tbody>
-                        </table>
-                    </form>
-                </div>
-                {/* Name (first name, last name), Email (as username), Password (ability to hide the password), Confirm password */}
+                {this.state.successfulSignup!=="" ? (
+                    <div>
+                        Registered
+                        <br/>
+                        P.S. my boss is -----
+                    </div>
+                ) : (
+                    <div>
+                        <div className='registerPage'>
+                            <form onSubmit={this.handleSubmit} className="form">
+                                <table className='registerTable'>
+                                    <thead>
+                                    <tr><td colSpan={2}><h1 className="registerTitle">REGISTRATION</h1></td></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td className="TextField">First Name:</td><td className="inputFieldR"><input type="text" className="firstName" onChange={this.changeFirstName} /></td></tr>
+                                        <tr><td className="TextField">Last Name:</td><td className="inputFieldR"><input type="text" className="lastName"  onChange={this.changeLastName}></input></td></tr>
+                                        <tr><td className="TextField">Email:</td><td className="inputFieldR"><input type="text" className="email"  onChange={this.changeEmail}></input></td></tr>
+                                        <tr><td className="TextField">Password:</td><td className="inputFieldR"><input type="password" className="Password" id="password" onChange={this.changePassword}></input></td></tr>
+                                        <tr><td className="TextField">Confirm password:</td><td className="inputFieldR"><input type="password" className="confirmPassword" id="confirmPassword" onChange={this.changePasswordConfirm}></input></td></tr>
+                                        <tr><td colSpan={2} className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label htmlFor='show-password'>Show Password</label></td></tr>
+                                        <tr><td className="TextField">{this.state.errorMessage}</td></tr>
+                                        <tr><td colSpan={2}><button className="registerButton">Register</button></td></tr>
+                                        <tr></tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                        {/* Name (first name, last name), Email (as username), Password (ability to hide the password), Confirm password */}
+                    </div>)}
             </div>
         )
     }
