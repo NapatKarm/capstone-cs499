@@ -68,6 +68,7 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
   }
 });
 
+// Needs work
 app.put('/businessRegister', async (req, res) => {     //Expected request: { businessname, businessaddr, owner, businesspass, first name, last name} (owner: email?)
   const existing_business = usersdb.where('businessaddr', '==', req.body.businessaddr).get();
   if(!existing_business) {   //Business already registered, cannot have 2 businesses on same address
