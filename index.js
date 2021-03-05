@@ -54,15 +54,22 @@ app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastn
 
 //QuerySnapshot
 // .empty = bool
-
-
+// array[QueryDocumentSnapShots]
 
 // Sign-in Endpoint
 app.post('/signin', async (req, res) => {         //Expected request: {email, password}
-  const existing_user = await usersdb.where('username', '==', req.body.email).get(); // QuerySnapshot
-  // For security reasons, you do not disclose whether email or password is invalid
+  const existing_user = await usersdb.where('email', '==', req.body.email).get(); // QuerySnapshot
+  // var test = existing_user.docs;
+  // test.forEach( docs => {
+  //   console.log(docs.id, docs.data());
+  //   res.status(200).send('yes');
+  // })
+  //For security reasons, you do not disclose whether email or password is invalid
   try {
-    if(!existing_user.empty || existing_user.get('email') != req.body.email || existing_user.get('password') !=  req.body.password) {  // Compares username and passwords to queried document
+    if(!existing_user.empty) { 
+      res.status(422).send('Invalid email or password');
+    }
+    else if (existing_user.empty && (existing_user.docs.data[0].email != req.body.email) || (existing_user.docs[0].password !=  req.body.password)) {
       res.status(422).send('Invalid email or password');
     }
     else {
