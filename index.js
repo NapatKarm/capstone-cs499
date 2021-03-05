@@ -59,21 +59,17 @@ app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastn
 // Sign-in Endpoint
 app.post('/signin', async (req, res) => {         //Expected request: {email, password}
   const existing_user = await usersdb.where('email', '==', req.body.email).get(); // QuerySnapshot
-  // var test = existing_user.docs;
-  // test.forEach( docs => {
-  //   console.log(docs.id, docs.data());
-  //   res.status(200).send('yes');
-  // })
   //For security reasons, you do not disclose whether email or password is invalid
   try {
-    if(!existing_user.empty) { 
-      res.status(422).send('Invalid email or password');
+    if(existing_user.empty) { 
+      res.status(422).send('Empty');
     }
-    else if (existing_user.empty && (existing_user.docs.data[0].email != req.body.email) || (existing_user.docs[0].password !=  req.body.password)) {
+    else if (!existing_user.empty && (existing_user.docs[0].get('email') != req.body.email) || (existing_user.docs[0].get('password') !=  req.body.password)) {
       res.status(422).send('Invalid email or password');
     }
     else {
-      res.status(200).send(existing_user.data());
+      console.log('Successful Log In')
+      res.status(200).send(existing_user.docs[0].data());
     }
   } catch(error) {
     console.log(error);
