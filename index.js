@@ -126,5 +126,22 @@ app.post('/businessJoin', async (req, res) => {                    //Expected re
   }
 });
 
+//Refresh
+app.get('/getBusinessData', function (req, res) {                   //Expected Request {email, token}
+  if(authMap.get(req.body.email).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    resInfo = Object.assign({}, authMap.get(req.body.email));
+    delete resInfo.firstname;
+    delete resInfo.lastname;
+    delete resInfo.email;
+    delete resInfo.password;
+    delete resInfo.token;
+
+    res.status(200).json(resInfo);                                  //Response: {businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
+  }
+});
+
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`App is listening on Port ${port}`));
