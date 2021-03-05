@@ -43,7 +43,7 @@ class LandingPage extends Component {
                             </div>
                         </div>
                         <div className="rightSide">
-                            {this.state.rightState==="none" ? ("") : (<div>{this.state.rightState==="register" ? (<RegisterTable signUpError={this.props.signUpError} userSignup={this.props.userSignup}/>) : (<LoginTable logInError={this.props.logInError} userLogin={this.props.userLogin}/>)}</div>)}
+                            {this.state.rightState==="none" ? ("") : (<div>{this.state.rightState==="register" ? (<RegisterTable signUpError={this.props.signUpError} userSignup={this.props.userSignup} signupResult={this.props.signupResult}/>) : (<LoginTable logInError={this.props.logInError} userLogin={this.props.userLogin}/>)}</div>)}
                         </div>
                     </div>
                     <footer>
