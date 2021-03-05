@@ -1,126 +1,128 @@
 // require('dotenv').config();
 const express = require('express');
-
+const bodyParser = require('body-parser')
 const app = express();
 const cors = require('cors');
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Connect to FireBase
-var admin = require("firebase-admin");
-
-var serviceAccount = require("./service-account.json");
+var admin = require('firebase-admin');
+var serviceAccount = require('./service-account.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://c-vivid-default-rtdb.firebaseio.com"
+  databaseURL: 'https://c-vivid-default-rtdb.firebaseio.com'
 });
 
+const db = admin.firestore();
+// db.settings({ ignoreUndefinedProperties: true })
+const usersdb = db.collection('users'); 
+const busdb = db.collection('business');
+// Default testing endpoint
 app.get('/', function (req, res) {
-  res.send('hello world')
+  console.log(req.body);
+  res.send('hello world');
 });
 
-//Declare Test/Temp Map
-let authMap = new Map();
 
-let businessMap = new Map();
-let businessId = 0;
-
-app.post('/signup', async (req, res) => {         //Expected request: {firstname, lastname, email, password}
-  if(authMap.has(req.body.email)){                //Email is taken
-    res.status(422).send("Username already in use");
+// Sign-up end point
+app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastname, email, password}
+  var existing_user = await usersdb.where('email', '==', req.body.email).get();
+  if(!existing_user.empty) {               //Email is taken
+    res.status(422).send('Email already in use');
   }
   else{
-    userInfo = {                                  //User Info Structure
-      "firstname": req.body.firstname,
-      "lastname": req.body.lastname,
-      "email": req.body.email,
-      "password": req.body.password,
-      "businesses": []
+    const userInfo = {                     //User Info Structure
+      'firstname': req.body.firstname,
+      'lastname': req.body.lastname,
+      'email': req.body.email,
+      'password': req.body.password,
+      'businesses': []
+    };
+    try {
+      await usersdb.add(userInfo);
+      res.status(200).send('Successfully registered');
+    } catch(error){
+      console.log(error);
     }
-    authMap.set(req.body.email, userInfo);        //Add user info to 'database'
-    res.status(200).send("Successfully registered");
   }
 });
 
+//QuerySnapshot
+// .empty = bool
+// array[QueryDocumentSnapShots]
+
+// Sign-in Endpoint
 app.post('/signin', async (req, res) => {         //Expected request: {email, password}
-  if(authMap.has(req.body.email)){                //If existing email
-    if(authMap.get(req.body.email).password == req.body.password){          //If correct password
-      authMap.get(req.body.email).token = uuidv4();
-      resInfo = Object.assign({}, authMap.get(req.body.email));             //delete password from data
-      delete resInfo.password;
-      delete resInfo.businesses;
-
-      res.status(200).json(resInfo);              //Response: {firstname, lastname, email, businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
+  const existing_user = await usersdb.where('email', '==', req.body.email).get(); // QuerySnapshot
+  //For security reasons, you do not disclose whether email or password is invalid
+  try {
+    if(existing_user.empty) { 
+      res.status(422).send('Empty');
     }
-    else{                                         //If Incorrect Password
-      res.status(401).send("Incorrect Password");           
+    else if (!existing_user.empty && (existing_user.docs[0].get('email') != req.body.email) || (existing_user.docs[0].get('password') !=  req.body.password)) {
+      res.status(422).send('Invalid email or password');
     }
-  }
-  else{                                           //If non-existing email
-    res.status(404).send("Email Not Found");
+    else {
+      console.log('Successful Log In')
+      res.status(200).send(existing_user.docs[0].data());
+    }
+  } catch(error) {
+    console.log(error);
   }
 });
 
-app.post('/businessRegister', async (req, res) => {     //Expected request: { businessname, businessaddr, owner, businesspass} (owner: email?)
-  if(businessMap.has(req.body.businessaddr)){           //Business already registered
-    res.status(400).send("Business Already Registered")
+// Needs work
+app.put('/businessRegister', async (req, res) => {     //Expected request: { businessname, businessaddr, owner, businesspass, first name, last name} (owner: email?)
+  const existing_business = usersdb.where('businessaddr', '==', req.body.businessaddr).get();
+  if(!existing_business) {   //Business already registered, cannot have 2 businesses on same address
+    res.status(400).send('Business Already Registered');
   }
-  else{
-    businessId++;
-    businessInfo = {                                    //Business Info Structure
-      "business_id": businessId,
-      "businessname": req.body.businessname,
-      "businessaddr": req.body.businessaddr,
-      "businesspass": req.body.businesspass,
-      "members": [{                                     //Member Info Structure
-        "firstname": authMap.get(req.body.owner).firstname,
-        "lastname": authMap.get(req.body.owner).lastname,
-        "email": req.body.owner,
-        "role": "admin"
+  else {
+    const businessInfo = {                       //Business Info Structure
+      'businessname': req.body.businessname,
+      'businessaddr': req.body.businessaddr,
+      'businesspass': req.body.businesspass,
+      'members': [{                              //Member Info Structure
+        'firstname': req.body.firstname,
+        'lastname': req.body.lastname,
+        'email': req.body.owner,
+        'role': 'admin'
       }]
     };
-    businessMap.set(req.body.business_id, businessInfo);           //Add business data to business 'database'
-    authMap.get(req.body.owner).businesses.push(businessInfo);      //Add business data to user 'database' under businesses
-    res.status(200).json(businessInfo);
+    try {
+      await busdb.add(businessInfo);       
+    } catch(error) {
+      console.log(error);
+    }
   }
 });
 
-app.post('/businessJoin', async (req, res) => {                     //Expected request: {email, businesspass, business_id, role}
-  if(!businessMap.has(req.body.business_id)){                      //If non-existing business
-    res.status(400).send("Business group does not exist");
+app.post('/businessJoin', async (req, res) => {                    //Expected request: {email, businesspass, businessaddr}
+  const existing_business = usersdb.where('businesspass', '==', req.body.businesspass).get();
+  if (!existing_business) {                                       // Non-existing Business, false = empty document
+    res.status(400).send('Business does not exist');
   }
-  else if(req.body.passcode != businessMap.get(req.body.business_id).businesspass){        //If incorrect passcode
-    res.status(400).send("Incorrect Passcode");
-  }
-  else{                                                             //If existing business and correct passcode
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
-    userInfo = authMap.get(req.body.email);                         //Get data from user 'database'
-
-    alreadyInBusiness = false;
-    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is already registered under the business
-      if(userInfo.email == businessInfo.members[i].email){
-        alreadyInBusiness = true;
-        break;
-      }
+  for (let i = 0; i < existing_business.members.length; i++) {  // Check if member already exists in a business
+    if (existing_business.members[i].email == req.body.email) {
+      res.status(422).send('User already is a member');
     }
-
-    if(alreadyInBusiness == true){                                  //If user has already been registered
-      res.status(400).send("You have already been registered")
-    }
-    else{                                                           //If user has not been registered
-      businessInfo.members.push({                                   //Add user as member under the business
-        "firstname": userInfo.firstname,
-        "lastname": userInfo.lastname,
-        "email": req.body.email,
-        "role": req.body.role
-      });
-      userInfo.businesses.push(businessInfo);                       //Add business data to user 'database' under businesses
-
-      res.status(200).send("Successfully Joined");
-    }
+  }                                                                                                                
+  const new_member = ({                                   //Add user as member under the business
+    'firstname': req.body.firstname,
+    'lastname': req.body.lastname,
+    'email': req.body.email,
+    'role': 'employee'
+  });
+  try {
+    // 
+    res.status(200).send('Successfully Joined'); 
+  } catch (error) {
+    console.log(error);
   }
 });
 
