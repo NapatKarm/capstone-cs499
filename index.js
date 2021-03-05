@@ -48,8 +48,10 @@ app.post('/signup', async (req, res) => {         //Expected request: {firstname
 app.post('/signin', async (req, res) => {         //Expected request: {email, password}
   if(authMap.has(req.body.email)){                //If existing email
     if(authMap.get(req.body.email).password == req.body.password){          //If correct password
+      authMap.get(req.body.email).token = uuidv4();
       resInfo = Object.assign({}, authMap.get(req.body.email));             //delete password from data
       delete resInfo.password;
+      delete resInfo.businesses;
 
       res.status(200).json(resInfo);              //Response: {firstname, lastname, email, businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
     }
@@ -86,15 +88,15 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
   }
 });
 
-app.post('/businessJoin', async (req, res) => {                     //Expected request: {email, businesspass, businessaddr, role}
-  if(!businessMap.has(req.body.businessaddr)){                      //If non-existing business
+app.post('/businessJoin', async (req, res) => {                     //Expected request: {email, businesspass, business_id, role}
+  if(!businessMap.has(req.body.business_id)){                      //If non-existing business
     res.status(400).send("Business group does not exist");
   }
-  else if(req.body.passcode != businessMap.get(req.body.businessaddr).businesspass){        //If incorrect passcode
+  else if(req.body.passcode != businessMap.get(req.body.business_id).businesspass){        //If incorrect passcode
     res.status(400).send("Incorrect Passcode");
   }
   else{                                                             //If existing business and correct passcode
-    businessInfo = businessMap.get(req.body.businessaddr);          //Get data from business 'database'
+    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
     userInfo = authMap.get(req.body.email);                         //Get data from user 'database'
 
     alreadyInBusiness = false;
@@ -119,6 +121,23 @@ app.post('/businessJoin', async (req, res) => {                     //Expected r
 
       res.status(200).send("Successfully Joined");
     }
+  }
+});
+
+//Refresh
+app.get('/getBusinessData', function (req, res) {                   //Expected Request {email, token}
+  if(authMap.get(req.body.email).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    resInfo = Object.assign({}, authMap.get(req.body.email));
+    delete resInfo.firstname;
+    delete resInfo.lastname;
+    delete resInfo.email;
+    delete resInfo.password;
+    delete resInfo.token;
+
+    res.status(200).json(resInfo);                                  //Response: {businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
   }
 });
 
