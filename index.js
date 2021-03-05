@@ -82,7 +82,7 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
         "role": "admin"
       }]
     };
-    businessMap.set(req.body.businessaddr, businessInfo);           //Add business data to business 'database'
+    businessMap.set(req.body.business_id, businessInfo);           //Add business data to business 'database'
     authMap.get(req.body.owner).businesses.push(businessInfo);      //Add business data to user 'database' under businesses
     res.status(200).json(businessInfo);
   }
