@@ -1,12 +1,13 @@
 // require('dotenv').config();
 const express = require('express');
-
+const bodyParser = require('body-parser')
 const app = express();
 const cors = require('cors');
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Connect to FireBase
 var admin = require('firebase-admin');
@@ -18,22 +19,21 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
+// db.settings({ ignoreUndefinedProperties: true })
 const usersdb = db.collection('users'); 
 const busdb = db.collection('business');
 // Default testing endpoint
 app.get('/', function (req, res) {
-  res.send('hello world')
+  console.log(req.body);
+  res.send('hello world');
 });
 
-//Declare Test/Temp Map
-let authMap = new Map();
-let businessMap = new Map();
 
 // Sign-up end point
 app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastname, email, password}
-  const existing_user = usersdb.where('email', '==', req.body.email).get();
+  var existing_user = await usersdb.where('email', '==', req.body.email).get();
   if(!existing_user.empty) {               //Email is taken
-    res.status(422).send('Username already in use');
+    res.status(422).send('Email already in use');
   }
   else{
     const userInfo = {                     //User Info Structure
@@ -52,9 +52,14 @@ app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastn
   }
 });
 
+//QuerySnapshot
+// .empty = bool
+
+
+
 // Sign-in Endpoint
 app.post('/signin', async (req, res) => {         //Expected request: {email, password}
-  const existing_user = usersdb.where('username', '==', req.body.email).get();
+  const existing_user = await usersdb.where('username', '==', req.body.email).get(); // QuerySnapshot
   // For security reasons, you do not disclose whether email or password is invalid
   try {
     if(!existing_user.empty || existing_user.get('email') != req.body.email || existing_user.get('password') !=  req.body.password) {  // Compares username and passwords to queried document
@@ -94,7 +99,7 @@ app.put('/businessRegister', async (req, res) => {     //Expected request: { bus
   }
 });
 
-app.post('/businessJoin', async (req, res) => {                     //Expected request: {email, businesspass, businessaddr}
+app.post('/businessJoin', async (req, res) => {                    //Expected request: {email, businesspass, businessaddr}
   const existing_business = usersdb.where('businesspass', '==', req.body.businesspass).get();
   if (!existing_business) {                                       // Non-existing Business, false = empty document
     res.status(400).send('Business does not exist');
@@ -111,11 +116,11 @@ app.post('/businessJoin', async (req, res) => {                     //Expected r
     'role': 'employee'
   });
   try {
+    // 
     res.status(200).send('Successfully Joined'); 
   } catch (error) {
     console.log(error);
   }
-  
 });
 
 const port = process.env.PORT || 5000;
