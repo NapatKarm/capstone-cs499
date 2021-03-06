@@ -7,6 +7,7 @@ import { userLoginThunk, userLogoutThunk, userSignupThunk } from "../../store/ut
 import TestLanding from '../Pages/TestLanding/TestLandingPage';
 import LandingPage from '../Pages/Landing/LandingPage';
 import HomePage from '../Pages/Home/HomePage';
+import CounterPage from  '../Pages/Counter/CounterPage';
 
 
 class RoutesView extends Component {
@@ -15,11 +16,13 @@ class RoutesView extends Component {
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
         const HomePageComponent = () => (<HomePage userData={this.props.userData}/>)
+        const CounterPageComponent = () => (<CounterPage userData={this.props.userData}/>)
         return (
             <Router>
                 <Switch>
                     <Route exact path="/test" render={TestLandingComponent} />
                     <Route exact path="/" render={LandingPageComponent} />
+                    <Route exact path="/counter" render={CounterPageComponent} />
                     {   loggedIn && (
                             <Switch>
                                 <Route exact path="/home" render={HomePageComponent} />
