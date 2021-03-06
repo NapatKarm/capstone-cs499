@@ -16,6 +16,7 @@ import BusinessDetailsPage from '../Pages/BusinessDetails/BusinessDetailsPage'
 class RoutesView extends Component {
     render() {
         const {loggedIn} = this.props
+        const {singleView} = this.props
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
         const CounterPageComponent = () => (<CounterPage userData={this.props.userData}/>)
@@ -30,7 +31,11 @@ class RoutesView extends Component {
                     {   loggedIn && (
                             <Switch>
                                 <Route exact path="/home" render={HomePageComponent} />
-                                <Route exact path="/details" render={BusinessDetailsComponent}/>
+                                { singleView && (
+                                    <Switch>
+                                    <Route exact path="/details" render={BusinessDetailsComponent}/>
+                                    </Switch>
+                                )}
                             </Switch>
                         )
                     }   
@@ -47,6 +52,7 @@ const mapState = (state) => {
         signupResult: state.userinfo.SignupResult,
         userinfoError: state.ErrorInfo,
         loggedIn: !!state.userinfo.UserData,
+        singleView: !!state.businessdetails.bDetails,
         signUpError: state.userinfo.signUpError,
         logInError: state.userinfo.logInError,
         businessData: state.businessinfo.Businesses,
