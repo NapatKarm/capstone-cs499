@@ -127,7 +127,7 @@ app.post('/businessJoin', async (req, res) => {                    //Expected re
 });
 
 //Refresh
-app.get('/getBusinessData', function (req, res) {                   //Expected Request {email, token}
+app.post('/getBusinessData', async (req, res) => {                   //Expected Request {email, token}
   if(authMap.get(req.body.email).token != req.body.token){
     res.status(400).send("Incorrect Token");
   }
