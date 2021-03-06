@@ -37,6 +37,7 @@ class HomePage extends Component {
     logout = () => {
         this.props.bUserLogout()
         this.props.userLogout()
+        this.props.history.push("/")
     }
     businessUpdate = async () => {
         await this.props.bGet(this.state.userData.email,this.state.userData.token) 
@@ -115,7 +116,7 @@ class HomePage extends Component {
                         <Button onClick={this.startBReg}>Register business</Button><Button onClick={this.startBJoin}>Join Business</Button><Button onClick={this.logout}>Logout</Button>
                     </div>
                     <div className="BusinessTable">
-                        <ManagedBusinessTable businessList={this.state.businessList} />
+                        <ManagedBusinessTable history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
                     </div>
                     <div className="BusinessRegisterComponent">
                         <Dialog open={this.state.registeringBusiness} onClose={this.cancelBReg} aria-labelledby="form-dialog-title">
