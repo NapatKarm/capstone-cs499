@@ -23,14 +23,17 @@ class HomePage extends Component {
             bPass: ""
         }
     }
-    componentDidMount = () => {
+    componentDidMount = async () => {
         this.setState({
             userData: this.props.userData
         }, () => {
+            console.log("USER INFOIOIOOJP",this.state.userData)
             if (this.state.userData) {
-                this.setState({
-                    businessList: this.state.userData.businesses
-                })
+                
+                    this.props.bGet(this.state.userData.email,this.state.userData.token).then(
+                        this.setState({businessList:this.props.businessData.businesses}),
+                        console.log("BUSINESS DATA",this.props.businessData)
+                        )
             }
         })
     }
@@ -55,6 +58,7 @@ class HomePage extends Component {
     }
     regBusiness = () => {
         console.log(this.state,"Look at reg info!")
+        this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass)
     }
         render() {
         return (
