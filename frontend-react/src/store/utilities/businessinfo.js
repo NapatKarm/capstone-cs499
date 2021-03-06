@@ -97,7 +97,7 @@ export const bJoinThunk = (email,businessid,businesspass) => async (dispatch) =>
             email: email,
             business_id: parseInt(businessid),
             businesspass: businesspass,
-            role: "Employee"
+            role: "employee"
         })
         .then(res => {
             console.log("Response from Business join",res.data);
