@@ -3,12 +3,14 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
 import { userLoginThunk, userLogoutThunk, userSignupThunk } from "../../store/utilities/userinfo";
 import { bRegisterThunk, bGetThunk, bJoinThunk, bUserLogoutThunk } from "../../store/utilities/businessinfo"
+import { bViewThunk, bClearThunk } from "../../store/utilities/businessdetails"
 
 //Page Imports
 import TestLanding from '../Pages/TestLanding/TestLandingPage';
 import LandingPage from '../Pages/Landing/LandingPage';
 import HomePage from '../Pages/Home/HomePage';
 import CounterPage from  '../Pages/Counter/CounterPage';
+import BusinessDetailsPage from '../Pages/BusinessDetails/BusinessDetailsPage'
 
 
 class RoutesView extends Component {
@@ -17,7 +19,8 @@ class RoutesView extends Component {
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
         const CounterPageComponent = () => (<CounterPage userData={this.props.userData}/>)
-        const HomePageComponent = () => (<HomePage userLogout={this.props.userLogout} bUserLogOut={this.props.bUserLogout}businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
+        const HomePageComponent = () => (<HomePage bView={this.props.bView} userLogout={this.props.userLogout} bUserLogOut={this.props.bUserLogout}businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
+        const BusinessDetailsComponent = () => (<BusinessDetailsPage bDetails={this.props.bDetails} bClear={this.props.bClear}/>)
         return (
             <Router>
                 <Switch>
@@ -27,6 +30,7 @@ class RoutesView extends Component {
                     {   loggedIn && (
                             <Switch>
                                 <Route exact path="/home" render={HomePageComponent} />
+                                <Route exact path="/details" render={BusinessDetailsComponent}/>
                             </Switch>
                         )
                     }   
@@ -47,7 +51,8 @@ const mapState = (state) => {
         logInError: state.userinfo.logInError,
         businessData: state.businessinfo.Businesses,
         bRegError: state.businessinfo.bRegError,
-        bJoinError: state.businessinfo.BJoinError
+        bJoinError: state.businessinfo.BJoinError,
+        bDetails: state.businessDetails.bDetails
     }
 }
 
@@ -59,7 +64,9 @@ const mapDispatch = (dispatch) => {
         bUserLogout: () => dispatch(bUserLogoutThunk()),
         bGet: (email,token) => dispatch(bGetThunk(email,token)),
         bJoin: (email,businessid,businesspass) => dispatch(bJoinThunk(email,businessid,businesspass)),
-        bRegister: (bname, baddress, email, businesspass) => dispatch(bRegisterThunk(bname, baddress, email, businesspass))
+        bRegister: (bname, baddress, email, businesspass) => dispatch(bRegisterThunk(bname, baddress, email, businesspass)),
+        bView: (business) => dispatch(bViewThunk(business)),
+        bClear: ()=> dispatch(bClearTHunk(business))
     }
 }
 
