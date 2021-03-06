@@ -128,7 +128,7 @@ class CounterPage extends Component {
 
     render() {
         return(
-            <div className="body">
+            <div className="body-counter">
                 <div className="navBar">
                     <AppBar position="static" style={{backgroundColor: "#8a0602"}}>
                         <Toolbar>
