@@ -18,24 +18,31 @@ class HomePage extends Component {
             userData: {},
             businessList: [],
             registeringBusiness: false,
+            joiningBusiness: false,
             bName: "",
             bAddress: "",
-            bPass: ""
+            bPass: "",
+            bID: "",
+            joinError: ""
         }
     }
     componentDidMount = async () => {
         this.setState({
             userData: this.props.userData
         }, () => {
-            console.log("USER INFOIOIOOJP",this.state.userData)
             if (this.state.userData) {
-                this.props.bGet(this.state.userData.email,this.state.userData.token) 
-                if(this.props.businessData) {
-                    this.setState({businessList:this.props.businessData.businesses})
-                    console.log("BUSINESS DATA",this.props.businessData)
-                }
-            }
-        })
+                this.businessUpdate()
+        }})
+    }
+    logout = () => {
+        this.props.bUserLogout()
+        this.props.userLogout()
+    }
+    businessUpdate = async () => {
+        await this.props.bGet(this.state.userData.email,this.state.userData.token) 
+        if(this.props.businessData) {
+            this.setState({businessList:this.props.businessData.businesses, registeringBusiness:false},()=>(console.log("BUSINESS DATAX",this.props.businessData)))    
+        }
     }
     cancelBReg = () => {
         this.setState({
@@ -44,11 +51,33 @@ class HomePage extends Component {
     }
     startBReg = () => {
         this.setState({
-            registeringBusiness: true
+            registeringBusiness: true,
+            bName: "",
+            bAddress: "",
+            bPass: "",
+            bID: ""
+        })
+    }
+    cancelBJoin = () => {
+        this.setState({
+            joiningBusiness: false,
+            joinError: ""
+        })
+    }
+    startBJoin = () => {
+        this.setState({
+            joiningBusiness: true,
+            bName: "",
+            bAddress: "",
+            bPass: "",
+            bID: ""
         })
     }
     changeBName = (event) => {
         this.setState({ bName: event.target.value })
+    }
+    changeBID = (event) => {
+        this.setState({ bID: event.target.value })
     }
     changeBAddress = (event) => {
         this.setState({ bAddress: event.target.value })
@@ -56,9 +85,26 @@ class HomePage extends Component {
     changeBPass = (event) => {
         this.setState({ bPass: event.target.value })
     }
-    regBusiness = () => {
+    regBusiness = async () => {
         console.log(this.state,"Look at reg info!")
-        this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass)
+        await this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass)
+        await this.props.bGet(this.state.userData.email,this.state.userData.token) 
+        if(this.props.businessData) {
+            this.setState({businessList:this.props.businessData.businesses, registeringBusiness:false},()=>(console.log(this.props.businessData)))    
+        }
+    }
+    joinBusiness = async () => {
+        await this.props.bJoin(this.state.userData.email,this.state.bID,this.state.bPass)
+        if(this.props.bJoinError){
+            
+            this.setState({joinError: this.props.bJoinError},()=>(console.log("This should have ran",this.state.joinError)))
+        }
+        else {
+            await this.props.bGet(this.state.userData.email,this.state.userData.token) 
+            if(this.props.businessData) {
+                this.setState({businessList:this.props.businessData.businesses, joiningBusiness: false},()=>(console.log(this.props.businessData)))    
+            }
+        } 
     }
         render() {
         return (
@@ -66,7 +112,7 @@ class HomePage extends Component {
                 <div>Top Nav</div>
                 <div>
                     <div>
-                        <Button onClick={this.startBReg}>Register business</Button><Button>Join Business</Button>
+                        <Button onClick={this.startBReg}>Register business</Button><Button onClick={this.startBJoin}>Join Business</Button><Button onClick={this.logout}>Logout</Button>
                     </div>
                     <div className="BusinessTable">
                         <ManagedBusinessTable businessList={this.state.businessList} />
@@ -76,7 +122,7 @@ class HomePage extends Component {
                             <DialogTitle id="form-dialog-title">Business Registration</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    Fill this out and bam you business hummie
+                                    Fill this out and bam you CREATE business hummie
                                  </DialogContentText>
                                 <TextField
                                     autoFocus
@@ -112,6 +158,43 @@ class HomePage extends Component {
                                 </Button>
                                 <Button onClick={this.regBusiness} color="primary">
                                     Register
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                    </div>
+                    <div className="BusinessJoinComponent">
+                        <Dialog open={this.state.joiningBusiness} onClose={this.cancelBJoin} aria-labelledby="form-dialog-title">
+                            <DialogTitle id="form-dialog-title">Joining a Business</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText>
+                                    Fill this out and bam you JOIN business hummie
+                                 </DialogContentText>
+                                <TextField
+                                    autoFocus
+                                    margin="dense"
+                                    id="BID"
+                                    label="Business ID"
+                                    type="string"
+                                    onChange={this.changeBID}
+                                    fullWidth
+                                />
+                                <TextField
+                                    autoFocus
+                                    margin="dense"
+                                    id="BCode"
+                                    label="Business Passcode"
+                                    type="string"
+                                    onChange={this.changeBPass}
+                                    fullWidth
+                                />
+                                {this.state.joinError}
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={this.cancelBJoin} color="primary">
+                                    Cancel
+                                </Button>
+                                <Button onClick={this.joinBusiness} color="primary">
+                                    Join
                                 </Button>
                             </DialogActions>
                         </Dialog>
