@@ -17,7 +17,7 @@ class RoutesView extends Component {
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
         const CounterPageComponent = () => (<CounterPage userData={this.props.userData}/>)
-        const HomePageComponent = () => (<HomePage businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bUserLogout={this.props.bUserLogout}/>)
+        const HomePageComponent = () => (<HomePage userLogout={this.props.userLogout} bUserLogOut={this.props.bUserLogout}businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
         return (
             <Router>
                 <Switch>
@@ -45,7 +45,9 @@ const mapState = (state) => {
         loggedIn: !!state.userinfo.UserData,
         signUpError: state.userinfo.signUpError,
         logInError: state.userinfo.logInError,
-        businessData: state.businessinfo.Businesses
+        businessData: state.businessinfo.Businesses,
+        bRegError: state.businessinfo.bRegError,
+        bJoinError: state.businessinfo.BJoinError
     }
 }
 

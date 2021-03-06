@@ -6,7 +6,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import StarsIcon from '@material-ui/icons/Stars';
+import StarBorderIcon from '@material-ui/icons/StarBorder';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -36,7 +36,7 @@ class ManagedBusinessTable extends Component {
                             this.props.businessList.length > 0 ? (this.props.businessList.map((business) => (
                             <TableRow key={business.business_id}>
                                 <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
-                                    <StarsIcon fontSize="small" style={{ color: cyan[500] }} />
+                                    <StarBorderIcon fontSize="medium" style={{ color: '#8a0602' }} />
                                 </TableCell>
                                 <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
                                     {business.businessname}
@@ -44,17 +44,17 @@ class ManagedBusinessTable extends Component {
                                 <TableCell align="center">
                                     <div>
                                         <div>
-                                            xx
+                                            {business.business_id}
                                         </div>
                                         <div>
-                                            Current Visitors
+                                            BusinessID
                                         </div>
                                     </div>
                                 </TableCell>
                                 <TableCell align="center">
                                     <div>
                                         <div>
-                                            xx
+                                            {business.businessaddr}
                                         </div>
                                         <div>
                                             Location
@@ -62,7 +62,15 @@ class ManagedBusinessTable extends Component {
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <Button>Track</Button>
+                                    {business.businessOpened ? 
+                                    (
+                                        <Button>Track</Button>
+                                    ):
+                                    (
+                                        <Button disabled>Closed</Button>
+                                    )
+                                    }
+                                    
                                 </TableCell>
                                 <TableCell>
                                     <Button>Details</Button>
