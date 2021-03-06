@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
 import { userLoginThunk, userLogoutThunk, userSignupThunk } from "../../store/utilities/userinfo";
+import { bRegisterThunk, bGetThunk, bJoinThunk, bUserLogoutThunk } from "../../store/utilities/businessinfo"
 
 //Page Imports
 import TestLanding from '../Pages/TestLanding/TestLandingPage';
@@ -14,7 +15,7 @@ class RoutesView extends Component {
         const {loggedIn} = this.props
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
-        const HomePageComponent = () => (<HomePage userData={this.props.userData}/>)
+        const HomePageComponent = () => (<HomePage businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bUserLogout={this.props.bUserLogout}/>)
         return (
             <Router>
                 <Switch>
@@ -40,7 +41,8 @@ const mapState = (state) => {
         userinfoError: state.ErrorInfo,
         loggedIn: !!state.userinfo.UserData,
         signUpError: state.userinfo.signUpError,
-        logInError: state.userinfo.logInError
+        logInError: state.userinfo.logInError,
+        businessData: state.businessinfo.Businesses
     }
 }
 
@@ -48,7 +50,11 @@ const mapDispatch = (dispatch) => {
     return {
         userSignup: (firstName, lastName, email, password) => dispatch(userSignupThunk(firstName, lastName, email, password)),
         userLogin: (email, password) => dispatch(userLoginThunk(email,password)),
-        userLogout: () => dispatch(userLogoutThunk())
+        userLogout: () => dispatch(userLogoutThunk()),
+        bUserLogout: () => dispatch(bUserLogoutThunk()),
+        bGet: (email,token) => dispatch(bGetThunk(email,token)),
+        bJoin: (email,businessid,businesspass) => dispatch(bJoinThunk(email,businessid,businesspass)),
+        bRegister: (bname, baddress, email, businesspass) => dispatch(bRegisterThunk(bname, baddress, email, businesspass))
     }
 }
 
