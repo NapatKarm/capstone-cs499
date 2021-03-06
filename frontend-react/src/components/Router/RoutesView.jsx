@@ -19,7 +19,7 @@ class RoutesView extends Component {
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
         const CounterPageComponent = () => (<CounterPage userData={this.props.userData}/>)
-        const HomePageComponent = () => (<HomePage bView={this.props.bView} userLogout={this.props.userLogout} bUserLogOut={this.props.bUserLogout}businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
+        const HomePageComponent = () => (<HomePage bDetails={this.props.bDetails} bView={this.props.bView} userLogout={this.props.userLogout} bUserLogOut={this.props.bUserLogout}businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
         const BusinessDetailsComponent = () => (<BusinessDetailsPage bDetails={this.props.bDetails} bClear={this.props.bClear}/>)
         return (
             <Router>
@@ -52,7 +52,7 @@ const mapState = (state) => {
         businessData: state.businessinfo.Businesses,
         bRegError: state.businessinfo.bRegError,
         bJoinError: state.businessinfo.BJoinError,
-        bDetails: state.businessDetails.bDetails
+        bDetails: state.businessdetails.bDetails
     }
 }
 
@@ -66,7 +66,7 @@ const mapDispatch = (dispatch) => {
         bJoin: (email,businessid,businesspass) => dispatch(bJoinThunk(email,businessid,businesspass)),
         bRegister: (bname, baddress, email, businesspass) => dispatch(bRegisterThunk(bname, baddress, email, businesspass)),
         bView: (business) => dispatch(bViewThunk(business)),
-        bClear: ()=> dispatch(bClearTHunk(business))
+        bClear: ()=> dispatch(bClearThunk())
     }
 }
 

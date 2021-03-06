@@ -22,6 +22,12 @@ class ManagedBusinessTable extends Component {
             businessList: this.props.businessList,
         })
     }
+    viewDetails = async (information) => {
+        await this.props.bView(information)
+        if(this.props.bDetails) {
+            this.props.history.push("/details")
+        }
+    }
     render() {
         return (
             <TableContainer component={Paper}>
@@ -73,7 +79,7 @@ class ManagedBusinessTable extends Component {
                                     
                                 </TableCell>
                                 <TableCell>
-                                    <Button>Details</Button>
+                                    <Button onClick={()=>this.viewDetails(business)}>Details</Button>
                                 </TableCell>
                             </TableRow>
                         ))):(
