@@ -31,7 +31,8 @@ app.get('/', function (req, res) {
 
 // Sign-up end point
 app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastname, email, password}
-  var existing_user = await usersdb.where('email', '==', req.body.email).get();
+  let toLowerEmail = req.body.email.toLowerCase();
+  var existing_user = await usersdb.where('email', '==', toLowerEmail).get();
   if(!existing_user.empty) {               //Email is taken
     res.status(422).send('Email already in use');
   }
@@ -39,7 +40,7 @@ app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastn
     const userInfo = {                     //User Info Structure
       'firstname': req.body.firstname,
       'lastname': req.body.lastname,
-      'email': req.body.email,
+      'email': toLowerEmail,
       'password': req.body.password,
       'businesses': []
     };
@@ -58,13 +59,14 @@ app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastn
 
 // Sign-in Endpoint
 app.post('/signin', async (req, res) => {         //Expected request: {email, password}
-  const existing_user = await usersdb.where('email', '==', req.body.email).get(); // QuerySnapshot
+  let toLowerEmail = req.body.email.toLowerCase();
+  const existing_user = await usersdb.where('email', '==', toLowerEmail).get(); // QuerySnapshot
   //For security reasons, you do not disclose whether email or password is invalid
   try {
     if(existing_user.empty) { 
       res.status(422).send('Empty');
     }
-    else if (!existing_user.empty && (existing_user.docs[0].get('email') != req.body.email) || (existing_user.docs[0].get('password') !=  req.body.password)) {
+    else if (!existing_user.empty && (existing_user.docs[0].get('email') != toLowerEmail) || (existing_user.docs[0].get('password') !=  req.body.password)) {
       res.status(422).send('Invalid email or password');
     }
     else {
