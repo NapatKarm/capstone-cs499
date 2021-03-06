@@ -29,11 +29,11 @@ class HomePage extends Component {
         }, () => {
             console.log("USER INFOIOIOOJP",this.state.userData)
             if (this.state.userData) {
-                
-                    this.props.bGet(this.state.userData.email,this.state.userData.token).then(
-                        this.setState({businessList:this.props.businessData.businesses}),
-                        console.log("BUSINESS DATA",this.props.businessData)
-                        )
+                this.props.bGet(this.state.userData.email,this.state.userData.token) 
+                if(this.props.businessData) {
+                    this.setState({businessList:this.props.businessData.businesses})
+                    console.log("BUSINESS DATA",this.props.businessData)
+                }
             }
         })
     }
