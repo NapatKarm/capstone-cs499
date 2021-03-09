@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const app = express();
 const cors = require('cors');
+const {v4: uuidv4} = require('uuid');
 
 app.use(cors());
 app.use(express.json());
@@ -71,6 +72,7 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
     }
     else {
       console.log('Successful Log In')
+      authMap.get(toLowerEmail).token = uuidv4();                         //Create Random UUID
       res.status(200).send(existing_user.docs[0].data());
     }
   } catch(error) {
