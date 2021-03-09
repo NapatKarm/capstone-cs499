@@ -1,4 +1,4 @@
-.body-counter {
+.bodyCunter {
     background: white;
     display: flex;
     position: relative;
@@ -75,7 +75,10 @@
     height: 100px;
     z-index: 2;
 }
-
+.backgroundButtons {
+    display:flex;
+    height: 100vh
+}
 .whiteCircle {
     position: absolute;
     align-items: center;
