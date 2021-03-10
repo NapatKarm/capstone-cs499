@@ -205,6 +205,38 @@ else{
 }
 });
 
+app.put('/kickMember', async (req, res) => {                      //Expected: {business_id, kickerEmail, kickeeEmail, token}
+  if(authMap.get(req.body.kickerEmail).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+    kickerRole = ""            //Make sure changer is owner (only owner can change roles)
+    kickeeRole = ""           //Make sure kickee is under kicker
+    kickerPos = ""            //Record position of employee with role 'to be changed'
+  
+    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is already registered under the business
+      if(businessInfo.members[i].email == req.body.kickerEmail){
+        kickerRole = businessInfo.members[i].role;
+      }
+      else if(businessInfo.members[i].email == req.body.kickeeEmail){
+        kickeeRole = businessInfo.members[i].role;
+        kickeePos = i;
+      }
+    }
+
+    if((kickerRole == "Owner") || (kickerRole == "Admin" && kickeeRole == "Employee")){
+      businessInfo.members.splice(kickeePos, 1);
+      res.status(200).send("Kick Success");
+    }
+    else{
+      res.status(403).send("Not Enough Permissions");
+    }
+  }
+});
+
+
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`App is listening on Port ${port}`));
