@@ -93,7 +93,7 @@ app.put('/businessRegister', async (req, res) => {     //Expected request: { bus
         'firstname': req.body.firstname,
         'lastname': req.body.lastname,
         'email': req.body.owner,
-        'role': 'admin'
+        'role': 'Owner'
       }]
     };
     try {
@@ -118,7 +118,7 @@ app.post('/businessJoin', async (req, res) => {                    //Expected re
     'firstname': req.body.firstname,
     'lastname': req.body.lastname,
     'email': req.body.email,
-    'role': 'employee'
+    'role': 'Employee'
   });
   try {
     // 
@@ -142,6 +142,15 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
     delete resInfo.token;
 
     res.status(200).json(resInfo);                                  //Response: {businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
+  }
+});
+
+app.post('/getSingleBusinessData', async (req, res) => {            //Expected: {business_id, email, token}
+  if(authMap.get(req.body.email).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    res.status(200).send(businessMap.get(req.body.business_id));
   }
 });
 
