@@ -154,5 +154,27 @@ app.post('/getSingleBusinessData', async (req, res) => {            //Expected: 
   }
 });
 
+app.put('/passcodeChange', async (req, res) => {                    //Expected: { business_id, email, token, businesspass}
+  if(authMap.get(req.body.email).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+    for(i = 0; i < businessInfo.members.length; i++){               //Check for owner or admin to change passcode
+      if(businessInfo.members[i].email == req.body.email){
+        if(businessInfo.members[i].role == "Owner" || businessInfo.members[i].role == "Admin"){
+          businessInfo.businesspass = req.body.businesspass;
+          res.status(200).send("Change Success");
+          break;
+        }
+        else{
+          res.status(401).send("Not Enough Permissions");
+        }
+      }
+    }
+  }
+});
+
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`App is listening on Port ${port}`));
