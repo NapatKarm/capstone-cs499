@@ -410,6 +410,176 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
 
 /**
  * @swagger
+ * /passcodeChange:
+ *   put:
+ *     summary: Change Business Passcode
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               business_id:
+ *                 type: integer
+ *                 description: The business id.
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *               role:
+ *                 type: string
+ *                 description: The user's role.
+ *               token:
+ *                 type: string
+ *                 description: The user's token.
+ *               businesspass:
+ *                 type: string
+ *                 description: The business' passcode.
+ *     responses:
+ *       '200':
+ *         description: Change Success.
+ *       '400':
+ *         description: Incorrect Token.
+ *       '401':
+ *         description: Unauthorized.
+*/
+
+app.put('/passcodeChange', async (req, res) => {                    //Expected: { business_id, email, token, role, businesspass}
+  if(authMap.get(req.body.email).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    if(req.body.role == "Owner" || req.body.role == "Admin"){
+      businessMap.get(req.body.business_id).businesspass = req.body.businesspass;
+      res.status(200).send("Change Success");
+    }
+    else{
+      res.status(401).send("Not Enough Permissions");
+    }
+  }
+});
+
+/**
+ * @swagger
+ * /roleChange:
+ *   put:
+ *     summary: Change Employee Role.
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               business_id:
+ *                 type: integer
+ *                 description: The business id.
+ *               ownerEmail:
+ *                 type: string
+ *                 description: The user's email.
+ *               ownerRole:
+ *                 type: string
+ *                 description: The user's role.
+ *               employeeEmail:
+ *                 type: string
+ *                 description: The employee's email.
+ *               employeeRole:
+ *                 type: string
+ *                 description: The employee's role.
+ *               token:
+ *                 type: string
+ *                 description: The user's token.
+ *     responses:
+ *       '200':
+ *         description: Change Success.
+ *       '400':
+ *         description: Incorrect Token.
+ *       '403':
+ *         description: Not Enough Permissions.
+*/
+
+app.put('/roleChange', async (req, res) => {                      //Expected: {business_id, ownerEmail, ownerRole, employeeEmail, employeeRole, token}
+  if(authMap.get(req.body.ownerEmail).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    if(req.body.ownerRole == "Owner"){
+      businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+      for(i = 0; i < businessInfo.members.length; i++){               //Check if user is already registered under the business
+        if(businessInfo.members[i].email == req.body.employeeEmail){
+          businessInfo.members[i].role = req.body.employeeRole;       //Sets employee role to new Role
+          break;
+        }
+      }
+      res.status(200).send("Change Success");
+    }
+    else{
+      res.status(403).send("Not Enough Permissions");
+    }
+  }
+});
+
+/**
+ * @swagger
+ * /kickMember:
+ *   put:
+ *     summary: Kick Member.
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               business_id:
+ *                 type: integer
+ *                 description: The business id.
+ *               ownerEmail:
+ *                 type: string
+ *                 description: The user's email.
+ *               ownerRole:
+ *                 type: string
+ *                 description: The user's role.
+ *               employeeEmail:
+ *                 type: string
+ *                 description: The employee's email.
+ *               employeeRole:
+ *                 type: string
+ *                 description: The employee's role.
+ *               token:
+ *                 type: string
+ *                 description: The user's token.
+ *     responses:
+ *       '200':
+ *         description: Change Success.
+ *       '400':
+ *         description: Incorrect Token.
+ *       '403':
+ *         description: Not Enough Permissions.
+*/
+
+app.put('/kickMember', async (req, res) => {                      //Expected: {business_id, ownerEmail, ownerRole, employeeEmail, employeeRole, token}
+  if(authMap.get(req.body.ownerEmail).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    if((req.body.ownerRole == "Owner") || (req.body.ownerRole == "Admin" && req.body.employeeRole == "Employee")){                //If kicker is owner or an admin kicking an employee (admin cannot kick owner or other admins)
+      businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+      for(i = 0; i < businessInfo.members.length; i++){               //Check if user is already registered under the business
+        if(businessInfo.members[i].email == req.body.employeeEmail){
+          businessInfo.members.splice(i, 1);                          //Remove Element
+          break;
+        }
+      }
+      res.status(200).send("Kick Success");
+    }
+    else{
+      res.status(403).send("Not Enough Permissions");
+    }
+  }
+});
+
+/**
+ * @swagger
  * /businessOpen:
  *   put:
  *     summary: Mark business as open
