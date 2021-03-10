@@ -21,7 +21,7 @@ class RoutesView extends Component {
         const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
         const CounterPageComponent = () => (<CounterPage userData={this.props.userData}/>)
         const HomePageComponent = () => (<HomePage bDetails={this.props.bDetails} bView={this.props.bView} userLogout={this.props.userLogout} bUserLogOut={this.props.bUserLogout}businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
-        const BusinessDetailsComponent = () => (<BusinessDetailsPage bDetails={this.props.bDetails} bClear={this.props.bClear}/>)
+        const BusinessDetailsComponent = () => (<BusinessDetailsPage bDetails={this.props.bDetails} bClear={this.props.bClear} userData={this.props.userData}/>)
         return (
             <Router>
                 <Switch>
