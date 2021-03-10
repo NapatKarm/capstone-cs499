@@ -251,7 +251,7 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
         "firstname": authMap.get(req.body.email).firstname,
         "lastname": authMap.get(req.body.email).lastname,
         "email": req.body.email,
-        "role": "admin"
+        "role": "Owner"
       }]
     };
     businessMap.set(businessId, businessInfo);           //Add business data to business 'database'
@@ -294,7 +294,7 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
  *         description: User already registered.
 */
 
-app.post('/businessJoin', async (req, res) => {                     //Expected request: {email, businesspass, business_id, role}
+app.post('/businessJoin', async (req, res) => {                     //Expected request: {email, businesspass, business_id}
   if(!businessMap.has(req.body.business_id)){                      //If non-existing business
     res.status(400).send("Business does not exist");
   }
@@ -321,7 +321,7 @@ app.post('/businessJoin', async (req, res) => {                     //Expected r
         "firstname": userInfo.firstname,
         "lastname": userInfo.lastname,
         "email": req.body.email,
-        "role": req.body.role
+        "role": "Employee"
       });
       userInfo.businesses.push(businessInfo);                       //Add business data to user 'database' under businesses
 
