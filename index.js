@@ -176,5 +176,35 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
   }
 });
 
+app.put('/roleChange', async (req, res) => {                      //Expected: {business_id, changerEmail, changeeEmail, newRole, token}
+if(authMap.get(req.body.changerEmail).token != req.body.token){
+  res.status(400).send("Incorrect Token");
+}
+else{
+  businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+  changerRole = ""            //Make sure changer is owner (only owner can change roles)
+  changeePos = ""            //Record position of employee with role 'to be changed'
+
+  for(i = 0; i < businessInfo.members.length; i++){               //Check for owner and position of changee
+    if(businessInfo.members[i].email == req.body.changerEmail){
+      changerRole = businessInfo.members[i].role;
+    }
+    else if(businessInfo.members[i].email == req.body.changeeEmail){
+      changeePos = i;
+    }
+  }
+
+  if(changerRole == "Owner"){
+    businessMap.get(req.body.business_id).members[changeePos].role = req.body.newRole;
+    res.status(200).send("Change Success");
+  }
+  else{
+    res.status(401).send("Not Enough Permissions");
+  }
+}
+});
+
+
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`App is listening on Port ${port}`));
