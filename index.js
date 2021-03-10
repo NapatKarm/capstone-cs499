@@ -410,9 +410,79 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
 
 /**
  * @swagger
+ * /getSingleBusinessData:
+ *   post:
+ *     summary: Retrieves business data for a single business
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               business_id:
+ *                 type: string
+ *                 description: The business' id.
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *               token:
+ *                 type: string
+ *                 description: The user's generated token on signin.
+ *     responses:
+ *       '200':
+ *         description: Success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 business_id:
+ *                   type: integer
+ *                   description: The business id.
+ *                 businessname:
+ *                   type: string
+ *                   description: The business name.
+ *                 businessaddr:
+ *                   type: string
+ *                   description: The business address.
+ *                 businessOpened:
+ *                   type: boolean
+ *                   description: The business open/close status.
+ *                 members:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       firstname:
+ *                         type: string
+ *                         description: The members first name.
+ *                       lastname:
+ *                         type: string
+ *                         description: The members last name.
+ *                       email:
+ *                         type: string
+ *                         description: The members email.
+ *                       role:
+ *                         type: string
+ *                         description: The members role at the business.
+ *       '400':
+ *         description: Incorrect Token.
+*/
+
+app.post('/getSingleBusinessData', async (req, res) => {            //Expected: {business_id, email, token}
+  if(authMap.get(req.body.email).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    res.status(200).send(businessMap.get(req.body.business_id));
+  }
+});
+
+/**
+ * @swagger
  * /passcodeChange:
  *   put:
- *     summary: Change Business Passcode
+ *     summary: Change business passcode
  *     requestBody:
  *       content:
  *         application/json:
@@ -425,9 +495,6 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
  *               email:
  *                 type: string
  *                 description: The user's email.
- *               role:
- *                 type: string
- *                 description: The user's role.
  *               token:
  *                 type: string
  *                 description: The user's token.
@@ -440,20 +507,27 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
  *       '400':
  *         description: Incorrect Token.
  *       '401':
- *         description: Unauthorized.
+ *         description: Not Enough Permissions.
 */
 
-app.put('/passcodeChange', async (req, res) => {                    //Expected: { business_id, email, token, role, businesspass}
+app.put('/passcodeChange', async (req, res) => {                    //Expected: { business_id, email, token, businesspass}
   if(authMap.get(req.body.email).token != req.body.token){
     res.status(400).send("Incorrect Token");
   }
   else{
-    if(req.body.role == "Owner" || req.body.role == "Admin"){
-      businessMap.get(req.body.business_id).businesspass = req.body.businesspass;
-      res.status(200).send("Change Success");
-    }
-    else{
-      res.status(401).send("Not Enough Permissions");
+    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+    for(i = 0; i < businessInfo.members.length; i++){               //Check for owner or admin to change passcode
+      if(businessInfo.members[i].email == req.body.email){
+        if(businessInfo.members[i].role == "Owner" || businessInfo.members[i].role == "Admin"){
+          businessInfo.businesspass = req.body.businesspass;
+          res.status(200).send("Change Success");
+          break;
+        }
+        else{
+          res.status(401).send("Not Enough Permissions");
+        }
+      }
     }
   }
 });
@@ -462,7 +536,7 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
  * @swagger
  * /roleChange:
  *   put:
- *     summary: Change Employee Role.
+ *     summary: Change employee role.
  *     requestBody:
  *       content:
  *         application/json:
@@ -472,18 +546,15 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
  *               business_id:
  *                 type: integer
  *                 description: The business id.
- *               ownerEmail:
+ *               changerEmail:
  *                 type: string
- *                 description: The user's email.
- *               ownerRole:
+ *                 description: The changer's email.
+ *               changeeEmail:
  *                 type: string
- *                 description: The user's role.
- *               employeeEmail:
+ *                 description: The changee's email.
+ *               newRole:
  *                 type: string
- *                 description: The employee's email.
- *               employeeRole:
- *                 type: string
- *                 description: The employee's role.
+ *                 description: The new role for the changee.
  *               token:
  *                 type: string
  *                 description: The user's token.
@@ -496,33 +567,40 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
  *         description: Not Enough Permissions.
 */
 
-app.put('/roleChange', async (req, res) => {                      //Expected: {business_id, ownerEmail, ownerRole, employeeEmail, employeeRole, token}
-  if(authMap.get(req.body.ownerEmail).token != req.body.token){
-    res.status(400).send("Incorrect Token");
+app.put('/roleChange', async (req, res) => {                      //Expected: {business_id, changerEmail, changeeEmail, newRole, token}
+if(authMap.get(req.body.changerEmail).token != req.body.token){
+  res.status(400).send("Incorrect Token");
+}
+else{
+  businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+  changerRole = ""            //Make sure changer is owner (only owner can change roles)
+  changeePos = ""            //Record position of employee with role 'to be changed'
+
+  for(i = 0; i < businessInfo.members.length; i++){               //Check for owner and position of changee
+    if(businessInfo.members[i].email == req.body.changerEmail){
+      changerRole = businessInfo.members[i].role;
+    }
+    else if(businessInfo.members[i].email == req.body.changeeEmail){
+      changeePos = i;
+    }
+  }
+
+  if(changerRole == "Owner"){
+    businessMap.get(req.body.business_id).members[changeePos].role = req.body.newRole;
+    res.status(200).send("Change Success");
   }
   else{
-    if(req.body.ownerRole == "Owner"){
-      businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
-
-      for(i = 0; i < businessInfo.members.length; i++){               //Check if user is already registered under the business
-        if(businessInfo.members[i].email == req.body.employeeEmail){
-          businessInfo.members[i].role = req.body.employeeRole;       //Sets employee role to new Role
-          break;
-        }
-      }
-      res.status(200).send("Change Success");
-    }
-    else{
-      res.status(403).send("Not Enough Permissions");
-    }
+    res.status(401).send("Not Enough Permissions");
   }
+}
 });
 
 /**
  * @swagger
  * /kickMember:
  *   put:
- *     summary: Kick Member.
+ *     summary: Kick member.
  *     requestBody:
  *       content:
  *         application/json:
@@ -532,44 +610,47 @@ app.put('/roleChange', async (req, res) => {                      //Expected: {b
  *               business_id:
  *                 type: integer
  *                 description: The business id.
- *               ownerEmail:
+ *               kickerEmail:
  *                 type: string
- *                 description: The user's email.
- *               ownerRole:
+ *                 description: The kicker's email.
+ *               kickeeEmail:
  *                 type: string
- *                 description: The user's role.
- *               employeeEmail:
- *                 type: string
- *                 description: The employee's email.
- *               employeeRole:
- *                 type: string
- *                 description: The employee's role.
+ *                 description: The kickee's email.
  *               token:
  *                 type: string
  *                 description: The user's token.
  *     responses:
  *       '200':
- *         description: Change Success.
+ *         description: Kick Success.
  *       '400':
  *         description: Incorrect Token.
  *       '403':
  *         description: Not Enough Permissions.
 */
 
-app.put('/kickMember', async (req, res) => {                      //Expected: {business_id, ownerEmail, ownerRole, employeeEmail, employeeRole, token}
-  if(authMap.get(req.body.ownerEmail).token != req.body.token){
+app.put('/kickMember', async (req, res) => {                      //Expected: {business_id, kickerEmail, kickeeEmail, token}
+  if(authMap.get(req.body.kickerEmail).token != req.body.token){
     res.status(400).send("Incorrect Token");
   }
   else{
-    if((req.body.ownerRole == "Owner") || (req.body.ownerRole == "Admin" && req.body.employeeRole == "Employee")){                //If kicker is owner or an admin kicking an employee (admin cannot kick owner or other admins)
-      businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
 
-      for(i = 0; i < businessInfo.members.length; i++){               //Check if user is already registered under the business
-        if(businessInfo.members[i].email == req.body.employeeEmail){
-          businessInfo.members.splice(i, 1);                          //Remove Element
-          break;
-        }
+    kickerRole = ""            //Make sure changer is owner (only owner can change roles)
+    kickeeRole = ""           //Make sure kickee is under kicker
+    kickerPos = ""            //Record position of employee with role 'to be changed'
+  
+    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is already registered under the business
+      if(businessInfo.members[i].email == req.body.kickerEmail){
+        kickerRole = businessInfo.members[i].role;
       }
+      else if(businessInfo.members[i].email == req.body.kickeeEmail){
+        kickeeRole = businessInfo.members[i].role;
+        kickeePos = i;
+      }
+    }
+
+    if((kickerRole == "Owner") || (kickerRole == "Admin" && kickeeRole == "Employee")){
+      businessInfo.members.splice(kickeePos, 1);
       res.status(200).send("Kick Success");
     }
     else{
@@ -590,8 +671,14 @@ app.put('/kickMember', async (req, res) => {                      //Expected: {b
  *             type: object
  *             properties:
  *               business_id:
- *                 type: string
+ *                 type: integer
  *                 description: The business id.
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *               token:
+ *                 type: string
+ *                 description: The user's token.
  *     responses:
  *       '200':
  *         description: Business Opened.
@@ -599,14 +686,27 @@ app.put('/kickMember', async (req, res) => {                      //Expected: {b
  *         description: Business Already Opened.
 */
 
-app.put('/businessOpen', async (req, res) => {                     //Expected Request {business_id}
-  let b_id = req.body.business_id;
-  if(businessMap.get(b_id).businessOpened == true){
-    res.status(400).send("Business Already Opened");
+app.put('/businessOpen', async (req, res) => {                     //Expected Request {business_id, email, token}
+  if(authMap.get(req.body.email).token != req.body.token){
+    res.status(400).send("Incorrect Token");
   }
   else{
-    businessMap.get(b_id).businessOpened = true;
-    res.status(200).send("Business Opened");
+    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is owner or admin
+      if(businessInfo.members[i].email == req.body.email){
+        role = businessInfo.members[i].role;
+        if(role == "Owner" || role == "Admin"){
+          if(businessInfo.businessOpened == true){
+            res.status(400).send("Business Already Opened");
+          }
+          else{
+            businessInfo.businessOpened = true;
+            res.status(200).send("Business Opened");
+          }
+        }
+      }
+    }
   }
 });
 
@@ -622,8 +722,14 @@ app.put('/businessOpen', async (req, res) => {                     //Expected Re
  *             type: object
  *             properties:
  *               business_id:
- *                 type: string
+ *                 type: integer
  *                 description: The business id.
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *               token:
+ *                 type: string
+ *                 description: The user's token.
  *     responses:
  *       '200':
  *         description: Business Closed.
@@ -631,14 +737,27 @@ app.put('/businessOpen', async (req, res) => {                     //Expected Re
  *         description: Business Already Closed.
 */
 
-app.put('/businessClose', async (req, res) => {                     //Expected Request {business_id}
-  let b_id = req.body.business_id;
-  if(businessMap.get(b_id).businessOpened == false){
-    res.status(400).send("Business Already Closed");
+app.put('/businessClose', async (req, res) => {                     //Expected Request {business_id, email, token}
+  if(authMap.get(req.body.email).token != req.body.token){
+    res.status(400).send("Incorrect Token");
   }
   else{
-    businessMap.get(b_id).businessOpened = false;
-    res.status(200).send("Business Closed");
+    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is owner or admin
+      if(businessInfo.members[i].email == req.body.email){
+        role = businessInfo.members[i].role;
+        if(role == "Owner" || role == "Admin"){
+          if(businessInfo.businessOpened == false){
+            res.status(400).send("Business Already Closed");
+          }
+          else{
+            businessInfo.businessOpened = false;
+            res.status(200).send("Business Closed");
+          }
+        }
+      }
+    }
   }
 });
 
