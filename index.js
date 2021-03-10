@@ -236,7 +236,53 @@ app.put('/kickMember', async (req, res) => {                      //Expected: {b
   }
 });
 
+app.put('/businessOpen', async (req, res) => {                     //Expected Request {business_id, email, token}
+  if(authMap.get(req.body.email).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
 
+    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is owner or admin
+      if(businessInfo.members[i].email == req.body.email){
+        role = businessInfo.members[i].role;
+        if(role == "Owner" || role == "Admin"){
+          if(businessInfo.businessOpened == true){
+            res.status(400).send("Business Already Opened");
+          }
+          else{
+            businessInfo.businessOpened = true;
+            res.status(200).send("Business Opened");
+          }
+        }
+      }
+    }
+  }
+});
+
+app.put('/businessClose', async (req, res) => {                     //Expected Request {business_id, email, token}
+  if(authMap.get(req.body.email).token != req.body.token){
+    res.status(400).send("Incorrect Token");
+  }
+  else{
+    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is owner or admin
+      if(businessInfo.members[i].email == req.body.email){
+        role = businessInfo.members[i].role;
+        if(role == "Owner" || role == "Admin"){
+          if(businessInfo.businessOpened == false){
+            res.status(400).send("Business Already Closed");
+          }
+          else{
+            businessInfo.businessOpened = false;
+            res.status(200).send("Business Closed");
+          }
+        }
+      }
+    }
+  }
+});
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`App is listening on Port ${port}`));
