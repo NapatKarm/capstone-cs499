@@ -1,4 +1,3 @@
-// require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser')
 const app = express();
@@ -12,7 +11,6 @@ app.use(bodyParser.json());
 // Connect to FireBase
 var admin = require('firebase-admin');
 var serviceAccount = require('./service-account.json');
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://c-vivid-default-rtdb.firebaseio.com'
@@ -76,35 +74,43 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
   }
 });
 
-// Needs work
-app.put('/businessRegister', async (req, res) => {     //Expected request: { businessname, businessaddr, owner, businesspass, first name, last name} (owner: email?)
-  const existing_business = usersdb.where('businessaddr', '==', req.body.businessaddr).get();
-  if(!existing_business) {   //Business already registered, cannot have 2 businesses on same address
+// Business Register Endpoint
+app.post('/businessRegister', async (req, res) => {     //Expected request: { businessname, businessaddr, owner_email, businesspass, first name, last name} (owner: email?)
+  const existing_business = await busdb.where('businessaddr', '==', req.body.businessaddr).get();  //
+  const owner = await usersdb.where('email','==', req.body.email).get();                           // Owner's Information
+  if (!existing_business.empty) {   //Business already registered, cannot have 2 businesses on same address
     res.status(400).send('Business Already Registered');
   }
   else {
-    const businessInfo = {                       //Business Info Structure
-      'businessname': req.body.businessname,
-      'businessaddr': req.body.businessaddr,
-      'businesspass': req.body.businesspass,
-      'members': [{                              //Member Info Structure
-        'firstname': req.body.firstname,
-        'lastname': req.body.lastname,
-        'email': req.body.owner,
-        'role': 'admin'
-      }]
-    };
     try {
-      await busdb.add(businessInfo);       
+      const incrementing_id = await busdb.where('counter', '>=', 0).get();
+      console.log("creating buss info");
+      const businessInfo = {                       //Business Info Structure
+        'businessname': req.body.businessname,
+        'businessaddr': req.body.businessaddr,
+        'businessid' : incrementing_id.docs[0].get('counter'),
+        'businesspass': req.body.businesspass,
+        'isopened' : false,
+        'members': [{                              //Member Info Structure
+          'firstname': owner.docs[0].get('firstname'),
+          'lastname': owner.docs[0].get('lastname'),
+          'email': req.body.email,
+          'role': 'Owner'
+        }]
+      }
+      await busdb.add(businessInfo); 
+      let counter_ref = busdb.doc("INCREMENTING_COUNTER");
+      counter_ref.update({ counter: admin.firestore.FieldValue.increment(1) });
+      res.status(200).send(businessInfo);
     } catch(error) {
       console.log(error);
     }
   }
 });
 
-app.post('/businessJoin', async (req, res) => {                    //Expected request: {email, businesspass, businessaddr}
-  const existing_business = usersdb.where('businesspass', '==', req.body.businesspass).get();
-  if (!existing_business) {                                       // Non-existing Business, false = empty document
+app.post('/businessJoin', async (req, res) => {                    //Expected request: {email, businesspass, businessid}
+  const existing_business = usersdb.where('businesspass', '==', req.body.businesspass).where('businessid', '==', req.body.businessid).get();
+  if (existing_business.empty) {                                       // Non-existing Business, false = empty document
     res.status(400).send('Business does not exist');
   }
   for (let i = 0; i < existing_business.members.length; i++) {  // Check if member already exists in a business
@@ -116,7 +122,7 @@ app.post('/businessJoin', async (req, res) => {                    //Expected re
     'firstname': req.body.firstname,
     'lastname': req.body.lastname,
     'email': req.body.email,
-    'role': 'employee'
+    'role': 'Employee'
   });
   try {
     // 
