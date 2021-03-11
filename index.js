@@ -101,7 +101,7 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
       await busdb.add(businessInfo); 
       let counter_ref = busdb.doc("INCREMENTING_COUNTER");
       counter_ref.update({ 
-        counter: admin.firestore.FieldValue.increment(1) 
+        counter: admin.firestore.FieldValue.increment(1)   // Really not intuitive because its different if using admin SDK 
       });
       res.status(200).send("Success");
     } catch(error) {
@@ -111,23 +111,40 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
 });
 
 app.post('/businessJoin', async (req, res) => {                    //Expected request: {email, businesspass, businessid}
-  const existing_business = usersdb.where('businesspass', '==', req.body.businesspass).where('businessid', '==', req.body.businessid).get();
+  const existing_business = await busdb.where('businesspass', '==', req.body.businesspass).where('businessid', '==', req.body.businessid).get();
   if (existing_business.empty) {                                       // Non-existing Business, false = empty document
     res.status(400).send('Business does not exist');
   }
-  for (let i = 0; i < existing_business.members.length; i++) {  // Check if member already exists in a business
-    if (existing_business.members[i].email == req.body.email) {
+  let member_list = existing_business.docs[0].get('members');
+  for (let i = 0; i < member_list.length; i++) {       // Check if member already exists in a business
+    if (member_list[i].email == req.body.email) {
       res.status(422).send('User already is a member');
     }
-  }                                                                                                                
-  const new_member = ({                                   //Add user as member under the business
-    'firstname': req.body.firstname,
-    'lastname': req.body.lastname,
+  }  
+  
+  const new_member_info = await usersdb.where('email', '==', req.body.email).get();       // Get the to-be-added employee's info from userdb and make an object                                                                                                     
+  const new_member = ({                                   // Will be added to the business' member array
+    'firstname': new_member_info.docs[0].get('firstname'),
+    'lastname': new_member_info.docs[0].get('lastname'),
     'email': req.body.email,
     'role': 'Employee'
   });
-  try {
-    // 
+
+  const bus_info = ({                                             // Business info to add to user's business array
+    'businessaddr': existing_business.docs[0].get('businessaddr'),
+    'businessname': existing_business.docs[0].get('businessname'),
+    'businessid' : existing_business.docs[0].get('businessid')
+  });
+
+  let bus_ref = busdb.doc(existing_business.docs[0].id);   // References for pushing new data to arrays
+  let user_ref = usersdb.doc(new_member_info.docs[0].id);
+  try { 
+    bus_ref.update({
+      members: admin.firestore.FieldValue.arrayUnion(new_member)
+    });
+    user_ref.update({
+      business: admin.firestore.FieldValue.arrayUnion(bus_info)
+    })
     res.status(200).send('Successfully Joined'); 
   } catch (error) {
     console.log(error);
