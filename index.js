@@ -474,6 +474,14 @@ app.post('/getSingleBusinessData', async (req, res) => {            //Expected: 
     res.status(400).send("Incorrect Token");
   }
   else{
+    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+
+    for(i = 0; i < businessInfo.members.length; i++){               //Check for owner or admin to change passcode
+      if(businessInfo.members[i].email == req.body.email){
+        res.status(200).send(businessMap.get(req.body.business_id));
+      }
+    }
+    
     res.status(200).send(businessMap.get(req.body.business_id));
   }
 });
