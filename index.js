@@ -651,6 +651,19 @@ app.put('/kickMember', async (req, res) => {                      //Expected: {b
 
     if((kickerRole == "Owner") || (kickerRole == "Admin" && kickeeRole == "Employee")){
       businessInfo.members.splice(kickeePos, 1);
+
+      kickeeEmail = req.body.kickeeEmail;
+      userInfo = authMap.get(kickeeEmail);
+      businessPos = 0;
+
+      for(i = 0; i < userInfo.businesses.length; i++){
+        if(userInfo.businesses[i].business_id == req.body.business_id){
+          businessPos = i;
+          break;
+        }
+      }
+      userInfo.businesses.splice(businessPos, 1);           //Remove business from user info
+
       res.status(200).send("Kick Success");
     }
     else{
