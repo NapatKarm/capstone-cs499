@@ -1,0 +1,46 @@
+.homePage {
+    color: white;
+    background-color: #191919;
+    height: 100vh;
+}
+.topButtonGroup{
+    display:flex;
+    justify-content: space-evenly;
+}
+.topButtonBox{
+    display:flex;
+    justify-content: space-between;
+    color: white;
+    background-color: #ab191e;
+    height: auto;
+    width: 20%;
+    padding: 20px;
+    align-items: center;
+    transition: 0.2s;
+}
+.topButtonBox:active{
+    background-color: #7a1216;
+}
+.topText{
+    font-size: 21px;
+    font-family: Helvetica;
+}
+.bottonText{
+    font-size: 18px;
+    font-family: Helvetica;
+}
+.BusinessTable{
+    padding: 25px;
+}
+.MBusinessTable{
+    background-color: #1c1c1c !important;
+    color: white !important;
+}
+.MTableBody{
+    color: white !important;
+}
+.topRowT{
+    font-size: 20px !important;
+    color: white !important;
+    width: 20%;
+}

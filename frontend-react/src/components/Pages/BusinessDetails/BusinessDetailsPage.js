@@ -69,6 +69,8 @@ class BusinessDetailsPage extends Component {
         })
         .catch(err => {
             console.log("Error from UPDATE",err)
+            alert("You are no longer in this business")
+                this.props.history.push("/home");
             
         })
     }
