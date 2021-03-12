@@ -32,27 +32,36 @@ class ManagedBusinessTable extends Component {
     }
     render() {
         return (
-            <TableContainer component={Paper}>
+            <TableContainer className="MBusinessTable" component={Paper}>
                 <Table aria-label="simple table" size="medium">
                     <TableHead>
-                        <TableRow style={{ backgroundColor: '#FFFFFF' }}>
-                            Businesses
-                            <IconButton aria-label="refresh" onClick={()=>this.props.businessUpdate()}>
-                                <RefreshIcon />
-                            </IconButton>
+                        <TableRow >
+                            <TableCell >
+                            </TableCell>
+                            <TableCell className="topRowT" align="left">
+                                Affiliated Businesses
+                            </TableCell>
+                            <TableCell>
+                            </TableCell>
+                            <TableCell></TableCell>
+                            <TableCell align="right">
+                                <IconButton aria-label="refresh" onClick={() => this.props.businessUpdate()} style={{ textAlign: "right" }}>
+                                    <RefreshIcon style={{ color: "white" }} />
+                                </IconButton>
+                            </TableCell>
                         </TableRow>
                     </TableHead>
-                    <TableBody>
+                    <TableBody className="MTableBody">
                         {this.props.businessList ? (
                             this.props.businessList.length > 0 ? (this.props.businessList.map((business) => (
                                 <TableRow key={business.business_id}>
-                                    <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
+                                    <TableCell component="th" scope="row" align="left" style={{ textAlign: "center", width: "50px" }}>
                                         <StarBorderIcon fontSize="medium" style={{ color: '#8a0602' }} />
                                     </TableCell>
-                                    <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
+                                    <TableCell className="MTableBody" component="th" scope="row" style={{ fontWeight: "bold" }}>
                                         {business.businessname}
                                     </TableCell>
-                                    <TableCell align="center">
+                                    <TableCell className="MTableBody" align="left">
                                         <div>
                                             <div>
                                                 {business.business_id}
@@ -62,7 +71,7 @@ class ManagedBusinessTable extends Component {
                                         </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell align="center">
+                                    <TableCell className="MTableBody" align="left">
                                         <div>
                                             <div>
                                                 {business.businessaddr}
@@ -72,23 +81,21 @@ class ManagedBusinessTable extends Component {
                                         </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+
+                                    <TableCell align="right" className="Tbuttons">
                                         {business.businessOpened ?
                                             (
-                                                <Button>Track</Button>
+                                                <Button className="MTableBody" style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Track</Button>
                                             ) :
                                             (
-                                                <Button disabled>Closed</Button>
+                                                <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Closed</Button>
                                             )
                                         }
-
-                                    </TableCell>
-                                    <TableCell>
-                                        <Button onClick={() => this.viewDetails(business)}>Details</Button>
+                                        <Button className="MTableBody" style={{ marginLeft:"10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e' }} onClick={() => this.viewDetails(business)}>Details</Button>
                                     </TableCell>
                                 </TableRow>
                             ))) : (
-                                <div> Currently not in any business</div>
+                                <div className="MTableBody"> Currently not in any business</div>
                             )) : (
                             <TableRow key="loading">
                                 <TableCell />
@@ -96,7 +103,7 @@ class ManagedBusinessTable extends Component {
                                     <div style={{ justifyContent: "center", padding: "30px" }}><CircularProgress fontSize="small" /></div>
                                 </TableCell>
                                 <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
-                                    <div> Loading Data... </div>
+                                    <div className="MTableBody"> Loading Data... </div>
                                 </TableCell>
                             </TableRow>
 
