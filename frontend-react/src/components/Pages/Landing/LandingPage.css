@@ -16,23 +16,56 @@
 .content {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: flex-end;
 }
 
 .landingLogo {
     width: 50vh;
 }
 
+.titleHeader {
+    padding-top: 10px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.actionButton {
+    display: flex;
+    justify-content: space-between;
+}
+
 .leftSide {
-    flex-grow: 1;
-    width: 0vh;
+    display: flex;
+    flex-direction: column;
+    width: 325px;
+    padding-left: 50px;
+    padding-top: 50px;
+    text-align: center;
+    font-size: 12px;
 }
 
 .rightSide {
     flex-grow: 1;
+    width: 40vh;
+    padding-left: 100px;
+    padding-top: 50px;
 }
 
-.footer {
+.footerLanding {
     position: absolute;
     bottom: 0;
+    width: 100%;
 }
+
+.footerText {
+    font-size: 8px;
+    padding-left: 50px;
+    padding-bottom: 10px;
+}
+
+#gitLink {
+    color: lightgray;
+    text-decoration: none;
+}
+
+/*** LOGINTABLE CSS ****/
