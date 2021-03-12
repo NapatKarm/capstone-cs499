@@ -40,6 +40,9 @@ class HomePage extends Component {
         this.props.history.push("/")
     }
     businessUpdate = async () => {
+        this.setState({
+            businessList: undefined
+        })
         await this.props.bGet(this.state.userData.email,this.state.userData.token) 
         if(this.props.businessData) {
             this.setState({businessList:this.props.businessData.businesses, registeringBusiness:false},()=>(console.log("BUSINESS DATAX",this.props.businessData)))    
@@ -116,7 +119,7 @@ class HomePage extends Component {
                         <Button onClick={this.startBReg}>Register business</Button><Button onClick={this.startBJoin}>Join Business</Button><Button onClick={this.logout}>Logout</Button>
                     </div>
                     <div className="BusinessTable">
-                        <ManagedBusinessTable history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
+                        <ManagedBusinessTable businessUpdate={this.businessUpdate} history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
                     </div>
                     <div className="BusinessRegisterComponent">
                         <Dialog open={this.state.registeringBusiness} onClose={this.cancelBReg} aria-labelledby="form-dialog-title">
