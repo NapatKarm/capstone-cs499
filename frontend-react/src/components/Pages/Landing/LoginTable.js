@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 import validator from 'validator'; //https://www.npmjs.com/package/validator
 
 class LoginTable extends Component {
@@ -28,15 +31,19 @@ class LoginTable extends Component {
     }
 
     handleSubmit = async (submit) => {
-        submit.preventDefault()
+        // submit.preventDefault()
         console.log(this.state.email, validator.isEmail(this.state.email), this.state.password)
         if(validator.isEmail(this.state.email)) {
             console.log("Email validated!")
-            await this.props.userLogin(this.state.email, this.state.password)
-            if(this.props.logInError) {
-                this.setState({
-                    errorMessage: this.props.logInError
-                })
+            if(this.state.password === "") {
+                this.setState({errorMessage: "Please enter a password"})
+            } else {
+                await this.props.userLogin(this.state.email, this.state.password)
+                if(this.props.logInError) {
+                    this.setState({
+                        errorMessage: this.props.logInError
+                    })
+                }
             }
         } else {
             this.setState({errorMessage: "Please enter a valid Email"})
@@ -50,14 +57,14 @@ class LoginTable extends Component {
                     <form onSubmit={this.handleSubmit} className="form">
                         <table className='loginTable'>
                             <thead>
-                            <tr><td colSpan={2}><h1 className="loginTitle">LOG IN</h1></td></tr>
+                                <tr><td colSpan={2}><h1 className="loginTitle">LOG IN</h1></td></tr>
                             </thead>
                             <tbody>
-                                <tr><td className="TextField">Email:</td><td className="inputFieldR"><input type="text" className="email"  id="Email" onChange={this.changeEmail}></input></td></tr>
-                                <tr><td className="TextField">Password:</td><td className="inputFieldR"><input type="password" className="Password" id="password" onChange={this.changePassword}></input></td></tr>
+                                <TextField id="standard-full-width" className="email" label="Email" style={{ margin: 8 }} placeholder="Email" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changeEmail}/>
+                                <TextField id="password" className="Password" type="password" label="Password" style={{ margin: 8 }} placeholder="Password" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changePassword}/>
                                 <tr><td colSpan={2} className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label htmlFor='show-password'>Show Password</label></td></tr>
                                 <tr><td className="TextField">{this.state.errorMessage}</td></tr>
-                                <tr><td colSpan={2}><button className="loginButton">Log In</button></td></tr>
+                                <Button className="loginButton" style={{color: 'white', backgroundColor: '#b71c1c', maxWidth: '160px', maxHeight: '50px', minWidth: '160px', minHeight: '50px'}} onClick={()=>this.handleSubmit()}>Log In</Button>
                                 <tr></tr>
                             </tbody>
                         </table>
