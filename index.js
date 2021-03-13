@@ -256,7 +256,7 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
 });
 
 
-app.patch('/roleChange', async (req, res) => {                      //Expected: {business_id, (owners)changerEmail, changeeEmail, newRole, token}
+app.put('/roleChange', async (req, res) => {                      //Expected: {business_id, (owners)changerEmail, changeeEmail, newRole, token}
   let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.changerEmail.toLowerCase()).get();
   if (user_info.docs[0].get('token') != req.body.token) {
     res.status(400).send("Incorrect Token");
@@ -336,50 +336,68 @@ app.patch('/kickMember', async (req, res) => {                      //Expected: 
   }
 });
 
-app.put('/businessOpen', async (req, res) => {                     //Expected Request {business_id, email, token}
-  if(authMap.get(req.body.email).token != req.body.token){
+app.patch('/businessOpen', async (req, res) => {                     //Expected Request {business_id, email, token}
+  let changer_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
+  if (changer_info.docs[0].get('token') != req.body.token || changer_info.empty) {
     res.status(400).send("Incorrect Token");
+    return;
   }
-  else{
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
-
-    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is owner or admin
-      if(businessInfo.members[i].email == req.body.email){
-        role = businessInfo.members[i].role;
-        if(role == "Owner" || role == "Admin"){
-          if(businessInfo.businessOpened == true){
-            res.status(400).send("Business Already Opened");
-          }
-          else{
-            businessInfo.businessOpened = true;
-            res.status(200).send("Business Opened");
-          }
-        }
-      }
+  let bus_info = await busdb.where("businessid", '==', req.body.business_id).get();
+  has_permissions = false;
+  bus_info.docs[0].get('members').forEach(member => { // Check every member in the business and check for their roles
+    if ((member.role == 'Owner' || member.role == 'Admin') && (member.email == req.body.email)) {
+      has_permissions = true;
+    }
+  });
+  if (has_permissions == false) {
+    res.status(401).send("Not enough permissions");
+    return;
+  } 
+  else if (bus_info.docs[0].get('isopened') == true) {
+    res.status(400).send('Business Already Opened');
+  } 
+  else {
+    let bus_ref = busdb.doc(bus_info.docs[0].id);
+    try {
+      bus_ref.update({
+        isopened : true
+      });
+      res.status(200).send('Business Opened');
+    } catch(error) {
+      console.log(error);
     }
   }
 });
 
-app.put('/businessClose', async (req, res) => {                     //Expected Request {business_id, email, token}
-  if(authMap.get(req.body.email).token != req.body.token){
+app.patch('/businessClose', async (req, res) => {                     //Expected Request {business_id, email, token}
+  let changer_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
+  if (changer_info.docs[0].get('token') != req.body.token || changer_info.empty) {
     res.status(400).send("Incorrect Token");
+    return;
   }
-  else{
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
-
-    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is owner or admin
-      if(businessInfo.members[i].email == req.body.email){
-        role = businessInfo.members[i].role;
-        if(role == "Owner" || role == "Admin"){
-          if(businessInfo.businessOpened == false){
-            res.status(400).send("Business Already Closed");
-          }
-          else{
-            businessInfo.businessOpened = false;
-            res.status(200).send("Business Closed");
-          }
-        }
-      }
+  let bus_info = await busdb.where("businessid", '==', req.body.business_id).get();
+  has_permissions = false;
+  bus_info.docs[0].get('members').forEach(member => { // Check every member in the business and check for their roles
+    if ((member.role == 'Owner' || member.role == 'Admin') && (member.email == req.body.email)) {
+      has_permissions = true;
+    }
+  });
+  if (has_permissions == false) {
+    res.status(401).send("Not enough permissions");
+    return;
+  } 
+  else if (bus_info.docs[0].get('isopened') == false) {
+    res.status(400).send('Business Already Closed');
+  } 
+  else {
+    let bus_ref = busdb.doc(bus_info.docs[0].id);
+    try {
+      bus_ref.update({
+        isopened : false
+      });
+      res.status(200).send('Business Closed');
+    } catch(error) {
+      console.log(error);
     }
   }
 });
