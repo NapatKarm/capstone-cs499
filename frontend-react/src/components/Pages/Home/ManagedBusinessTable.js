@@ -58,7 +58,7 @@ class ManagedBusinessTable extends Component {
                                     <TableCell component="th" scope="row" align="left" style={{ textAlign: "center", width: "50px" }}>
                                         <StarBorderIcon fontSize="medium" style={{ color: '#8a0602' }} />
                                     </TableCell>
-                                    <TableCell className="MTableBody" component="th" scope="row" style={{ fontWeight: "bold" }}>
+                                    <TableCell className="MTableBody" component="th" scope="row" style={{ fontWeight: "bold",fontSize: "21px" }}>
                                         {business.businessname}
                                     </TableCell>
                                     <TableCell className="MTableBody" align="left">
