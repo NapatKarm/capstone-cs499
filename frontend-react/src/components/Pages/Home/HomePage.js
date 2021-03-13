@@ -151,7 +151,6 @@ class HomePage extends Component {
                             </div>
                         </div>
                         </div>
-                        <Button onClick={this.logout}>Logout</Button>
                     </div>
                     <div className="BusinessTable">
                         <ManagedBusinessTable businessUpdate={this.businessUpdate} history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
