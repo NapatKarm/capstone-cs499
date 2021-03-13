@@ -27,7 +27,10 @@ app.get('/', async function (req, res) {
   // user_bus.forEach(doc => {
   //   console.log(doc.data())
   // });
-  some_bus = await busdb.where('businessid','==', 0).get();
+  some_bus = await busdb.where('businessid', 'in', [0, 1]).get();
+  some_bus.docs.forEach(doc => {
+    console.log(doc.data())
+  });
   some_bus_ref = await busdb.doc(some_bus.docs[0].id);
   new_member = {                             
     'firstname': "testing",
@@ -35,16 +38,16 @@ app.get('/', async function (req, res) {
     'email': "some test email",
     'role': 'Employee'
   };
-  try {
-    some_bus_ref.update({                                            // Add business info to user's business[]
-      members: admin.firestore.FieldValue.arrayUnion(new_member)
-    });
-    console.log("sucessfully updated array");
-    some_bus = await busdb.where('businessid','==', 0).get();
-    res.send(some_bus.docs[0].get('members'));
-  } catch (error) {
-    console.log(error);
-  }
+  // try {
+  //   some_bus_ref.update({                                            // Add business info to user's business[]
+  //     members: admin.firestore.FieldValue.arrayUnion(new_member)
+  //   });
+  //   console.log("sucessfully updated array");
+  //   some_bus = await busdb.where('businessid','==', 0).get();
+  //   res.send(some_bus.docs[0].get('members'));
+  // } catch (error) {
+  //   console.log(error);
+  // }
 
   // res.send('hello world');
 });
@@ -139,7 +142,7 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
   }
 });
 
-// needs testing
+// I think it works
 app.post('/businessJoin', async (req, res) => {                    //Expected request: {email, businesspass, businessid}
   const existing_business = await busdb.where('businesspass', '==', req.body.businesspass).where('businessid', '==', req.body.businessid).get();
   if (existing_business.empty) {                                       // Non-existing Business, false = empty document
@@ -173,7 +176,7 @@ app.post('/businessJoin', async (req, res) => {                    //Expected re
     });
     user_ref.update({                                            // Add business id to user's business[]
       business: admin.firestore.FieldValue.arrayUnion(bus_info)
-    })
+    });
     res.status(200).send('Successfully Joined'); 
   } catch (error) {
     console.log(error);
@@ -181,20 +184,18 @@ app.post('/businessJoin', async (req, res) => {                    //Expected re
 });
 
 //Refresh
-app.post('/getBusinessData', async (req, res) => {                   //Expected Request {email, token}
-  let user_info = await usersdb.where('token', '==', req.body.token).get()
+app.get('/getBusinessData', async (req, res) => {                   //Expected Request {email, token}
+  let user_info = await usersdb.where('token', '==', req.body.token).get();
   if (user_info.docs[0].get('token') != req.body.token) {
     res.status(400).send("Incorrect Token");
   }
   else{
-    resInfo = Object.assign({}, authMap.get(req.body.email));
-    delete resInfo.firstname;
-    delete resInfo.lastname;
-    delete resInfo.email;
-    delete resInfo.password;
-    delete resInfo.token;
-
-    res.status(200).json(resInfo);                            //Response: {businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
+    let arr_of_bus = await busdb.where('businessid', 'in', user_info.docs[0].get('businesses')).get();
+    let bus_info = [];                // Must call doc.data() on each element because 
+    arr_of_bus.docs.forEach(doc => {  // The actual array contains lots of meta data 
+      bus_info.push(doc.data())
+    });
+    res.status(200).send(bus_info);                            //Response: {businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
   }
 });
 
