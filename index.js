@@ -256,7 +256,7 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
 });
 
 
-app.put('/roleChange', async (req, res) => {                      //Expected: {business_id, (owners)changerEmail, changeeEmail, newRole, token}
+app.patch('/roleChange', async (req, res) => {                      //Expected: {business_id, (owners)changerEmail, changeeEmail, newRole, token}
   let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.changerEmail.toLowerCase()).get();
   if (user_info.docs[0].get('token') != req.body.token) {
     res.status(400).send("Incorrect Token");
@@ -294,46 +294,40 @@ app.put('/roleChange', async (req, res) => {                      //Expected: {b
   }
 });
 
-app.put('/kickMember', async (req, res) => {                      //Expected: {business_id, kickerEmail, kickeeEmail, token}
-  if(authMap.get(req.body.kickerEmail).token != req.body.token){
+app.patch('/kickMember', async (req, res) => {                      //Expected: {business_id, kickerEmail, kickeeEmail, token}
+  let kicker_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.kickerEmail.toLowerCase()).get();
+  if (kicker_info.docs[0].get('token') != req.body.token) {
     res.status(400).send("Incorrect Token");
+    return;
   }
-  else{
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
-
-    kickerRole = ""            //Make sure changer is owner (only owner can change roles)
-    kickeeRole = ""           //Make sure kickee is under kicker
-    kickerPos = ""            //Record position of employee with role 'to be changed'
-  
-    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is already registered under the business
-      if(businessInfo.members[i].email == req.body.kickerEmail){
-        kickerRole = businessInfo.members[i].role;
-      }
-      else if(businessInfo.members[i].email == req.body.kickeeEmail){
-        kickeeRole = businessInfo.members[i].role;
-        kickeePos = i;
+  else {
+    let bus_info = await busdb.where('businessid', '==', req.body.business_id).get();
+    let has_permissions = false;
+    let kickee_pos = 0;
+    let new_member_list = bus_info.docs[0].get('members');
+    for (let i = 0; i < new_member_list.length; i++) {
+      if (new_member_list[i].email == req.body.kickeeEmail) {
+        kickee_pos = i;
       }
     }
-
-    if((kickerRole == "Owner") || (kickerRole == "Admin" && kickeeRole == "Employee")){
-      businessInfo.members.splice(kickeePos, 1);            //Remove user from business
-
-      kickeeEmail = req.body.kickeeEmail;
-      userInfo = authMap.get(kickeeEmail);
-      businessPos = 0;
-
-      for(i = 0; i < userInfo.businesses.length; i++){
-        if(userInfo.businesses[i].business_id == req.body.business_id){
-          businessPos = i;
-          break;
-        }
+    bus_info.docs[0].get('members').forEach(member => { // If kicker's role is Owner OR kicker's role is admin AND kickee's role is Employee
+      if (((member.role == 'Owner') || (member.role == 'Admin' && new_member_list[kickee_pos].email == 'Employee')) && (member.email == req.body.kickerEmail)) {
+        has_permissions = true;
       }
-      userInfo.businesses.splice(businessPos, 1);           //Remove business from user info
-
+    });
+    if (has_permissions == false) {
+      res.status(401).send("Not enough permissions");
+      return;
+    }
+    new_member_list.splice(kickee_pos, 1);
+    bus_ref = busdb.doc(bus_info.docs[0].id);
+    try {
+      bus_ref.update({
+        members : new_member_list
+      });
       res.status(200).send("Kick Success");
-    }
-    else{
-      res.status(403).send("Not Enough Permissions");
+    } catch(error) {
+      console.log(error);
     }
   }
 });
