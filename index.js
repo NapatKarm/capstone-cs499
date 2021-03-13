@@ -195,24 +195,31 @@ app.get('/getBusinessData', async (req, res) => {                   //Expected R
     arr_of_bus.docs.forEach(doc => {  // The actual array contains lots of meta data 
       bus_info.push(doc.data())
     });
-    res.status(200).send(bus_info);                            //Response: {businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
+    res.status(200).send(bus_info);   //Response: {businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
   }
 });
 
-app.post('/getSingleBusinessData', async (req, res) => {            //Expected: {business_id, email, token}
-  if(authMap.get(req.body.email).token != req.body.token){
+app.get('/getSingleBusinessData', async (req, res) => {            //Expected: {business_id, email, token}
+  let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
+  if (user_info.docs[0].get('token') != req.body.token) {
     res.status(400).send("Incorrect Token");
   }
-  else{
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
 
-    for(i = 0; i < businessInfo.members.length; i++){               //Check for owner or admin to change passcode
-      if(businessInfo.members[i].email == req.body.email){
-        res.status(200).send(businessMap.get(req.body.business_id));
-      }
+  let is_member = false;
+  user_info.docs[0].get('businesses').forEach(business_id => {
+    if (business_id == req.body.business_id) {
+      is_member = true;
     }
-    
-    res.status(200).send(businessMap.get(req.body.business_id));
+  });
+  if (is_member == false) {
+    res.status(400).send("Not a member of this business");
+  }
+
+  try {
+    let business_info = await busdb.where('businessid', '==', req.body.business_id).get();
+    res.status(200).send(business_info.docs[0].data());  
+  } catch (error) {
+    console.log(error);
   }
 });
 
