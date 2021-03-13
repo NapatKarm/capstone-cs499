@@ -303,12 +303,16 @@ app.patch('/kickMember', async (req, res) => {                      //Expected: 
   else {
     let bus_info = await busdb.where('businessid', '==', req.body.business_id).get();
     let has_permissions = false;
-    let kickee_pos = 0;
     let new_member_list = bus_info.docs[0].get('members');
+    let kickee_pos = "";
     for (let i = 0; i < new_member_list.length; i++) {
       if (new_member_list[i].email == req.body.kickeeEmail) {
         kickee_pos = i;
       }
+    }
+    if (kickee_pos == "") {
+      res.status(401).send("Kickee Email invalid or does not exist within the business");
+      return;
     }
     bus_info.docs[0].get('members').forEach(member => { // If kicker's role is Owner OR kicker's role is admin AND kickee's role is Employee
       if (((member.role == 'Owner') || (member.role == 'Admin' && new_member_list[kickee_pos].email == 'Employee')) && (member.email == req.body.kickerEmail)) {
