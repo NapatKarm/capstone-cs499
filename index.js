@@ -257,32 +257,41 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
 
 
 app.put('/roleChange', async (req, res) => {                      //Expected: {business_id, (owners)changerEmail, changeeEmail, newRole, token}
-if(authMap.get(req.body.changerEmail).token != req.body.token){
-  res.status(400).send("Incorrect Token");
-}
-else{
-  businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
-
-  changerRole = ""            //Make sure changer is owner (only owner can change roles)
-  changeePos = ""            //Record position of employee with role 'to be changed'
-
-  for(i = 0; i < businessInfo.members.length; i++){               //Check for owner and position of changee
-    if(businessInfo.members[i].email == req.body.changerEmail){
-      changerRole = businessInfo.members[i].role;
-    }
-    else if(businessInfo.members[i].email == req.body.changeeEmail){
-      changeePos = i;
-    }
-  }
-
-  if(changerRole == "Owner"){
-    businessMap.get(req.body.business_id).members[changeePos].role = req.body.newRole;
-    res.status(200).send("Change Success");
+  let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.changerEmail.toLowerCase()).get();
+  if (user_info.docs[0].get('token') != req.body.token) {
+    res.status(400).send("Incorrect Token");
+    return;
   }
   else{
-    res.status(401).send("Not Enough Permissions");
+    let bus_info = await busdb.where('businessid', '==', req.body.business_id).get();
+    let has_permissions = false;
+    bus_info.docs[0].get('members').forEach(member => { // Check every member in the business and check for their roles
+      if ((member.role == 'Owner' || member.role == 'Admin') && (member.email == req.body.changerEmail)) {
+        has_permissions = true;
+      }
+    });
+    if (has_permissions == false) {
+      res.status(401).send("Not enough permissions");
+      return;
+    }
+    
+    new_member_list = bus_info.docs[0].get('members');
+    for (let i = 0; i < new_member_list.length; i++) {
+      if (new_member_list[i].email == req.body.changeeEmail) {
+        new_member_list[i].role = req.body.newRole;
+      }
+    }
+
+    bus_ref = busdb.doc(bus_info.docs[0].id);
+    try {
+      bus_ref.update({
+        members : new_member_list
+      });
+      res.status(200).send("Change Success");
+    } catch(error) {
+      console.log(error);
+    }
   }
-}
 });
 
 app.put('/kickMember', async (req, res) => {                      //Expected: {business_id, kickerEmail, kickeeEmail, token}
