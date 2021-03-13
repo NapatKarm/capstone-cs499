@@ -10,6 +10,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import BusinessIcon from '@material-ui/icons/Business';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
+import CVIVIDNav from '../SharedComponent/Navbar'
 import './HomePage.css';
 
 
@@ -32,7 +33,7 @@ class HomePage extends Component {
     }
     componentDidMount = async () => {
         this.setState({
-            userData: this.props.userData
+            userData: this.props.userData,
         }, () => {
             if (this.state.userData) {
                 this.businessUpdate()
@@ -117,7 +118,9 @@ class HomePage extends Component {
         render() {
         return (
             <div className="homePage">
-                <div>Top Nav</div>
+                <div>
+                    <CVIVIDNav userData={this.props.userData} logout={this.logout}/>
+                </div>
                 <div>
                     <div>
                         <div className="topButtonGroup">
