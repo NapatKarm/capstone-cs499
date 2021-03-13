@@ -225,23 +225,32 @@ app.get('/getSingleBusinessData', async (req, res) => {            //Expected: {
 
 
 app.put('/passcodeChange', async (req, res) => {                    //Expected: { business_id, email, token, businesspass}
-  if(authMap.get(req.body.email).token != req.body.token){
+  let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
+  if(user_info.docs[0].get('token') != req.body.token){
     res.status(400).send("Incorrect Token");
+    return;
   }
   else{
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
-
-    for(i = 0; i < businessInfo.members.length; i++){               //Check for owner or admin to change passcode
-      if(businessInfo.members[i].email == req.body.email){
-        if(businessInfo.members[i].role == "Owner" || businessInfo.members[i].role == "Admin"){
-          businessInfo.businesspass = req.body.businesspass;
-          res.status(200).send("Change Success");
-          break;
-        }
-        else{
-          res.status(401).send("Not Enough Permissions");
-        }
+    let bus_info = await busdb.where('businessid', '==', req.body.business_id).get();
+    let has_permissions = false;
+    bus_info.docs[0].get('members').forEach(member => { // Check every member in the business and check for their roles
+      if ((member.role == 'Owner' || member.role == 'Admin') && (member.email == req.body.email)) {
+        has_permissions = true;
       }
+    });
+    if (has_permissions == false) {
+      res.status(401).send("Not enough permissions");
+      return;
+    }
+
+    bus_ref = busdb.doc(bus_info.docs[0].id);  // Ref for updating passcode
+    try {
+      bus_ref.update({
+        businesspass : req.body.businesspass
+      });
+      res.status(200).send("Change Success");
+    } catch (error) {
+      console.log(error);
     }
   }
 });
