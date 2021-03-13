@@ -41,8 +41,8 @@ class LandingPage extends Component {
                             <Button style={{color: 'white', backgroundColor: '#e8333a', maxWidth: '325px', maxHeight: '50px', minWidth: '325px', minHeight: '50px'}}>GO TO THE MAP</Button>
                             <p><br/>Businesses/Workers:</p>
                             <div className="actionButton">
-                                <Button onClick={()=>this.setState({rightState: "register"})} style={{color: 'black', backgroundColor: 'white', maxWidth: '160px', maxHeight: '50px', minWidth: '160px', minHeight: '50px'}}>REGISTER</Button>
-                                <Button onClick={()=>this.setState({rightState: "login"})}  style={{color: 'white', backgroundColor: '#b71c1c', maxWidth: '160px', maxHeight: '50px', minWidth: '160px', minHeight: '50px'}}>LOGIN</Button>
+                                <Button onClick={()=>this.setState({rightState: "register"})} style={{color: 'black', backgroundColor: '#f7f6f6', maxWidth: '160px', maxHeight: '50px', minWidth: '160px', minHeight: '50px'}}>REGISTER</Button>
+                                <Button onClick={()=>this.setState({rightState: "login"})}  style={{color: 'white', backgroundColor: '#b71c1c', maxWidth: '160px', maxHeight: '50px', minWidth: '160px', minHeight: '50px'}}>SIGN IN</Button>
                             </div>
                         </div>
                         <div className="rightSide">
