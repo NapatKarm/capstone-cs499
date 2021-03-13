@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 import validator from 'validator';
 
 class RegisterTable extends Component {
@@ -46,7 +48,6 @@ class RegisterTable extends Component {
         this.setState({ passwordConfirm: event.target.value })
     }
     handleSubmit = async (submit) => {
-        submit.preventDefault()
         if(validator.isEmail(this.state.email)) {
             if (this.state.password === this.state.passwordConfirm) {
                 console.log(this.state.firstName, this.state.lastName, this.state.email, this.state.password, this.state.passwordConfirm, this.state.password === this.state.passwordConfirm)
@@ -76,25 +77,18 @@ class RegisterTable extends Component {
                     </div>
                 ) : (
                     <div>
-                        <div className='registerPage'>
-                            <form onSubmit={this.handleSubmit} className="form">
-                                <table className='registerTable'>
-                                    <thead>
-                                    <tr><td colSpan={2}><h1 className="registerTitle">REGISTRATION</h1></td></tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td className="TextField">First Name:</td><td className="inputFieldR"><input type="text" className="firstName" onChange={this.changeFirstName} /></td></tr>
-                                        <tr><td className="TextField">Last Name:</td><td className="inputFieldR"><input type="text" className="lastName"  onChange={this.changeLastName}></input></td></tr>
-                                        <tr><td className="TextField">Email:</td><td className="inputFieldR"><input type="text" className="email"  onChange={this.changeEmail}></input></td></tr>
-                                        <tr><td className="TextField">Password:</td><td className="inputFieldR"><input type="password" className="Password" id="password" onChange={this.changePassword}></input></td></tr>
-                                        <tr><td className="TextField">Confirm password:</td><td className="inputFieldR"><input type="password" className="confirmPassword" id="confirmPassword" onChange={this.changePasswordConfirm}></input></td></tr>
-                                        <tr><td colSpan={2} className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label htmlFor='show-password'>Show Password</label></td></tr>
-                                        <tr><td className="TextField">{this.state.errorMessage}</td></tr>
-                                        <tr><td colSpan={2}><button className="registerButton">Register</button></td></tr>
-                                        <tr></tr>
-                                    </tbody>
-                                </table>
-                            </form>
+                        <div className='registerTable'>
+                            <div><h1 className="registerTitle">REGISTER</h1></div>
+                            <div className="registerName">
+                                <TextField id="standard-full-width" className="firstName" label="First Name" placeholder="First Name" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changeFirstName}/>
+                                <TextField id="standard-full-width" className="lastName" label="Last Name" placeholder="Last Name" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changeLastName}/>
+                            </div>
+                            <TextField id="standard-full-width" className="email" label="Email" placeholder="Email" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changeEmail}/>
+                            <TextField id="password" className="Password" type="password" label="Password" placeholder="Password" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changePassword}/>
+                            <TextField id="confirmPassword" className="confirmPassword" type="password" label="Confirm Password" placeholder="Confirm Password" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changePasswordConfirm}/>
+                            <div className="showPassword"><input type="checkbox" className="showPassCheck" id='show-password' onClick={this.showPass}></input><label htmlFor='show-password'>Show Password</label></div>
+                            <div className="TextField errorText" >{this.state.errorMessage}</div>
+                            <Button className="registerButton" style={{color: 'white', backgroundColor: '#b71c1c', maxWidth: '295px', maxHeight: '50px', minWidth: '295px', minHeight: '50px'}} onClick={()=>this.handleSubmit()}>Register</Button>
                         </div>
                         {/* Name (first name, last name), Email (as username), Password (ability to hide the password), Confirm password */}
                     </div>)}

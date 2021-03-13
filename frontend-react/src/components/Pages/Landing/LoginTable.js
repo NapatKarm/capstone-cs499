@@ -54,21 +54,12 @@ class LoginTable extends Component {
         return (
             <div>
                 <div className='loginTable'>
-                    <form onSubmit={this.handleSubmit} className="form">
-                        <table className='loginTable'>
-                            <thead>
-                                <tr><td colSpan={2}><h1 className="loginTitle">LOG IN</h1></td></tr>
-                            </thead>
-                            <tbody>
-                                <TextField id="standard-full-width" className="email" label="Email" style={{ margin: 8 }} placeholder="Email" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changeEmail}/>
-                                <TextField id="password" className="Password" type="password" label="Password" style={{ margin: 8 }} placeholder="Password" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changePassword}/>
-                                <tr><td colSpan={2} className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label htmlFor='show-password'>Show Password</label></td></tr>
-                                <tr><td className="TextField">{this.state.errorMessage}</td></tr>
-                                <Button className="loginButton" style={{color: 'white', backgroundColor: '#b71c1c', maxWidth: '160px', maxHeight: '50px', minWidth: '160px', minHeight: '50px'}} onClick={()=>this.handleSubmit()}>Log In</Button>
-                                <tr></tr>
-                            </tbody>
-                        </table>
-                    </form>
+                    <div><h1 className="loginTitle">SIGN IN</h1></div>
+                    <TextField id="standard-full-width" className="email" label="Email" placeholder="Email" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changeEmail}/>
+                    <TextField id="password" className="Password" type="password" label="Password" placeholder="Password" fullWidth margin="normal" InputLabelProps={{ shrink: true, }} onChange={this.changePassword}/>
+                    <div className="showPassword"><input type="checkbox" className="showPassCheck"id='show-password' onClick={this.showPass}></input><label htmlFor='show-password'>Show Password</label></div>
+                    <div className="TextField errorText" >{this.state.errorMessage}</div>
+                    <Button className="loginButton" style={{color: 'white', backgroundColor: '#b71c1c', maxWidth: '295px', maxHeight: '50px', minWidth: '295px', minHeight: '50px'}} onClick={()=>this.handleSubmit()}>Sign In</Button>
                 </div>
                 {/* Name (first name, last name), Email (as username), Password (ability to hide the password), Confirm password */}
             </div>

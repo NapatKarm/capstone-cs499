@@ -16,7 +16,7 @@
 .content {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: space-evenly;
 }
 
 .landingLogo {
@@ -30,25 +30,26 @@
 }
 
 .actionButton {
+    width: 325px;
     display: flex;
     justify-content: space-between;
 }
 
 .leftSide {
-    display: flex;
+    /* flex-grow: 1; */
     flex-direction: column;
+    text-align: center;
+    font-size: 12px;
     width: 325px;
     padding-left: 50px;
     padding-top: 50px;
-    text-align: center;
-    font-size: 12px;
 }
 
 .rightSide {
     flex-grow: 1;
     width: 40vh;
-    padding-left: 100px;
-    padding-top: 50px;
+    padding: 50px;
+    /* padding-top: 50px; */
 }
 
 .footerLanding {
@@ -69,3 +70,63 @@
 }
 
 /*** LOGINTABLE CSS ****/
+.loginTable {
+    margin-top: 15px;
+    margin-right: 50px;
+    border-radius: 5px;
+    position: absolute;
+    width: 30%;
+    right: 50px;
+    background-color: #f7f6f6;
+    padding-bottom: 50px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.loginTitle {
+    color: gray;
+}
+
+.showPassword {
+    color: gray;
+    left: 0px!important;
+    align-self: left!important;
+}
+
+.errorText {
+    color: lightcoral;
+}
+
+.loginButton {
+    text-align: center;
+}
+
+/*** REGISTERTABLE CSS ***/
+.registerTable {
+    margin-top: 15px;
+    margin-right: 50px;
+    border-radius: 5px;
+    position: absolute;
+    width: 30%;
+    right: 50px;
+    background-color: #f7f6f6;
+    padding-bottom: 50px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.registerTitle {
+    color: gray;
+}
+
+.registerName {
+    display: flex;
+}
+
+.registerButton {
+    text-align: center;
+}
