@@ -10,7 +10,6 @@
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.2.2",
-    "address-validator": "^0.2.3",
     "axios": "^0.21.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
