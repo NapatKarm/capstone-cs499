@@ -30,6 +30,9 @@ class ManagedBusinessTable extends Component {
             this.props.history.push("/details")
         }
     }
+    joinTracker = (bID) => {
+        this.props.socket.emit('joinTracker', {businessid:bID,email:this.props.userData.email})
+    }
     render() {
         return (
             <TableContainer className="MBusinessTable" component={Paper}>
@@ -85,7 +88,7 @@ class ManagedBusinessTable extends Component {
                                     <TableCell align="right" className="Tbuttons">
                                         {business.businessOpened ?
                                             (
-                                                <Button className="MTableBody" style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Track</Button>
+                                                <Button onClick={()=>this.joinTracker(business.business_id)}className="MTableBody" style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Track</Button>
                                             ) :
                                             (
                                                 <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Closed</Button>

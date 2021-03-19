@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { userLoginThunk, userLogoutThunk, userSignupThunk } from "../../store/utilities/userinfo";
 import { bRegisterThunk, bGetThunk, bJoinThunk, bUserLogoutThunk } from "../../store/utilities/businessinfo"
 import { bViewThunk, bClearThunk } from "../../store/utilities/businessdetails"
+import socket from '../socket'; 
 
 //Page Imports
 import TestLanding from '../Pages/TestLanding/TestLandingPage';
@@ -19,9 +20,9 @@ class RoutesView extends Component {
         const {singleView} = this.props
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
-        const CounterPageComponent = () => (<CounterPage userData={this.props.userData}/>)
-        const HomePageComponent = () => (<HomePage bDetails={this.props.bDetails} bView={this.props.bView} userLogout={this.props.userLogout} businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
-        const BusinessDetailsComponent = () => (<BusinessDetailsPage userLogout={this.props.userLogout} bUserLogout={this.props.bUserLogout} bDetails={this.props.bDetails} bClear={this.props.bClear} userData={this.props.userData}/>)
+        const CounterPageComponent = () => (<CounterPage socket={socket} userData={this.props.userData}/>)
+        const HomePageComponent = () => (<HomePage socket={socket} bDetails={this.props.bDetails} bView={this.props.bView} userLogout={this.props.userLogout} businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
+        const BusinessDetailsComponent = () => (<BusinessDetailsPage socket={socket} userLogout={this.props.userLogout} bUserLogout={this.props.bUserLogout} bDetails={this.props.bDetails} bClear={this.props.bClear} userData={this.props.userData}/>)
         return (
             <Router>
                 <Switch>
