@@ -11,3 +11,10 @@
 .fullContainerBDP {
     padding: 20px;
 }
+.topInfo {
+    display: flex;
+    justify-content: space-between;
+}
+.topRight {
+    text-align: right;
+}
