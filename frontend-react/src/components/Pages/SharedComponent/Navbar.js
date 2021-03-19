@@ -7,6 +7,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuIcon from '@material-ui/icons/Menu';
 import Button from '@material-ui/core/Button';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import { Link, withRouter } from 'react-router-dom';
 class CVIVIDNav extends Component {
     constructor(props) {
         super(props);
@@ -26,7 +27,7 @@ class CVIVIDNav extends Component {
     render() {
         return (
             <div>
-                <AppBar position="static" style={{ padding: '5px',backgroundColor: "#8a0602" }}>
+                <AppBar position="static" style={{backgroundColor: "#8a0602" }}>
                     <Toolbar style={{display:'flex',justifyContent:'space-between'}}>
                         <div style={{display:'flex', alignItems:'center'}}>
                         <IconButton edge="start" color="inherit" aria-label="menu">
@@ -35,16 +36,15 @@ class CVIVIDNav extends Component {
                         </div>
                         <div>
                             <div style={{display:'flex',justifyContent:'flex-end',alignItems:'center'}}>
-                        <div style={{display:'flex', flexDirection:'column',textAlign:'right',fontSize:'18px',marginRight:'20px'}}>
+                        <div style={{display:'flex', flexDirection:'column',textAlign:'right',fontSize:'18px',marginRight:'20px',fontWeight:'bold'}}>
                             <div>
                                 {this.state.uFirst} {this.state.uLast}
                             </div>
-                            <div>
-                            <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'rgb(255 255 255 / 100%)' }} onClick={this.props.logout}>Logout</Button>
-                            </div>
+                            {/* Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'rgb(255 255 255 / 100%)' }}  */}
+                            <Link style={{color: 'white', fontSize: '13px', fontWeight:'normal'}} onClick={this.props.logout}>Logout</Link>
                         </div>
                         <div>
-                        <AccountCircle fontSize="large"/>
+                        <AccountCircle style={{paddingTop:'5px',fontSize:'2.7rem'}} fontSize="large"/>
                         </div>
                         </div>
                         <div>

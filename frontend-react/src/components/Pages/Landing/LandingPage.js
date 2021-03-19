@@ -33,7 +33,7 @@ class LandingPage extends Component {
                                 Welcome to C-Vivid
                             </div>
                             <div className="aboutP">
-                                <p>Some two line preech about nothing at all in general - lorum ipsum dolar sit amet, consectetur adipiscing elit. Proin phareta lorem aba aba aba</p>
+                                <p>Some two line preach about nothing at all in general - lorum ipsum dolar sit amet, consectetur adipiscing elit. Proin phareta lorem aba aba aba</p>
                             </div>
 
                             {/* vvv Link page vvv*/}
@@ -46,7 +46,7 @@ class LandingPage extends Component {
                             </div>
                         </div>
                         <div className="rightSide">
-                            {this.state.rightState==="none" ? ("") : (<div>{this.state.rightState==="register" ? (<RegisterTable signUpError={this.props.signUpError} userSignup={this.props.userSignup} signupResult={this.props.signupResult}/>) : (<LoginTable logInError={this.props.logInError} userLogin={this.props.userLogin}/>)}</div>)}
+                            {this.state.rightState==="none" ? ("") : (<div>{this.state.rightState==="register" ? (<RegisterTable signUpError={this.props.signUpError} userSignup={this.props.userSignup} signupResult={this.props.signupResult} loginPass={()=>this.setState({rightState: "login"})}/>) : (<LoginTable logInError={this.props.logInError} userLogin={this.props.userLogin}/>)}</div>)}
                         </div>
                     </div>
                     <footer className="footerLanding">
