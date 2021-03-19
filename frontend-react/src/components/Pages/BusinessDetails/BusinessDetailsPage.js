@@ -270,57 +270,59 @@ class BusinessDetailsPage extends Component {
                     </div>
                     {this.state.businessDetails ? (
                         <div>
+                            <div>
+                                <div className="businessNameTitle">{this.state.businessDetails.businessname}</div>
+                            </div>
                             <div className="topInfo">
                                 <div>
-                                    <div>Business Name: {this.state.businessDetails.businessname}</div>
-                                    <div>Business ID: {this.state.businessDetails.business_id} </div>
-                                    <div>Business Address: {this.state.businessDetails.businessaddr}</div>
+                                    <div>{this.state.businessDetails.businessaddr}</div>
+                                    <div>Role: {this.state.role}</div>
                                 </div>
                                 <div className="topRight">
-                                    <div>Role: {this.state.role}</div>
+                                    <div>ID: {this.state.businessDetails.business_id} </div>
                                     <div>Passcode: {this.state.businessDetails.businesspass}</div>
                                 </div>
                             </div>
-                            <div className="workersTable">
+                            <div className="workersTableDiv">
                                 <TableContainer component={Paper}>
                                     <Table className="workersTable" size="small" aria-label="a dense table">
                                         <TableHead>
-                                            <TableRow>
-                                                <TableCell>First name</TableCell>
-                                                <TableCell align="right">Last name</TableCell>
-                                                <TableCell align="right">Email</TableCell>
-                                                <TableCell align="right">Role</TableCell>
-                                                <TableCell></TableCell>
+                                            <TableRow className="workersRow">
+                                                <TableCell className="tableText large-text">First name</TableCell>
+                                                <TableCell className="tableText large-text" align="right">Last name</TableCell>
+                                                <TableCell className="tableText large-text" align="right">Email</TableCell>
+                                                <TableCell className="tableText large-text" align="right">Role</TableCell>
+                                                <TableCell className="tableText large-text"></TableCell>
                                             </TableRow>
                                         </TableHead>
-                                        <TableBody>
+                                        <TableBody className="workersTable">
                                             {this.state.businessDetails.members.map((member) => (
-                                                <TableRow key={member.email}>
-                                                    <TableCell component="th" scope="row">
+                                                <TableRow className="workersRow" key={member.email}>
+                                                    <TableCell className="tableText" component="th" scope="row">
                                                         {member.firstname}
                                                     </TableCell>
-                                                    <TableCell align="right">{member.lastname}</TableCell>
-                                                    <TableCell align="right">{member.email}</TableCell>
-                                                    <TableCell align="right">{member.role}</TableCell>
+                                                    <TableCell className="tableText" align="right">{member.lastname}</TableCell>
+                                                    <TableCell className="tableText" align="right">{member.email}</TableCell>
+                                                    <TableCell className="tableText" align="right" style={{width:'100px'}}>{member.role}</TableCell>
                                                     {(((this.state.role === "Owner") | (this.state.role === "Admin")) && (this.props.userData.email !== member.email)) ?
                                                         (
                                                             this.state.role === "Owner" ?
                                                                 (
                                                                     member.role === "Admin" ?
                                                                         (
-                                                                            <TableCell align="center">
+                                                                            <TableCell className="buttonText" align="center">
                                                                                 <ButtonGroup color="primary" aria-label="outlined primary button group">
-                                                                                    <Button onClick={() => this.runPromote(member.email)} disabled>Promote</Button>
-                                                                                    <Button onClick={() => this.runDemote(member.email)}>Demote</Button>
-                                                                                    <Button onClick={() => this.runKick(member.email)}>Kick</Button>
+                                                                                    <Button className="disabledButton" onClick={() => this.runPromote(member.email)} disabled>Promote</Button>
+                                                                                    <Button className="clickableButton" onClick={() => this.runDemote(member.email)}>Demote</Button>
+                                                                                    <Button className="clickableButton" onClick={() => this.runKick(member.email)}>Kick</Button>
                                                                                 </ButtonGroup>
                                                                             </TableCell>
                                                                         ) : (
-                                                                            <TableCell align="center">
+                                                                            <TableCell className="buttonText" align="center">
                                                                                 <ButtonGroup color="primary" aria-label="outlined primary button group">
-                                                                                    <Button onClick={() => this.runPromote(member.email)}>Promote</Button>
-                                                                                    <Button onClick={() => this.runDemote(member.email)} disabled>Demote</Button>
-                                                                                    <Button onClick={() => this.runKick(member.email)}>Kick</Button>
+                                                                                    <Button className="clickableButton" onClick={() => this.runPromote(member.email)}>Promote</Button>
+                                                                                    <Button className="disabledButton" onClick={() => this.runDemote(member.email)} disabled>Demote</Button>
+                                                                                    <Button className="clickableButton" onClick={() => this.runKick(member.email)}>Kick</Button>
                                                                                 </ButtonGroup>
                                                                             </TableCell>
                                                                         )
@@ -347,7 +349,7 @@ class BusinessDetailsPage extends Component {
                                                                 )
 
                                                         ) : (
-                                                            <TableCell></TableCell>
+                                                            <TableCell className="tableText"></TableCell>
                                                         )}
                                                 </TableRow>
                                             ))}

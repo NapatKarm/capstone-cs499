@@ -103,8 +103,10 @@ class ManagedBusinessTable extends Component {
                                     <div style={{ justifyContent: "center", padding: "30px" }}><CircularProgress fontSize="small" /></div>
                                 </TableCell>
                                 <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
-                                    <div className="MTableBody"> Loading Data... </div>
+                                    <div className="MTableBody"> Loading Data . . .</div>
                                 </TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
                             </TableRow>
 
                         )}

@@ -18,3 +18,43 @@
 .topRight {
     text-align: right;
 }
+
+.businessNameTitle{
+    font-size:40px;
+    font-weight:bold;
+}
+
+.workersTableDiv {
+    margin-top: 15px;
+}
+
+.workersTable {
+    background-color: #191919 !important;
+}
+
+.tableText {
+    background-color: #1c1c1c;
+    color: white!important;
+    padding: 20px!important;
+}
+
+.buttonText {
+    background-color: #1c1c1c;
+    color: white!important;
+}
+
+.large-text {
+    font-size: 21px!important;
+}
+
+.clickableButton {
+    font-weight: normal!important;
+    color: black!important;
+    background-color: #ebebeb!important;
+}
+
+.disabledButton {
+    font-weight: normal!important;
+    color: black!important;
+    background-color: #d6d6d6!important;
+}
