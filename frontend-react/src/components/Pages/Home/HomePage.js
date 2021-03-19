@@ -13,7 +13,6 @@ import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import CVIVIDNav from '../SharedComponent/Navbar'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-
 import './HomePage.css';
 
 
@@ -31,24 +30,35 @@ class HomePage extends Component {
             userData: {},
             businessList: [],
             registeringBusiness: false,
+            joiningBusiness: false,
             bName: "",
             bAddress: "",
-            bPass: ""
+            bPass: "",
+            bID: "",
+            joinError: ""
         }
     }
     componentDidMount = async () => {
         this.setState({
-            userData: this.props.userData
+            userData: this.props.userData,
         }, () => {
-            console.log("USER INFOIOIOOJP",this.state.userData)
             if (this.state.userData) {
-                this.props.bGet(this.state.userData.email,this.state.userData.token) 
-                if(this.props.businessData) {
-                    this.setState({businessList:this.props.businessData.businesses})
-                    console.log("BUSINESS DATA",this.props.businessData)
-                }
-            }
+                this.businessUpdate()
+        }})
+    }
+    logout = () => {
+        this.props.bUserLogout()
+        this.props.userLogout()
+        this.props.history.push("/")
+    }
+    businessUpdate = async () => {
+        this.setState({
+            businessList: undefined
         })
+        await this.props.bGet(this.state.userData.email,this.state.userData.token) 
+        if(this.props.businessData) {
+            this.setState({businessList:this.props.businessData.businesses, registeringBusiness:false},()=>(console.log("BUSINESS DATAX",this.props.businessData)))    
+        }
     }
     cancelBReg = () => {
         this.setState({
@@ -57,11 +67,33 @@ class HomePage extends Component {
     }
     startBReg = () => {
         this.setState({
-            registeringBusiness: true
+            registeringBusiness: true,
+            bName: "",
+            bAddress: "",
+            bPass: "",
+            bID: ""
+        })
+    }
+    cancelBJoin = () => {
+        this.setState({
+            joiningBusiness: false,
+            joinError: ""
+        })
+    }
+    startBJoin = () => {
+        this.setState({
+            joiningBusiness: true,
+            bName: "",
+            bAddress: "",
+            bPass: "",
+            bID: ""
         })
     }
     changeBName = (event) => {
         this.setState({ bName: event.target.value })
+    }
+    changeBID = (event) => {
+        this.setState({ bID: event.target.value })
     }
     changeBAddress = (event) => {
         this.setState({ bAddress: event.target.value })
@@ -91,21 +123,50 @@ class HomePage extends Component {
     }
         render() {
         return (
-            <div>
-                <div>Top Nav</div>
+            <div className="homePage">
+                <div>
+                    <CVIVIDNav userData={this.props.userData} logout={this.logout}/>
+                </div>
                 <div>
                     <div>
-                        <Button onClick={this.startBReg}>Register business</Button><Button>Join Business</Button>
+                        <div className="topButtonGroup">
+                        <div className="topButtonBox" onClick={this.startBReg}>
+                            <div>
+                                <div className="topText">
+                                    REGISTER
+                                </div>
+                                <div className="buttomText">
+                                    Business
+                                </div>
+                            </div>
+                            <div>
+                                <BusinessIcon fontSize="large"/>
+                            </div>
+                        </div>
+                        <div className="topButtonBox" onClick={this.startBJoin}>
+                            <div>
+                                <div className="topText">
+                                    JOIN
+                                </div>
+                                <div className="buttomText">
+                                    Business
+                                </div>
+                            </div>
+                            <div>
+                                <BusinessCenterIcon fontSize="large"/>
+                            </div>
+                        </div>
+                        </div>
                     </div>
                     <div className="BusinessTable">
-                        <ManagedBusinessTable businessList={this.state.businessList} />
+                        <ManagedBusinessTable logout={this.logout} businessUpdate={this.businessUpdate} history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
                     </div>
                     <div className="BusinessRegisterComponent">
                         <Dialog open={this.state.registeringBusiness} onClose={this.cancelBReg} aria-labelledby="form-dialog-title">
                             <DialogTitle id="form-dialog-title">Business Registration</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    Fill this out and bam you business hummie
+                                    Fill this out and bam you CREATE business hummie
                                  </DialogContentText>
                                 <TextField
                                     autoFocus
@@ -143,6 +204,43 @@ class HomePage extends Component {
                                 </Button>
                                 <Button onClick={this.regBusiness} color="primary">
                                     Register
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                    </div>
+                    <div className="BusinessJoinComponent">
+                        <Dialog open={this.state.joiningBusiness} onClose={this.cancelBJoin} aria-labelledby="form-dialog-title">
+                            <DialogTitle id="form-dialog-title">Joining a Business</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText>
+                                    Fill this out and bam you JOIN business hummie
+                                 </DialogContentText>
+                                <TextField
+                                    autoFocus
+                                    margin="dense"
+                                    id="BID"
+                                    label="Business ID"
+                                    type="string"
+                                    onChange={this.changeBID}
+                                    fullWidth
+                                />
+                                <TextField
+                                    autoFocus
+                                    margin="dense"
+                                    id="BCode"
+                                    label="Business Passcode"
+                                    type="string"
+                                    onChange={this.changeBPass}
+                                    fullWidth
+                                />
+                                {this.state.joinError}
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={this.cancelBJoin} color="primary">
+                                    Cancel
+                                </Button>
+                                <Button onClick={this.joinBusiness} color="primary">
+                                    Join
                                 </Button>
                             </DialogActions>
                         </Dialog>

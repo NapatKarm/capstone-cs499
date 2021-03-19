@@ -24,7 +24,7 @@ class LandingPage extends Component {
 
     render() {
         return(
-            <div className="body">
+            <div className="bodyT">
                 <div className="bgImage">
                     <div className="content">
                         <div className="leftSide">

@@ -1,4 +1,4 @@
-.body {
+.bodyT {
     height: 100vh;
     color: white;
     background-color: #191919;
@@ -88,11 +88,16 @@
 .loginTitle {
     color: gray;
 }
-
+.circleAvatarLogo{
+    width: auto;
+}
 .showPassword {
     color: gray;
     left: 0px!important;
     align-self: left!important;
+    text-align: left !important;
+    padding-bottom: 25px;
+
 }
 
 .errorText {

@@ -128,7 +128,7 @@ class CounterPage extends Component {
 
     render() {
         return(
-            <div className="body-counter">
+            <div>
                 <div className="navBar">
                     <AppBar position="static" style={{backgroundColor: "#8a0602"}}>
                         <Toolbar>
@@ -156,8 +156,10 @@ class CounterPage extends Component {
                 <div className="displayRemCap">
                     <div><b>Remaining Capacity: {this.state.maxCap-this.state.capacity}</b></div>
                 </div>
-                <div className="leftAdd" onClick={this.addCapacity}></div>
-                <div className="rightAdd" onClick={this.subCapacity}></div>
+                <div className="backgroundButtons">
+                <div className="leftAdd" onClick={this.addCapacity}/>
+                <div className="rightAdd" onClick={this.subCapacity}/>
+                </div>
             </div>
         )
     }
