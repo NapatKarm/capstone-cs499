@@ -107,23 +107,36 @@ class CounterPage extends Component {
         super(props);
         this.state = {
             capacity: 0,
-            maxCap: 15
+            maxCap: 15,
+            joinError: ""
         }
     }
 
+    componentDidMount() {
+        this.props.socket.on("updateCounter",({ error, counter }) => {
+            if(error!==undefined){
+                console.log("error: ",error);
+                this.setState({joinError:error});
+            }
+            if(counter!==undefined){
+                if(this.props.bDetails===undefined)
+                {
+                    this.setState({capacity: counter})
+                }
+            }
+        })
+    }
     addCapacity = ()=> {
-        let newCapacity=this.state.capacity+1
-        this.setState({capacity: newCapacity})
+        if (this.props.bDetails) {
+            this.props.socket.emit('addCount', {businessid: this.props.bDetails.business_id})
+        }
     }
     subCapacity = ()=> {
-        if (this.state.capacity-1 <= 0) {
-            let newCapacity=0
-            this.setState({capacity: newCapacity})
-        } else {
-            let newCapacity=this.state.capacity-1
-            this.setState({capacity: newCapacity})
-        }
-        
+        if (this.state.capacity > 0) {
+            if (this.props.bDetails) {
+                this.props.socket.emit('removeCount', {businessid: this.props.bDetails.business_id})
+            }
+        }   
     }
 
     render() {

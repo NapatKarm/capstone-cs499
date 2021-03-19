@@ -70,10 +70,15 @@ class RegisterTable extends Component {
         return (
             <div>
                 {this.state.successfulSignup!=="" ? (
-                    <div>
-                        Registered
+                    <div className='registerTable registerSuccess'>
                         <br/>
-                        P.S. my boss is -----
+                        Registration successful
+                        <br/>
+                        Please sign in
+                        {/* If we have time before final presentation:
+                        <div className="actionButton">
+                            <Button onClick={()=>this.props.loginPass}  style={{color: 'white', backgroundColor: '#b71c1c', maxWidth: '160px', maxHeight: '50px', minWidth: '160px', minHeight: '50px'}}>SIGN IN</Button>
+                        </div> */}
                     </div>
                 ) : (
                     <div>

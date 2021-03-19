@@ -124,6 +124,10 @@
     text-align: center;
 }
 
+.registerSuccess {
+    color: black;
+}
+
 .registerTitle {
     color: gray;
 }

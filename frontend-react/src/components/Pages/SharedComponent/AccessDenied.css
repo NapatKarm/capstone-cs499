@@ -1,0 +1,23 @@
+.deniedContent {
+    display: flex;
+    align-items: center;
+    height: 100vh;
+}
+
+.deniedHeader {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 50px;
+}
+
+.textRight {
+    text-align: center;
+}
+
+.cookieDiv {
+    height: -50px;
+}
+
+.cookie {
+    height: 250px;
+}

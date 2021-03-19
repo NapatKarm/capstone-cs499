@@ -11,20 +11,23 @@ import LandingPage from '../Pages/Landing/LandingPage';
 import HomePage from '../Pages/Home/HomePage';
 import CounterPage from  '../Pages/Counter/CounterPage';
 import BusinessDetailsPage from '../Pages/BusinessDetails/BusinessDetailsPage'
+import AccessDenied from '../Pages/SharedComponent/AccessDenied';
 
 
 class RoutesView extends Component {
     render() {
         const {loggedIn} = this.props
         const {singleView} = this.props
+        const AccessDeniedComponent = () => (<AccessDenied/>)
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
-        const CounterPageComponent = () => (<CounterPage userData={this.props.userData}/>)
-        const HomePageComponent = () => (<HomePage bDetails={this.props.bDetails} bView={this.props.bView} userLogout={this.props.userLogout} businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
-        const BusinessDetailsComponent = () => (<BusinessDetailsPage userLogout={this.props.userLogout} bUserLogout={this.props.bUserLogout} bDetails={this.props.bDetails} bClear={this.props.bClear} userData={this.props.userData}/>)
+        const CounterPageComponent = () => (<CounterPage socket={socket} userData={this.props.userData} bDetails={this.props.bDetails}/>)
+        const HomePageComponent = () => (<HomePage socket={socket} bDetails={this.props.bDetails} bView={this.props.bView} userLogout={this.props.userLogout} businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
+        const BusinessDetailsComponent = () => (<BusinessDetailsPage socket={socket} userLogout={this.props.userLogout} bUserLogout={this.props.bUserLogout} bDetails={this.props.bDetails} bClear={this.props.bClear} userData={this.props.userData}/>)
         return (
             <Router>
                 <Switch>
+                    <Route exact path="/denied" render={AccessDeniedComponent} />
                     <Route exact path="/test" render={TestLandingComponent} />
                     <Route exact path="/" render={LandingPageComponent} />
                     <Route exact path="/counter" render={CounterPageComponent} />
@@ -39,7 +42,7 @@ class RoutesView extends Component {
                             </Switch>
                         )
                     }   
-                    <Route render={LandingPageComponent} />
+                    <Route render={AccessDeniedComponent} />
                 </Switch>
             </Router>
         )

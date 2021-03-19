@@ -32,7 +32,9 @@ class BusinessDetailsPage extends Component {
             actionName: "",
             actionVictim: "",
             changingBPass: false,
-            passError: ""
+            passError: "",
+            openingBusiness: false,
+            limitNum: ""
         }
     }
     componentDidMount() {
@@ -89,6 +91,12 @@ class BusinessDetailsPage extends Component {
         this.setState({
             changingBPass: false,
             passError: ""
+        })
+    }
+    cancelOpening = () => {
+        this.setState({
+            openingBusiness: false,
+            limitNum: ""
         })
     }
     changingBPass = () => {
@@ -156,6 +164,15 @@ class BusinessDetailsPage extends Component {
             actionVictim: bName,
             action: true
         })
+    }
+    runOpen = () => {
+        console.log("Opening")
+        this.setState({
+            openingBusiness: true
+        })
+    }
+    changeLimit = (event) => {
+        this.setState({ limitNum: event.target.value })
     }
     goBackHome = () => {
         this.props.bClear()
@@ -260,7 +277,7 @@ class BusinessDetailsPage extends Component {
                                     ) : (
                                         <div>
                                             <Button onClick={this.changingBPass} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Change Passcode</Button>
-                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Open</Button>
+                                            <Button onClick={this.runOpen} style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Open</Button>
                                             <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Close</Button>
                                         </div>
                                     )
@@ -361,7 +378,7 @@ class BusinessDetailsPage extends Component {
                     ) : (
                         <div>
                             No Info: If you can see this, you've encountered a bug (:
-                            or you know.. you did something you weren't supposed to
+                            or you know... you did something you weren't supposed to
                         </div>
                     )}
                 </div>
@@ -406,6 +423,33 @@ class BusinessDetailsPage extends Component {
                             <Button onClick={this.BPassChange} color="primary">
                                 Change
                                 </Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={this.state.openingBusiness} onClose={this.cancelOpening} aria-labelledby="form-dialog-title">
+                        <DialogTitle id="form-dialog-title">Open Store</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                What is your maximum capacity for the day?
+                            </DialogContentText>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="limit"
+                                label="Capacity"
+                                type="integer"
+                                onChange={this.changeLimit}
+                                fullWidth
+                            />
+                            {this.state.passError}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={this.cancelOpening} color="primary">
+                                Cancel
+                            </Button>
+                            {/* vvv Add an onclick vvv */}
+                            <Button color="primary">
+                                Open
+                            </Button>
                         </DialogActions>
                     </Dialog>
                 </div>
