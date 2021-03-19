@@ -11,10 +11,17 @@ import Slide from '@material-ui/core/Slide';
 import BusinessIcon from '@material-ui/icons/Business';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import CVIVIDNav from '../SharedComponent/Navbar'
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import './HomePage.css';
 
 
 import ManagedBusinessTable from './ManagedBusinessTable'
+
+var geocoder = new MapboxGeocoder({
+    accessToken: 'pk.eyJ1IjoibmFwYXRrYXJtIiwiYSI6ImNrbWRzejdmZTJwOGIyb29qem5kaGdnYWQifQ.0qB-jB0GW4iI1V3ban2fXQ',
+    types: 'country,region,place,postcode,locality,neighborhood'
+});
 
 class HomePage extends Component {
     constructor(props) {
@@ -105,7 +112,6 @@ class HomePage extends Component {
     joinBusiness = async () => {
         await this.props.bJoin(this.state.userData.email,this.state.bID,this.state.bPass)
         if(this.props.bJoinError){
-            
             this.setState({joinError: this.props.bJoinError},()=>(console.log("This should have ran",this.state.joinError)))
         }
         else {
@@ -171,10 +177,12 @@ class HomePage extends Component {
                                     onChange={this.changeBName}
                                     fullWidth
                                 />
+                                {/* {geocoder.addTo('#geocoder')} */}
                                 <TextField
                                     autoFocus
                                     margin="dense"
                                     id="BAddress"
+                                    id="geocoder"
                                     label="Business Address"
                                     type="string"
                                     onChange={this.changeBAddress}
