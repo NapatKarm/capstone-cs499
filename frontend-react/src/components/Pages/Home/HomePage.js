@@ -8,8 +8,21 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import BusinessIcon from '@material-ui/icons/Business';
+import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
+import CVIVIDNav from '../SharedComponent/Navbar'
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+
+import './HomePage.css';
+
 
 import ManagedBusinessTable from './ManagedBusinessTable'
+
+var geocoder = new MapboxGeocoder({
+    accessToken: 'pk.eyJ1IjoibmFwYXRrYXJtIiwiYSI6ImNrbWRzejdmZTJwOGIyb29qem5kaGdnYWQifQ.0qB-jB0GW4iI1V3ban2fXQ',
+    types: 'country,region,place,postcode,locality,neighborhood'
+});
 
 class HomePage extends Component {
     constructor(props) {
@@ -56,9 +69,25 @@ class HomePage extends Component {
     changeBPass = (event) => {
         this.setState({ bPass: event.target.value })
     }
-    regBusiness = () => {
+    regBusiness = async () => {
         console.log(this.state,"Look at reg info!")
-        this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass)
+        await this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass)
+        await this.props.bGet(this.state.userData.email,this.state.userData.token) 
+        if(this.props.businessData) {
+            this.setState({businessList:this.props.businessData.businesses, registeringBusiness:false},()=>(console.log(this.props.businessData)))    
+        }
+    }
+    joinBusiness = async () => {
+        await this.props.bJoin(this.state.userData.email,this.state.bID,this.state.bPass)
+        if(this.props.bJoinError){
+            this.setState({joinError: this.props.bJoinError},()=>(console.log("This should have ran",this.state.joinError)))
+        }
+        else {
+            await this.props.bGet(this.state.userData.email,this.state.userData.token) 
+            if(this.props.businessData) {
+                this.setState({businessList:this.props.businessData.businesses, joiningBusiness: false},()=>(console.log(this.props.businessData)))    
+            }
+        } 
     }
         render() {
         return (
@@ -87,10 +116,12 @@ class HomePage extends Component {
                                     onChange={this.changeBName}
                                     fullWidth
                                 />
+                                {/* {geocoder.addTo('#geocoder')} */}
                                 <TextField
                                     autoFocus
                                     margin="dense"
                                     id="BAddress"
+                                    id="geocoder"
                                     label="Business Address"
                                     type="string"
                                     onChange={this.changeBAddress}
