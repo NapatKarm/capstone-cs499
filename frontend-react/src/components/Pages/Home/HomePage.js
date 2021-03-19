@@ -125,7 +125,7 @@ class HomePage extends Component {
         return (
             <div className="homePage">
                 <div>
-                    <CVIVIDNav userData={this.props.userData} logout={this.logout}/>
+                    <CVIVIDNav userData={this.props.userData} socket={this.props.socket} userData={this.props.userData} logout={this.logout}/>
                 </div>
                 <div>
                     <div>
