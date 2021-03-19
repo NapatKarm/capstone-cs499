@@ -153,7 +153,7 @@ class HomePage extends Component {
                         </div>
                     </div>
                     <div className="BusinessTable">
-                        <ManagedBusinessTable businessUpdate={this.businessUpdate} history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
+                        <ManagedBusinessTable logout={this.logout} businessUpdate={this.businessUpdate} history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
                     </div>
                     <div className="BusinessRegisterComponent">
                         <Dialog open={this.state.registeringBusiness} onClose={this.cancelBReg} aria-labelledby="form-dialog-title">

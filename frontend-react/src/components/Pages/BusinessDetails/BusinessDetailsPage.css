@@ -1,0 +1,13 @@
+.businessDetailsPage{
+    color: white;
+    background-color: #191919;
+    height: 100vh;
+}
+.topButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.fullContainerBDP {
+    padding: 20px;
+}

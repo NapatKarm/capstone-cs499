@@ -26,7 +26,7 @@ class CVIVIDNav extends Component {
     render() {
         return (
             <div>
-                <AppBar position="static" style={{ padding: '5px', marginBottom:'35px',backgroundColor: "#8a0602" }}>
+                <AppBar position="static" style={{ padding: '5px',backgroundColor: "#8a0602" }}>
                     <Toolbar style={{display:'flex',justifyContent:'space-between'}}>
                         <div style={{display:'flex', alignItems:'center'}}>
                         <IconButton edge="start" color="inherit" aria-label="menu">
