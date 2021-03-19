@@ -50,6 +50,11 @@ class BusinessDetailsPage extends Component {
 
         })
     }
+    logout = () => {
+        this.props.bUserLogout()
+        this.props.userLogout()
+        this.props.history.push("/")
+    }
     updateDetails = async () => {
         console.log("UPDATING")
         axios.post(`https://c-vivid-backend.herokuapp.com/getSingleBusinessData`, {
@@ -233,12 +238,12 @@ class BusinessDetailsPage extends Component {
         return (
             <div className="businessDetailsPage">
                 <div>
-                    <CVIVIDNav userData={this.props.userData} logout={this.props.logout} />
+                    <CVIVIDNav userData={this.props.userData} logout={this.logout} />
                 </div>
                 <div className="fullContainerBDP">
                     <div className="topButtons">
                         <div>
-                            <Button onClick={this.goBackHome} style={{padding: '5px 20px 5px 20px', backgroundColor: '#ab191e',color:'white' }}>Back Home</Button>
+                            <Button onClick={this.goBackHome} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Back Home</Button>
                             <IconButton aria-label="refresh" onClick={() => this.updateDetails()}>
                                 <RefreshIcon style={{ color: "white" }} />
                             </IconButton>
@@ -249,28 +254,32 @@ class BusinessDetailsPage extends Component {
                                     this.businessOpened ? (
                                         <div>
                                             <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Change Passcode</Button>
-                                            <Button style={{ marginLeft:"10px",padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Open</Button>
-                                            <Button style={{ marginLeft:"10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e' }} onClick={this.runClose}>Close</Button>
+                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Open</Button>
+                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e' }} onClick={this.runClose}>Close</Button>
                                         </div>
                                     ) : (
                                         <div>
-                                            <Button  onClick={this.changingBPass} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Change Passcode</Button>
-                                            <Button style={{ marginLeft:"10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e',color:'white' }}>Open</Button>
-                                            <Button style={{ marginLeft:"10px",padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Close</Button>
+                                            <Button onClick={this.changingBPass} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Change Passcode</Button>
+                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Open</Button>
+                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Close</Button>
                                         </div>
                                     )
                                 ) : ("")
                             ) : ("")}
                         </div>
                     </div>
-                    <div>Your Role: {this.state.role}</div>
                     {this.state.businessDetails ? (
                         <div>
                             <div className="topInfo">
-                                <div>Business ID: {this.state.businessDetails.business_id} </div>
-                                <div>Business Name: {this.state.businessDetails.businessname}</div>
-                                <div>Business Address: {this.state.businessDetails.businessaddr}</div>
-                                <div>Business Passcode: {this.state.businessDetails.businesspass}</div>
+                                <div>
+                                    <div>Business Name: {this.state.businessDetails.businessname}</div>
+                                    <div>Business ID: {this.state.businessDetails.business_id} </div>
+                                    <div>Business Address: {this.state.businessDetails.businessaddr}</div>
+                                </div>
+                                <div className="topRight">
+                                    <div>Role: {this.state.role}</div>
+                                    <div>Passcode: {this.state.businessDetails.businesspass}</div>
+                                </div>
                             </div>
                             <div className="workersTable">
                                 <TableContainer component={Paper}>
