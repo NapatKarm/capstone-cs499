@@ -2,6 +2,23 @@ require('dotenv').config();
 const express = require('express');
 
 const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, {cors: true});
+const redisadapter = require('socket.io-redis');
+const Redis = require("ioredis");
+const ioredis = new Redis({
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+  password: process.env.REDIS_PASSWORD
+});
+io.adapter(redisadapter({
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+  auth_pass: process.env.REDIS_PASSWORD
+}));
+
+
+const axios = require('axios');
 const cors = require('cors');
 const {v4: uuidv4} = require('uuid');
 
@@ -896,4 +913,4 @@ io.on('connection', (socket) => {
 });
 
 const port = process.env.PORT || 4000;
-app.listen(port, () => console.log(`App is listening on Port ${port}`));
+server.listen(port, () => console.log(`App is listening on Port ${port}`));
