@@ -1,4 +1,4 @@
-// require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 
 const app = express();
@@ -782,6 +782,118 @@ app.put('/businessClose', async (req, res) => {                     //Expected R
   }
 });
 
+async function isPartofBusiness(businessid, socket_id){
+  const members = await io.of('/').adapter.sockets(new Set([businessid]));
+  for (let it = members.values(), socketID = null; socketID = it.next().value;) { // iterate through a SET
+    if(socket_id == socketID){
+      return true;
+    }
+  }
+  return false;
+}
+
+io.on('connection', (socket) => {
+  console.log(`user ${socket.id} has connected`);
+
+  socket.leave(socket.id);
+
+  socket.on('openBusiness', async ({businessid, businessname, businessaddr, limit, email, token}) => {
+    const json = JSON.stringify({
+      businessname: businessname,
+      businessaddr: businessaddr,
+      limit: limit
+    });
+    await ioredis.set(businessid, json);
+    await ioredis.set(businessid.toString()+"counter", 0);
+
+    await axios.put(`https://${process.env.EXPRESS_HOST}/businessOpen`, {business_id: businessid, email: email, token: token})
+    .then(res => {
+      socket.emit('openResponse', {success: "Success"});
+    })
+    .catch(err => {
+      socket.emit('openResponse', {error: "Error"});
+    })
+    console.log("open");
+  });
+
+  socket.on('closeBusiness', async ({businessid, email, token}) => {
+    await ioredis.del(businessid);
+    await ioredis.set(businessid.toString()+"counter");
+    await axios.put(`https://${process.env.EXPRESS_HOST}/businessClose`, {business_id: businessid, email: email, token: token})
+    .then(res => {
+      socket.emit('closeResponse', {success: "Success"});
+    })
+    .catch(err => {
+      socket.emit('closeResponse', {error: "Error"});
+    })
+    console.log("close");
+  });
+
+  socket.on('joinTracker', async ({email, businessid}) => {
+    if(await ioredis.exists(businessid)){
+      console.log("join");
+      socket.join(businessid);
+      const json = JSON.stringify({
+        email: email
+      });
+      await ioredis.set(socket.id, json);
+      let business = await ioredis.get(businessid);
+      let businessJson = JSON.parse(business);
+
+      socket.emit('joinCheck', { counter: await ioredis.get(businessid.toString()+"counter"), limit: businessJson.limit});
+    }
+    else{
+      socket.emit('joinCheck', {error: "Business is closed"});
+    }
+  });
+
+  socket.on('addCount', async ({businessid}) => {
+    if(await isPartofBusiness(businessid, socket.id)){
+      const businessCounter = await ioredis.get(businessid.toString()+"counter");
+
+      await ioredis.incr(businessid.toString()+"counter");
+
+      console.log(await ioredis.get(businessid.toString()+"counter"));
+      socket.emit('updateCounter', {counter: await ioredis.get(businessid.toString()+"counter")});
+    }
+  });
+
+  socket.on('removeCount', async ({businessid})=> {
+    if(await isPartofBusiness(businessid, socket.id)){
+      const businessCounter = await ioredis.get(businessid.toString()+"counter");
+      if(businessCounter > 0){
+        await ioredis.decr(businessid.toString()+"counter");
+      }
+      console.log(await ioredis.get(businessid.toString()+"counter"));
+      socket.emit('updateCounter', {counter: await ioredis.get(businessid.toString()+"counter")});
+    }
+  });
+
+  socket.on('limitChange', async ({businessid, limit}) => {
+    let business = await ioredis.get(businessid);
+    let businessJson = JSON.parse(business);
+    businessJson.limit = limit;
+    business = JSON.stringify(businessJson);
+
+    await ioredis.set(businessid, business);
+    let newbusiness = await ioredis.get(businessid);
+    let newBusinessJson = JSON.parse(newbusiness);
+    console.log(newBusinessJson.limit);
+  });
+
+  socklet.on('leaveBusiness', async ({businessid}) => {
+    socket.leave(businessid);
+    await ioredis.del(socket.id);
+  });
+
+  socket.on('disconnect', async () => {
+    const user = await ioredis.get(socket.id);
+    if(user != null){
+      await ioredis.del(socket.id);
+    }
+    console.log(`user ${socket.id} disconnected`);
+  });
+});
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`App is listening on Port ${port}`));
