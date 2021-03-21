@@ -102,6 +102,7 @@
 
 .errorText {
     color: lightcoral;
+    padding-bottom: 25px;
 }
 
 .loginButton {

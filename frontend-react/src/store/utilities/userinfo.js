@@ -75,7 +75,8 @@ export const userSignupThunk = (firstName, lastName, email, password) => async (
         })
         .catch(err => {
             console.log("Error from signup",err)
-            dispatch(signUpErrorCatch(err.response.data));
+            if(err.response) dispatch(signUpErrorCatch(err.response.data));
+            else dispatch(signUpErrorCatch(err.message))
             
         })
     }
@@ -92,12 +93,13 @@ export const userLoginThunk = (email,password) => async (dispatch) => {
             password: password
         })
         .then(res => {
-            console.log("Response from login",res.data);
+            console.log("Response from login",res);
             dispatch(userLogin(res.data));
         })
         .catch(err => {
             console.log("Error from login",err)
-            dispatch(logInErrorCatch(err.response.data));
+            if(err.response) dispatch(logInErrorCatch(err.response.data));
+            else dispatch(logInErrorCatch(err.message))
             
         })
     }
