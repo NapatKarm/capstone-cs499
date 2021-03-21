@@ -57,7 +57,7 @@ class HomePage extends Component {
         })
         await this.props.bGet(this.state.userData.email,this.state.userData.token) 
         if(this.props.businessData) {
-            this.setState({businessList:this.props.businessData.businesses, registeringBusiness:false},()=>(console.log("BUSINESS DATAX",this.props.businessData)))    
+            this.setState({businessList:this.props.businessData.businessList, registeringBusiness:false},()=>(console.log("BUSINESS DATAX",this.props.businessData)))    
         }
     }
     cancelBReg = () => {
@@ -106,7 +106,7 @@ class HomePage extends Component {
         await this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass)
         await this.props.bGet(this.state.userData.email,this.state.userData.token) 
         if(this.props.businessData) {
-            this.setState({businessList:this.props.businessData.businesses, registeringBusiness:false},()=>(console.log(this.props.businessData)))    
+            this.setState({businessList:this.props.businessData.businessList, registeringBusiness:false},()=>(console.log(this.props.businessData)))    
         }
     }
     joinBusiness = async () => {
@@ -117,7 +117,7 @@ class HomePage extends Component {
         else {
             await this.props.bGet(this.state.userData.email,this.state.userData.token) 
             if(this.props.businessData) {
-                this.setState({businessList:this.props.businessData.businesses, joiningBusiness: false},()=>(console.log(this.props.businessData)))    
+                this.setState({businessList:this.props.businessData.businessList, joiningBusiness: false},()=>(console.log(this.props.businessData)))    
             }
         } 
     }
@@ -159,7 +159,7 @@ class HomePage extends Component {
                         </div>
                     </div>
                     <div className="BusinessTable">
-                        <ManagedBusinessTable logout={this.logout} businessUpdate={this.businessUpdate} history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
+                        <ManagedBusinessTable  userData={this.props.userData}socket={this.props.socket} logout={this.logout} businessUpdate={this.businessUpdate} history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
                     </div>
                     <div className="BusinessRegisterComponent">
                         <Dialog open={this.state.registeringBusiness} onClose={this.cancelBReg} aria-labelledby="form-dialog-title">

@@ -3,6 +3,9 @@
     background-color: #191919;
     height: 100vh;
 }
+.forcedWhiteColor{
+    color: white !important;
+}
 .topButtons {
     display: flex;
     justify-content: space-between;

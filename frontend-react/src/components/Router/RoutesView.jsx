@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { userLoginThunk, userLogoutThunk, userSignupThunk } from "../../store/utilities/userinfo";
 import { bRegisterThunk, bGetThunk, bJoinThunk, bUserLogoutThunk } from "../../store/utilities/businessinfo"
 import { bViewThunk, bClearThunk } from "../../store/utilities/businessdetails"
+import { cUpdateThunk, cWipeThunk } from "../../store/utilities/counterinfo"
 import socket from '../socket'; 
 
 //Page Imports
@@ -59,7 +60,7 @@ const mapState = (state) => {
         singleView: !!state.businessdetails.bDetails,
         signUpError: state.userinfo.signUpError,
         logInError: state.userinfo.logInError,
-        businessData: state.businessinfo.Businesses,
+        businessData: state.businessinfo.businessList,
         bRegError: state.businessinfo.bRegError,
         bJoinError: state.businessinfo.BJoinError,
         bDetails: state.businessdetails.bDetails
@@ -76,7 +77,9 @@ const mapDispatch = (dispatch) => {
         bJoin: (email,businessid,businesspass) => dispatch(bJoinThunk(email,businessid,businesspass)),
         bRegister: (bname, baddress, email, businesspass) => dispatch(bRegisterThunk(bname, baddress, email, businesspass)),
         bView: (business) => dispatch(bViewThunk(business)),
-        bClear: ()=> dispatch(bClearThunk())
+        bClear: ()=> dispatch(bClearThunk()),
+        cUpdate: (cInfo)=> dispatch(cUpdateThunk(cInfo)),
+        cWipe: ()=> dispatch(cWipeThunk())
     }
 }
 

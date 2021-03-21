@@ -20,6 +20,7 @@ class ManagedBusinessTable extends Component {
         businessList: []
     }
     componentDidMount() {
+        console.log("UHHH DEBUG PROPS",this.props.businessList)
         this.setState({
             businessList: this.props.businessList,
         })
@@ -32,6 +33,14 @@ class ManagedBusinessTable extends Component {
     }
     joinTracker = (bID) => {
         this.props.socket.emit('joinTracker', {businessid:bID,email:this.props.userData.email})
+        this.props.socket.on("joinCheck", ({ counter, limit, error }) => {
+            console.log("JOIN Response",counter,limit,error)
+            if(error!==undefined) this.setState({joinERR:error});
+            else if(counter!==undefined&&limit!==undefined) {
+                console.log("Time to reroute")
+                }
+            }
+        )
     }
     render() {
         return (
@@ -88,7 +97,7 @@ class ManagedBusinessTable extends Component {
                                     <TableCell align="right" className="Tbuttons">
                                         {business.businessOpened ?
                                             (
-                                                <Button onClick={()=>this.joinTracker(business.business_id)}className="MTableBody" style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Track</Button>
+                                                <Button onClick={()=>this.joinTracker(business.business_id)} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Track</Button>
                                             ) :
                                             (
                                                 <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Closed</Button>
