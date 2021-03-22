@@ -35,7 +35,8 @@ class HomePage extends Component {
             bAddress: "",
             bPass: "",
             bID: "",
-            joinError: ""
+            joinError: "",
+            registerError: undefined
         }
     }
     componentDidMount = async () => {
@@ -71,7 +72,8 @@ class HomePage extends Component {
             bName: "",
             bAddress: "",
             bPass: "",
-            bID: ""
+            bID: "",
+            registerError: undefined
         })
     }
     cancelBJoin = () => {
@@ -102,12 +104,18 @@ class HomePage extends Component {
         this.setState({ bPass: event.target.value })
     }
     regBusiness = async () => {
-        console.log(this.state,"Look at reg info!")
+        
         await this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass)
-        await this.props.bGet(this.state.userData.email,this.state.userData.token) 
-        if(this.props.businessData) {
-            this.setState({businessList:this.props.businessData.businessList, registeringBusiness:false},()=>(console.log(this.props.businessData)))    
+        console.log(this.props.bRegError,"Look at reg info!#################")
+        if(this.props.bRegError===undefined){
+            await this.props.bGet(this.state.userData.email,this.state.userData.token) 
+            if(this.props.businessData) {
+                this.setState({businessList:this.props.businessData.businessList, registeringBusiness:false},()=>(console.log(this.props.businessData)))    
+            }
         }
+        else this.setState({registerError:this.props.bRegError})
+
+
     }
     joinBusiness = async () => {
         await this.props.bJoin(this.state.userData.email,this.state.bID,this.state.bPass)
@@ -125,7 +133,7 @@ class HomePage extends Component {
         return (
             <div className="homePage">
                 <div>
-                    <CVIVIDNav userData={this.props.userData} socket={this.props.socket} userData={this.props.userData} logout={this.logout}/>
+                    <CVIVIDNav socket={this.props.socket} userData={this.props.userData} logout={this.logout}/>
                 </div>
                 <div>
                     <div>
@@ -159,7 +167,7 @@ class HomePage extends Component {
                         </div>
                     </div>
                     <div className="BusinessTable">
-                        <ManagedBusinessTable  userData={this.props.userData}socket={this.props.socket} logout={this.logout} businessUpdate={this.businessUpdate} history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
+                        <ManagedBusinessTable  cUpdate={this.props.cUpdate} cInfo={this.props.cInfo} userData={this.props.userData}socket={this.props.socket} logout={this.logout} businessUpdate={this.businessUpdate} history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
                     </div>
                     <div className="BusinessRegisterComponent">
                         <Dialog open={this.state.registeringBusiness} onClose={this.cancelBReg} aria-labelledby="form-dialog-title">
@@ -197,6 +205,7 @@ class HomePage extends Component {
                                     onChange={this.changeBPass}
                                     fullWidth
                                 />
+                                {this.state.registerError}
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={this.cancelBReg} color="primary">

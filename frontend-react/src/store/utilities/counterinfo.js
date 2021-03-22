@@ -7,7 +7,7 @@ const cUpdate = (result) => {
     return {
         type: C_UPDATE,
         payload: {
-            CInfo: result
+            cInfo: result
         }
     }
 }
