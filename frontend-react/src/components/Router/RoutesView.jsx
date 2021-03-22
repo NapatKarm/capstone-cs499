@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { userLoginThunk, userLogoutThunk, userSignupThunk } from "../../store/utilities/userinfo";
 import { bRegisterThunk, bGetThunk, bJoinThunk, bUserLogoutThunk } from "../../store/utilities/businessinfo"
 import { bViewThunk, bClearThunk } from "../../store/utilities/businessdetails"
+import { cUpdateThunk, cWipeThunk } from "../../store/utilities/counterinfo"
 import socket from '../socket'; 
 
 //Page Imports
@@ -21,9 +22,9 @@ class RoutesView extends Component {
         const {singleView} = this.props
         const AccessDeniedComponent = () => (<AccessDenied/>)
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
-        const LandingPageComponent = () => (<LandingPage logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
-        const CounterPageComponent = () => (<CounterPage socket={socket} userData={this.props.userData} bDetails={this.props.bDetails}/>)
-        const HomePageComponent = () => (<HomePage socket={socket} bDetails={this.props.bDetails} bView={this.props.bView} userLogout={this.props.userLogout} businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
+        const LandingPageComponent = () => (<LandingPage socket={socket} logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
+        const CounterPageComponent = () => (<CounterPage cInfo={this.props.cInfo} socket={socket} userData={this.props.userData} bDetails={this.props.bDetails}/>)
+        const HomePageComponent = () => (<HomePage cInfo={this.props.cInfo} cUpdate={this.props.cUpdate} socket={socket} bDetails={this.props.bDetails} bView={this.props.bView} userLogout={this.props.userLogout} businessData={this.props.businessData} userData={this.props.userData} bGet={this.props.bGet} bJoin={this.props.bJoin} bRegister={this.props.bRegister} bJoinError={this.props.bJoinError} bRegError={this.props.bRegError} bUserLogout={this.props.bUserLogout}/>)
         const BusinessDetailsComponent = () => (<BusinessDetailsPage socket={socket} userLogout={this.props.userLogout} bUserLogout={this.props.bUserLogout} bDetails={this.props.bDetails} bClear={this.props.bClear} userData={this.props.userData}/>)
         return (
             <Router>
@@ -60,9 +61,10 @@ const mapState = (state) => {
         signUpError: state.userinfo.signUpError,
         logInError: state.userinfo.logInError,
         businessData: state.businessinfo.Businesses,
-        bRegError: state.businessinfo.bRegError,
+        bRegError: state.businessinfo.BRegError,
         bJoinError: state.businessinfo.BJoinError,
-        bDetails: state.businessdetails.bDetails
+        bDetails: state.businessdetails.bDetails,
+        cInfo: state.counterinfo.cInfo
     }
 }
 
@@ -76,7 +78,9 @@ const mapDispatch = (dispatch) => {
         bJoin: (email,businessid,businesspass) => dispatch(bJoinThunk(email,businessid,businesspass)),
         bRegister: (bname, baddress, email, businesspass) => dispatch(bRegisterThunk(bname, baddress, email, businesspass)),
         bView: (business) => dispatch(bViewThunk(business)),
-        bClear: ()=> dispatch(bClearThunk())
+        bClear: ()=> dispatch(bClearThunk()),
+        cUpdate: (cInfo)=> dispatch(cUpdateThunk(cInfo)),
+        cWipe: ()=> dispatch(cWipeThunk())
     }
 }
 

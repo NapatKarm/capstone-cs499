@@ -95,7 +95,7 @@ export const bJoinThunk = (email,businessid,businesspass) => async (dispatch) =>
     try {
         await axios.post(`https://c-vivid-backend.herokuapp.com/businessJoin`, {
             email: email,
-            business_id: parseInt(businessid),
+            businessId: parseInt(businessid),
             businesspass: businesspass
         })
         .then(res => {

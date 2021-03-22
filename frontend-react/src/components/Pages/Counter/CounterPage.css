@@ -15,11 +15,12 @@
     position: absolute;
     color: black;
     display: flex;
+    flex-direction: column;
     align-self: center;
     align-items: center;
     justify-content: center;
     text-align: center;
-    top: 22%;
+    top: 25%;
     left: 50%;
     margin-top: -50px;
     margin-left: -50px;
