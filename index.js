@@ -3,7 +3,11 @@ const express = require('express');
 
 const app = express();
 const server = require('http').createServer(app);
-const io = require('socket.io')(server, {cors: true});
+const io = require('socket.io')(server, { 
+  cors: {
+    origins: "*"
+  }
+});
 const redisadapter = require('socket.io-redis');
 const Redis = require("ioredis");
 const ioredis = new Redis({
@@ -16,7 +20,6 @@ io.adapter(redisadapter({
   port: process.env.REDIS_PORT,
   auth_pass: process.env.REDIS_PASSWORD
 }));
-
 
 const axios = require('axios');
 const cors = require('cors');
@@ -70,7 +73,7 @@ app.get('/', function (req, res) {
 let authMap = new Map();
 
 let businessMap = new Map();
-let businessId = 0;
+let business_Id = 0;
 
 /**
  * @swagger
@@ -113,7 +116,7 @@ app.post('/signup', async (req, res) => {         //Expected request: {firstname
       "lastname": req.body.lastname,
       "email": toLowerEmail,
       "password": req.body.password,
-      "businesses": []
+      "businessList": []
     }
     authMap.set(toLowerEmail, userInfo);        //Add user info to 'database'
     res.status(200).send("Successfully registered");
@@ -147,13 +150,16 @@ app.post('/signup', async (req, res) => {         //Expected request: {firstname
  *               properties:
  *                 firstname:
  *                   type: string
- *                   description: The users first name.
+ *                   description: The user's first name.
  *                 lastname:
  *                   type: string
- *                   description: The users last name.
+ *                   description: The user's last name.
  *                 email:
  *                   type: string
- *                   description: The users email.
+ *                   description: The user's email.
+ *                 token:
+ *                   type: string
+ *                   description: The user's token.
  *       '401':
  *         description: Incorrect Email or Password.
 */
@@ -165,7 +171,7 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
       authMap.get(toLowerEmail).token = uuidv4();                         //Create Random UUID
       resInfo = Object.assign({}, authMap.get(toLowerEmail));             //delete password from data
       delete resInfo.password;
-      delete resInfo.businesses;
+      delete resInfo.businessList;
       
       res.status(200).json(resInfo);              //Response: {firstname, lastname, email}
     }
@@ -209,7 +215,7 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
  *             schema:
  *               type: object
  *               properties:
- *                 business_id:
+ *                 businessId:
  *                   type: integer
  *                   description: The business id.
  *                 businessname:
@@ -224,23 +230,23 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
  *                 businessOpened:
  *                   type: boolean
  *                   description: The business open/close status.
- *                 members:
+ *                 memberList:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
  *                       firstname:
  *                         type: string
- *                         description: The members first name.
+ *                         description: The member's first name.
  *                       lastname:
  *                         type: string
- *                         description: The members last name.
+ *                         description: The member's last name.
  *                       email:
  *                         type: string
- *                         description: The members email.
+ *                         description: The member's email.
  *                       role:
  *                         type: string
- *                         description: The members role at the business.
+ *                         description: The member's role at the business.
  *       '400':
  *         description: Business Already Registered.
 */
@@ -257,22 +263,22 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
     res.status(400).send("Business Already Registered");
   }
   else{
-    businessId++;
+    business_Id++;
     businessInfo = {                                    //Business Info Structure
-      "business_id": businessId,
+      "businessId": business_Id,
       "businessname": req.body.businessname,
       "businessaddr": req.body.businessaddr,
       "businesspass": req.body.businesspass,
       "businessOpened": false,
-      "members": [{                                     //Member Info Structure
+      "memberList": [{                                     //Member Info Structure
         "firstname": authMap.get(req.body.email).firstname,
         "lastname": authMap.get(req.body.email).lastname,
         "email": req.body.email,
         "role": "Owner"
       }]
     };
-    businessMap.set(businessId, businessInfo);           //Add business data to business 'database'
-    authMap.get(req.body.email).businesses.push(businessInfo);      //Add business data to user 'database' under businesses
+    businessMap.set(business_Id, businessInfo);           //Add business data to business 'database'
+    authMap.get(req.body.email).businessList.push(businessInfo);      //Add business data to user 'database' under businessList
     res.status(200).json(businessInfo);
   }
 });
@@ -294,12 +300,9 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
  *               businesspass:
  *                 type: string
  *                 description: The business passcode.
- *               business_id:
+ *               businessId:
  *                 type: string
  *                 description: The business id.
- *               role:
- *                 type: string
- *                 description: The user's role at the business.
  *     responses:
  *       '200':
  *         description: Success.
@@ -311,20 +314,20 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
  *         description: User already registered.
 */
 
-app.post('/businessJoin', async (req, res) => {                     //Expected request: {email, businesspass, business_id}
-  if(!businessMap.has(req.body.business_id)){                      //If non-existing business
+app.post('/businessJoin', async (req, res) => {                     //Expected request: {email, businesspass, businessId}
+  if(!businessMap.has(req.body.businessId)){                      //If non-existing business
     res.status(400).send("Business does not exist");
   }
-  else if(req.body.businesspass != businessMap.get(req.body.business_id).businesspass){        //If incorrect passcode
+  else if(req.body.businesspass != businessMap.get(req.body.businessId).businesspass){        //If incorrect passcode
     res.status(400).send("Incorrect Passcode");
   }
   else{                                                             //If existing business and correct passcode
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+    businessInfo = businessMap.get(req.body.businessId);          //Get data from business 'database'
     userInfo = authMap.get(req.body.email);                         //Get data from user 'database'
 
     alreadyInBusiness = false;
-    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is already registered under the business
-      if(userInfo.email == businessInfo.members[i].email){
+    for(i = 0; i < businessInfo.memberList.length; i++){               //Check if user is already registered under the business
+      if(userInfo.email == businessInfo.memberList[i].email){
         alreadyInBusiness = true;
         break;
       }
@@ -334,13 +337,13 @@ app.post('/businessJoin', async (req, res) => {                     //Expected r
       res.status(400).send("You have already been registered")
     }
     else{                                                           //If user has not been registered
-      businessInfo.members.push({                                   //Add user as member under the business
+      businessInfo.memberList.push({                                   //Add user as member under the business
         "firstname": userInfo.firstname,
         "lastname": userInfo.lastname,
         "email": req.body.email,
         "role": "Employee"
       });
-      userInfo.businesses.push(businessInfo);                       //Add business data to user 'database' under businesses
+      userInfo.businessList.push(businessInfo);                       //Add business data to user 'database' under businessList
 
       res.status(200).send("Successfully Joined");
     }
@@ -372,38 +375,43 @@ app.post('/businessJoin', async (req, res) => {                     //Expected r
  *             schema:
  *               type: object
  *               properties:
- *                 business_id:
- *                   type: integer
- *                   description: The business id.
- *                 businessname:
- *                   type: string
- *                   description: The business name.
- *                 businessaddr:
- *                   type: string
- *                   description: The business address.
- *                 businesspass:
- *                   type: string
- *                   description: The business pass.
- *                 businessOpened:
- *                   type: boolean
- *                   description: The business open/close status.
- *                 members:
+ *                 businessList:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
- *                       firstname:
+ *                       businessId:
+ *                         type: integer
+ *                         description: The business id.
+ *                       businessname:
  *                         type: string
- *                         description: The members first name.
- *                       lastname:
+ *                         description: The business name.
+ *                       businessaddr:
  *                         type: string
- *                         description: The members last name.
- *                       email:
+ *                         description: The business address.
+ *                       businesspass:
  *                         type: string
- *                         description: The members email.
- *                       role:
- *                         type: string
- *                         description: The members role at the business.
+ *                         description: The business pass.
+ *                       businessOpened:
+ *                         type: boolean
+ *                         description: The business open/close status.
+ *                       memberList:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             firstname:
+ *                               type: string
+ *                               description: The member's first name.
+ *                             lastname:
+ *                               type: string
+ *                               description: The member's last name.
+ *                             email:
+ *                               type: string
+ *                               description: The member's email.
+ *                             role:
+ *                               type: string
+ *                               description: The member's role at the business.
  *       '400':
  *         description: Incorrect Token.
 */
@@ -421,7 +429,7 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
     delete resInfo.password;
     delete resInfo.token;
 
-    res.status(200).json(resInfo);                                  //Response: {businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
+    res.status(200).json(resInfo);                                  //Response: {businessList[{businessId, businessname, businessaddr, businesspass, memberList[{firstname, lastname, email, role}]}]}
   }
 });
 
@@ -436,7 +444,7 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
  *           schema:
  *             type: object
  *             properties:
- *               business_id:
+ *               businessId:
  *                 type: string
  *                 description: The business' id.
  *               email:
@@ -453,7 +461,7 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
  *             schema:
  *               type: object
  *               properties:
- *                 business_id:
+ *                 businessId:
  *                   type: integer
  *                   description: The business id.
  *                 businessname:
@@ -462,44 +470,49 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
  *                 businessaddr:
  *                   type: string
  *                   description: The business address.
+ *                 businesspass:
+ *                   type: string
+ *                   description: The business passcode.
  *                 businessOpened:
  *                   type: boolean
  *                   description: The business open/close status.
- *                 members:
+ *                 memberList:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
  *                       firstname:
  *                         type: string
- *                         description: The members first name.
+ *                         description: The member's first name.
  *                       lastname:
  *                         type: string
- *                         description: The members last name.
+ *                         description: The member's last name.
  *                       email:
  *                         type: string
- *                         description: The members email.
+ *                         description: The member's email.
  *                       role:
  *                         type: string
- *                         description: The members role at the business.
+ *                         description: The member's role at the business.
  *       '400':
  *         description: Incorrect Token.
+ *       '403':
+ *         description: You are not a part of this business.
 */
 
-app.post('/getSingleBusinessData', async (req, res) => {            //Expected: {business_id, email, token}
+app.post('/getSingleBusinessData', async (req, res) => {            //Expected: {businessId, email, token}
   if(authMap.get(req.body.email).token != req.body.token){
     res.status(400).send("Incorrect Token");
   }
   else{
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+    businessInfo = businessMap.get(req.body.businessId);          //Get data from business 'database'
 
-    for(i = 0; i < businessInfo.members.length; i++){               //Check for owner or admin to change passcode
-      if(businessInfo.members[i].email == req.body.email){
-        res.status(200).send(businessMap.get(req.body.business_id));
+    for(i = 0; i < businessInfo.memberList.length; i++){               //Check for owner or admin to change passcode
+      if(businessInfo.memberList[i].email == req.body.email){
+        res.status(200).send(businessMap.get(req.body.businessId));
       }
     }
-    
-    res.status(200).send(businessMap.get(req.body.business_id));
+    res.status(403).send("You are not a part of this business");
+
   }
 });
 
@@ -514,7 +527,7 @@ app.post('/getSingleBusinessData', async (req, res) => {            //Expected: 
  *           schema:
  *             type: object
  *             properties:
- *               business_id:
+ *               businessId:
  *                 type: integer
  *                 description: The business id.
  *               email:
@@ -535,16 +548,16 @@ app.post('/getSingleBusinessData', async (req, res) => {            //Expected: 
  *         description: Not Enough Permissions.
 */
 
-app.put('/passcodeChange', async (req, res) => {                    //Expected: { business_id, email, token, businesspass}
+app.put('/passcodeChange', async (req, res) => {                    //Expected: { businessId, email, token, businesspass}
   if(authMap.get(req.body.email).token != req.body.token){
     res.status(400).send("Incorrect Token");
   }
   else{
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+    businessInfo = businessMap.get(req.body.businessId);          //Get data from business 'database'
 
-    for(i = 0; i < businessInfo.members.length; i++){               //Check for owner or admin to change passcode
-      if(businessInfo.members[i].email == req.body.email){
-        if(businessInfo.members[i].role == "Owner" || businessInfo.members[i].role == "Admin"){
+    for(i = 0; i < businessInfo.memberList.length; i++){               //Check for owner or admin to change passcode
+      if(businessInfo.memberList[i].email == req.body.email){
+        if(businessInfo.memberList[i].role == "Owner" || businessInfo.memberList[i].role == "Admin"){
           businessInfo.businesspass = req.body.businesspass;
           res.status(200).send("Change Success");
           break;
@@ -568,7 +581,7 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
  *           schema:
  *             type: object
  *             properties:
- *               business_id:
+ *               businessId:
  *                 type: integer
  *                 description: The business id.
  *               changerEmail:
@@ -592,27 +605,27 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
  *         description: Not Enough Permissions.
 */
 
-app.put('/roleChange', async (req, res) => {                      //Expected: {business_id, changerEmail, changeeEmail, newRole, token}
+app.put('/roleChange', async (req, res) => {                      //Expected: {businessId, changerEmail, changeeEmail, newRole, token}
 if(authMap.get(req.body.changerEmail).token != req.body.token){
   res.status(400).send("Incorrect Token");
 }
 else{
-  businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+  businessInfo = businessMap.get(req.body.businessId);          //Get data from business 'database'
 
   changerRole = ""            //Make sure changer is owner (only owner can change roles)
   changeePos = ""            //Record position of employee with role 'to be changed'
 
-  for(i = 0; i < businessInfo.members.length; i++){               //Check for owner and position of changee
-    if(businessInfo.members[i].email == req.body.changerEmail){
-      changerRole = businessInfo.members[i].role;
+  for(i = 0; i < businessInfo.memberList.length; i++){               //Check for owner and position of changee
+    if(businessInfo.memberList[i].email == req.body.changerEmail){
+      changerRole = businessInfo.memberList[i].role;
     }
-    else if(businessInfo.members[i].email == req.body.changeeEmail){
+    else if(businessInfo.memberList[i].email == req.body.changeeEmail){
       changeePos = i;
     }
   }
 
   if(changerRole == "Owner"){
-    businessMap.get(req.body.business_id).members[changeePos].role = req.body.newRole;
+    businessMap.get(req.body.businessId).memberList[changeePos].role = req.body.newRole;
     res.status(200).send("Change Success");
   }
   else{
@@ -632,7 +645,7 @@ else{
  *           schema:
  *             type: object
  *             properties:
- *               business_id:
+ *               businessId:
  *                 type: integer
  *                 description: The business id.
  *               kickerEmail:
@@ -653,41 +666,41 @@ else{
  *         description: Not Enough Permissions.
 */
 
-app.put('/kickMember', async (req, res) => {                      //Expected: {business_id, kickerEmail, kickeeEmail, token}
+app.put('/kickMember', async (req, res) => {                      //Expected: {businessId, kickerEmail, kickeeEmail, token}
   if(authMap.get(req.body.kickerEmail).token != req.body.token){
     res.status(400).send("Incorrect Token");
   }
   else{
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+    businessInfo = businessMap.get(req.body.businessId);          //Get data from business 'database'
 
     kickerRole = ""            //Make sure changer is owner (only owner can change roles)
     kickeeRole = ""           //Make sure kickee is under kicker
-    kickerPos = ""            //Record position of employee with role 'to be changed'
+    kickerPos = 0            //Record position of employee with role 'to be changed'
   
-    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is already registered under the business
-      if(businessInfo.members[i].email == req.body.kickerEmail){
-        kickerRole = businessInfo.members[i].role;
+    for(i = 0; i < businessInfo.memberList.length; i++){               //Check if user is already registered under the business
+      if(businessInfo.memberList[i].email == req.body.kickerEmail){
+        kickerRole = businessInfo.memberList[i].role;
       }
-      else if(businessInfo.members[i].email == req.body.kickeeEmail){
-        kickeeRole = businessInfo.members[i].role;
+      else if(businessInfo.memberList[i].email == req.body.kickeeEmail){
+        kickeeRole = businessInfo.memberList[i].role;
         kickeePos = i;
       }
     }
 
     if((kickerRole == "Owner") || (kickerRole == "Admin" && kickeeRole == "Employee")){
-      businessInfo.members.splice(kickeePos, 1);
-
+      businessInfo.memberList.splice(kickeePos, 1);            //Remove user from business info
+      
       kickeeEmail = req.body.kickeeEmail;
       userInfo = authMap.get(kickeeEmail);
       businessPos = 0;
 
-      for(i = 0; i < userInfo.businesses.length; i++){
-        if(userInfo.businesses[i].business_id == req.body.business_id){
+      for(i = 0; i < userInfo.businessList.length; i++){
+        if(userInfo.businessList[i].businessId == req.body.businessId){
           businessPos = i;
           break;
         }
       }
-      userInfo.businesses.splice(businessPos, 1);           //Remove business from user info
+      userInfo.businessList.splice(businessPos, 1);           //Remove business from user info
 
       res.status(200).send("Kick Success");
     }
@@ -708,7 +721,7 @@ app.put('/kickMember', async (req, res) => {                      //Expected: {b
  *           schema:
  *             type: object
  *             properties:
- *               business_id:
+ *               businessId:
  *                 type: integer
  *                 description: The business id.
  *               email:
@@ -724,16 +737,16 @@ app.put('/kickMember', async (req, res) => {                      //Expected: {b
  *         description: Business Already Opened.
 */
 
-app.put('/businessOpen', async (req, res) => {                     //Expected Request {business_id, email, token}
+app.put('/businessOpen', async (req, res) => {                     //Expected Request {businessId, email, token}
   if(authMap.get(req.body.email).token != req.body.token){
     res.status(400).send("Incorrect Token");
   }
   else{
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+    businessInfo = businessMap.get(req.body.businessId);          //Get data from business 'database'
 
-    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is owner or admin
-      if(businessInfo.members[i].email == req.body.email){
-        role = businessInfo.members[i].role;
+    for(i = 0; i < businessInfo.memberList.length; i++){               //Check if user is owner or admin
+      if(businessInfo.memberList[i].email == req.body.email){
+        role = businessInfo.memberList[i].role;
         if(role == "Owner" || role == "Admin"){
           if(businessInfo.businessOpened == true){
             res.status(400).send("Business Already Opened");
@@ -759,7 +772,7 @@ app.put('/businessOpen', async (req, res) => {                     //Expected Re
  *           schema:
  *             type: object
  *             properties:
- *               business_id:
+ *               businessId:
  *                 type: integer
  *                 description: The business id.
  *               email:
@@ -775,16 +788,16 @@ app.put('/businessOpen', async (req, res) => {                     //Expected Re
  *         description: Business Already Closed.
 */
 
-app.put('/businessClose', async (req, res) => {                     //Expected Request {business_id, email, token}
+app.put('/businessClose', async (req, res) => {                     //Expected Request {businessId, email, token}
   if(authMap.get(req.body.email).token != req.body.token){
     res.status(400).send("Incorrect Token");
   }
   else{
-    businessInfo = businessMap.get(req.body.business_id);          //Get data from business 'database'
+    businessInfo = businessMap.get(req.body.businessId);          //Get data from business 'database'
 
-    for(i = 0; i < businessInfo.members.length; i++){               //Check if user is owner or admin
-      if(businessInfo.members[i].email == req.body.email){
-        role = businessInfo.members[i].role;
+    for(i = 0; i < businessInfo.memberList.length; i++){               //Check if user is owner or admin
+      if(businessInfo.memberList[i].email == req.body.email){
+        role = businessInfo.memberList[i].role;
         if(role == "Owner" || role == "Admin"){
           if(businessInfo.businessOpened == false){
             res.status(400).send("Business Already Closed");
@@ -799,9 +812,9 @@ app.put('/businessClose', async (req, res) => {                     //Expected R
   }
 });
 
-async function isPartofBusiness(businessid, socket_id){
-  const members = await io.of('/').adapter.sockets(new Set([businessid]));
-  for (let it = members.values(), socketID = null; socketID = it.next().value;) { // iterate through a SET
+async function isPartofBusiness(businessId, socket_id){
+  const memberList = await io.of('/').adapter.sockets(new Set([businessId]));
+  for (let it = memberList.values(), socketID = null; socketID = it.next().value;) { // iterate through a SET
     if(socket_id == socketID){
       return true;
     }
@@ -814,16 +827,16 @@ io.on('connection', (socket) => {
 
   socket.leave(socket.id);
 
-  socket.on('openBusiness', async ({businessid, businessname, businessaddr, limit, email, token}) => {
+  socket.on('openBusiness', async ({businessId, businessname, businessaddr, limit, email, token}) => {
     const json = JSON.stringify({
       businessname: businessname,
       businessaddr: businessaddr,
       limit: limit
     });
-    await ioredis.set(businessid, json);
-    await ioredis.set(businessid.toString()+"counter", 0);
+    await ioredis.set(businessId, json);
+    await ioredis.set(businessId.toString()+"counter", 0);
 
-    await axios.put(`https://${process.env.EXPRESS_HOST}/businessOpen`, {business_id: businessid, email: email, token: token})
+    await axios.put(`https://${process.env.EXPRESS_HOST}/businessOpen`, {businessId: businessId, email: email, token: token})
     .then(res => {
       socket.emit('openResponse', {success: "Success"});
     })
@@ -833,10 +846,10 @@ io.on('connection', (socket) => {
     console.log("open");
   });
 
-  socket.on('closeBusiness', async ({businessid, email, token}) => {
-    await ioredis.del(businessid);
-    await ioredis.set(businessid.toString()+"counter");
-    await axios.put(`https://${process.env.EXPRESS_HOST}/businessClose`, {business_id: businessid, email: email, token: token})
+  socket.on('closeBusiness', async ({businessId, email, token}) => {
+    await ioredis.del(businessId);
+    await ioredis.del(businessId.toString()+"counter");
+    await axios.put(`https://${process.env.EXPRESS_HOST}/businessClose`, {businessId: businessId, email: email, token: token})
     .then(res => {
       socket.emit('closeResponse', {success: "Success"});
     })
@@ -846,61 +859,80 @@ io.on('connection', (socket) => {
     console.log("close");
   });
 
-  socket.on('joinTracker', async ({email, businessid}) => {
-    if(await ioredis.exists(businessid)){
+  socket.on('joinTracker', async ({email, businessId}) => {
+    if(await ioredis.exists(businessId)){
       console.log("join");
-      socket.join(businessid);
+      socket.join(businessId);
       const json = JSON.stringify({
         email: email
       });
       await ioredis.set(socket.id, json);
-      let business = await ioredis.get(businessid);
+      let business = await ioredis.get(businessId);
       let businessJson = JSON.parse(business);
 
-      socket.emit('joinCheck', { counter: await ioredis.get(businessid.toString()+"counter"), limit: businessJson.limit});
+      socket.emit('joinCheck', { counter: await ioredis.get(businessId.toString()+"counter"), limit: businessJson.limit});
     }
     else{
       socket.emit('joinCheck', {error: "Business is closed"});
     }
   });
 
-  socket.on('addCount', async ({businessid}) => {
-    if(await isPartofBusiness(businessid, socket.id)){
-      const businessCounter = await ioredis.get(businessid.toString()+"counter");
+  socket.on('addCount', async ({businessId}) => {
+    if(await isPartofBusiness(businessId, socket.id)){
+      let business = await ioredis.get(businessId);
+      let businessJson = JSON.parse(business);
 
-      await ioredis.incr(businessid.toString()+"counter");
+      await ioredis.incr(businessId.toString()+"counter");
 
-      console.log(await ioredis.get(businessid.toString()+"counter"));
-      socket.emit('updateCounter', {counter: await ioredis.get(businessid.toString()+"counter")});
+      console.log(await ioredis.get(businessId.toString()+"counter"));
+      io.in(businessId).emit('updateCounter', {counter: await ioredis.get(businessId.toString()+"counter"), limit: businessJson.limit});
     }
   });
 
-  socket.on('removeCount', async ({businessid})=> {
-    if(await isPartofBusiness(businessid, socket.id)){
-      const businessCounter = await ioredis.get(businessid.toString()+"counter");
+  socket.on('removeCount', async ({businessId})=> {
+    if(await isPartofBusiness(businessId, socket.id)){
+      const businessCounter = await ioredis.get(businessId.toString()+"counter");
+      let business = await ioredis.get(businessId);
+      let businessJson = JSON.parse(business);
+
       if(businessCounter > 0){
-        await ioredis.decr(businessid.toString()+"counter");
+        await ioredis.decr(businessId.toString()+"counter");
       }
-      console.log(await ioredis.get(businessid.toString()+"counter"));
-      socket.emit('updateCounter', {counter: await ioredis.get(businessid.toString()+"counter")});
+      console.log(await ioredis.get(businessId.toString()+"counter"));
+      io.in(businessId).emit('updateCounter', {counter: await ioredis.get(businessId.toString()+"counter"), limit: businessJson.limit});
     }
   });
 
-  socket.on('limitChange', async ({businessid, limit}) => {
-    let business = await ioredis.get(businessid);
+  socket.on('limitChange', async ({businessId, limit}) => {
+    let business = await ioredis.get(businessId);
     let businessJson = JSON.parse(business);
     businessJson.limit = limit;
     business = JSON.stringify(businessJson);
 
-    await ioredis.set(businessid, business);
-    let newbusiness = await ioredis.get(businessid);
+    await ioredis.set(businessId, business);
+    io.in(businessId).emit('updateCounter', {counter: await ioredis.get(businessId.toString()+"counter"), limit: businessJson.limit})
+    let newbusiness = await ioredis.get(businessId);
     let newBusinessJson = JSON.parse(newbusiness);
     console.log(newBusinessJson.limit);
   });
 
-  socklet.on('leaveBusiness', async ({businessid}) => {
-    socket.leave(businessid);
+  socket.on('leaveBusiness', async ({businessId}) => {
+    socket.leave(businessId);
     await ioredis.del(socket.id);
+  });
+
+  socket.on('getAllData', async () => {
+    const rooms = await io.of('/').adapter.allRooms();
+    var allData = []
+    rooms.forEach(async (businessId) => {
+      let business = await ioredis.get(businessId);
+      let counter = await ioredis.get(businessId.toString()+"counter");
+      let businessJson = JSON.parse(business);
+      businessJson.counter = counter;
+      businessJson.businessId = businessId;
+      allData.push({businessJson});
+    });
+    socket.emit('updateMap', allData);
   });
 
   socket.on('disconnect', async () => {
