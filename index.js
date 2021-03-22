@@ -20,18 +20,19 @@ const db = admin.firestore();
 // db.settings({ ignoreUndefinedProperties: true })
 const usersdb = db.collection('users'); 
 const busdb = db.collection('business');
+
 // Default testing endpoint
 app.get('/', async function (req, res) {
   // user_info = await usersdb.where('email', '==', req.body.email).get();
-  // user_bus = await busdb.where('bussinessid', 'in', user_info.docs[0].get(businesses)).get();
+  // user_bus = await busdb.where('bussinessid', 'in', user_info.docs[0].get(businessList)).get();
   // user_bus.forEach(doc => {
   //   console.log(doc.data())
   // });
-  some_bus = await busdb.where('businessid', 'in', [0, 1]).get();
+  some_bus = await busdb.where('businessId', 'in', [0, 1]).get();
   some_bus.docs.forEach(doc => {
     console.log(doc.data())
   });
-  some_bus_ref = await busdb.doc(some_bus.docs[0].id);
+  some_bus_ref = busdb.doc(some_bus.docs[0].id);
   new_member = {                             
     'firstname': "testing",
     'lastname': "123 test",
@@ -40,18 +41,17 @@ app.get('/', async function (req, res) {
   };
   // try {
   //   some_bus_ref.update({                                            // Add business info to user's business[]
-  //     members: admin.firestore.FieldValue.arrayUnion(new_member)
+  //     memberList: admin.firestore.FieldValue.arrayUnion(new_member)
   //   });
   //   console.log("sucessfully updated array");
-  //   some_bus = await busdb.where('businessid','==', 0).get();
-  //   res.send(some_bus.docs[0].get('members'));
+  //   some_bus = await busdb.where('businessId','==', 0).get();
+  //   res.send(some_bus.docs[0].get('memberList'));
   // } catch (error) {
   //   console.log(error);
   // }
 
   // res.send('hello world');
 });
-
 
 // Sign-up end point
 app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastname, email, password}
@@ -66,7 +66,7 @@ app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastn
       'email': req.body.email.toLowerCase(),
       'password': req.body.password,
       'token': uuidv4(),
-      'businesses': []  // Store's the businesses' id  
+      'businessList': []  // Store's the businessList' id  
     };
     try {
       await usersdb.add(userInfo);
@@ -76,10 +76,6 @@ app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastn
     }
   }
 });
-
-//QuerySnapshot
-// .empty = bool
-// array[QueryDocumentSnapShots]
 
 // Sign-in Endpoint
 app.post('/signin', async (req, res) => {         //Expected request: {email, password}
@@ -99,7 +95,10 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
         token : new_token
       });
       existing_user = await usersdb.where('email', '==', req.body.email.toLowerCase()).get(); // Requery to get newly updated token value
-      res.status(200).send(existing_user.docs[0].data());
+      existing_user = existing_user.docs[0].data();
+      delete existing_user['password'];
+      delete existing_user['businessList'];
+      res.status(200).send(existing_user);
       console.log('Successful Log In')
     }
   } catch(error) {
@@ -111,7 +110,7 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
 app.post('/businessRegister', async (req, res) => {     //Expected request: { businessname, businessaddr, owner_email, businesspass, first name, last name} (owner: email?)
   const existing_business = await busdb.where('businessaddr', '==', req.body.businessaddr).get();  //
   const owner = await usersdb.where('email','==', req.body.email.toLowerCase()).get();                           // Owner's Information
-  if (!existing_business.empty) {   //Business already registered, cannot have 2 businesses on same address
+  if (!existing_business.empty) {   //Business already registered, cannot have 2 businessList on same address
     res.status(400).send('Business Already Registered');
   }
   else {
@@ -120,10 +119,10 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
       const businessInfo = {                       //Business Info Structure
         'businessname': req.body.businessname,
         'businessaddr': req.body.businessaddr,
-        'businessid' : incrementing_id.docs[0].get('counter'),
+        'businessId' : incrementing_id.docs[0].get('counter'),
         'businesspass': req.body.businesspass,
         'isopened' : false,
-        'members': [{                              //Member Info Structure
+        'memberList': [{                              //Member Info Structure
           'firstname': owner.docs[0].get('firstname'),
           'lastname': owner.docs[0].get('lastname'),
           'email': req.body.email.toLowerCase(),
@@ -135,6 +134,11 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
       counter_ref.update({ 
         counter: admin.firestore.FieldValue.increment(1)   // Really not intuitive because its different if using admin SDK 
       });
+
+      owner_ref = usersdb.doc(owner.docs[0].id);
+      owner_ref.update({
+        businessList: admin.firestore.FieldValue.arrayUnion(businessInfo.businessId)
+      });
       res.status(200).send("Success");
     } catch(error) {
       console.log(error);
@@ -143,14 +147,14 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
 });
 
 // I think it works
-app.post('/businessJoin', async (req, res) => {                    //Expected request: {email, businesspass, businessid}
-  const existing_business = await busdb.where('businesspass', '==', req.body.businesspass).where('businessid', '==', req.body.businessid).get();
+app.post('/businessJoin', async (req, res) => {                    //Expected request: {email, businesspass, businessId}
+  const existing_business = await busdb.where('businesspass', '==', req.body.businesspass).where('businessId', '==', req.body.businessId).get();
   if (existing_business.empty) {                                       // Non-existing Business, false = empty document
     res.status(400).send('Business does not exist');
     return;
   }
 
-  let member_list = existing_business.docs[0].get('members');
+  let member_list = existing_business.docs[0].get('memberList');
   for (let i = 0; i < member_list.length; i++) {       // Check if member already exists in a business
     if (member_list[i].email == req.body.email.toLowerCase()) {
       res.status(422).send('User already is a member');
@@ -166,16 +170,16 @@ app.post('/businessJoin', async (req, res) => {                    //Expected re
     'role': 'Employee'
   });
 
-  const bus_info = existing_business.docs[0].get('businessid');   // Business id 
+  const bus_info = existing_business.docs[0].get('businessId');   // Business id 
  
   let bus_ref = busdb.doc(existing_business.docs[0].id);         // References for pushing new data to arrays
   let user_ref = usersdb.doc(new_member_info.docs[0].id);
   try { 
     bus_ref.update({
-      members: admin.firestore.FieldValue.arrayUnion(new_member) // Add new member's info to business' member[]
+      memberList: admin.firestore.FieldValue.arrayUnion(new_member) // Add new member's info to business' member[]
     });
     user_ref.update({                                            // Add business id to user's business[]
-      business: admin.firestore.FieldValue.arrayUnion(bus_info)
+      businessList: admin.firestore.FieldValue.arrayUnion(bus_info)
     });
     res.status(200).send('Successfully Joined'); 
   } catch (error) {
@@ -190,12 +194,12 @@ app.get('/getBusinessData', async (req, res) => {                   //Expected R
     res.status(400).send("Incorrect Token");
   }
   else{
-    let arr_of_bus = await busdb.where('businessid', 'in', user_info.docs[0].get('businesses')).get();
+    let arr_of_bus = await busdb.where('businessId', 'in', user_info.docs[0].get('businessList')).get();
     let bus_info = [];                // Must call doc.data() on each element because 
     arr_of_bus.docs.forEach(doc => {  // The actual array contains lots of meta data 
       bus_info.push(doc.data())
     });
-    res.status(200).send(bus_info);   //Response: {businesses[{business_id, businessname, businessaddr, businesspass, members[{firstname, lastname, email, role}]}]}
+    res.status(200).send(bus_info);   //Response: {businessList[{business_id, businessname, businessaddr, businesspass, memberList[{firstname, lastname, email, role}]}]}
   }
 });
 
@@ -206,8 +210,8 @@ app.get('/getSingleBusinessData', async (req, res) => {            //Expected: {
   }
 
   let is_member = false;
-  user_info.docs[0].get('businesses').forEach(business_id => {
-    if (business_id == req.body.business_id) {
+  user_info.docs[0].get('businessList').forEach(business_id => {
+    if (business_id == req.body.businessId) {
       is_member = true;
     }
   });
@@ -216,13 +220,12 @@ app.get('/getSingleBusinessData', async (req, res) => {            //Expected: {
   }
 
   try {
-    let business_info = await busdb.where('businessid', '==', req.body.business_id).get();
+    let business_info = await busdb.where('businessId', '==', req.body.businessId).get();
     res.status(200).send(business_info.docs[0].data());  
   } catch (error) {
     console.log(error);
   }
 });
-
 
 app.put('/passcodeChange', async (req, res) => {                    //Expected: { business_id, email, token, businesspass}
   let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
@@ -231,9 +234,9 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
     return;
   }
   else{
-    let bus_info = await busdb.where('businessid', '==', req.body.business_id).get();
+    let bus_info = await busdb.where('businessId', '==', req.body.businessId).get();
     let has_permissions = false;
-    bus_info.docs[0].get('members').forEach(member => { // Check every member in the business and check for their roles
+    bus_info.docs[0].get('memberList').forEach(member => { // Check every member in the business and check for their roles
       if ((member.role == 'Owner' || member.role == 'Admin') && (member.email == req.body.email)) {
         has_permissions = true;
       }
@@ -255,7 +258,6 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
   }
 });
 
-
 app.put('/roleChange', async (req, res) => {                      //Expected: {business_id, (owners)changerEmail, changeeEmail, newRole, token}
   let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.changerEmail.toLowerCase()).get();
   if (user_info.docs[0].get('token') != req.body.token) {
@@ -263,9 +265,9 @@ app.put('/roleChange', async (req, res) => {                      //Expected: {b
     return;
   }
   else{
-    let bus_info = await busdb.where('businessid', '==', req.body.business_id).get();
+    let bus_info = await busdb.where('businessId', '==', req.body.businessId).get();
     let has_permissions = false;
-    bus_info.docs[0].get('members').forEach(member => { // Check every member in the business and check for their roles
+    bus_info.docs[0].get('memberList').forEach(member => { // Check every member in the business and check for their roles
       if ((member.role == 'Owner' || member.role == 'Admin') && (member.email == req.body.changerEmail)) {
         has_permissions = true;
       }
@@ -275,7 +277,7 @@ app.put('/roleChange', async (req, res) => {                      //Expected: {b
       return;
     }
     
-    new_member_list = bus_info.docs[0].get('members');
+    new_member_list = bus_info.docs[0].get('memberList');
     for (let i = 0; i < new_member_list.length; i++) {
       if (new_member_list[i].email == req.body.changeeEmail) {
         new_member_list[i].role = req.body.newRole;
@@ -285,7 +287,7 @@ app.put('/roleChange', async (req, res) => {                      //Expected: {b
     bus_ref = busdb.doc(bus_info.docs[0].id);
     try {
       bus_ref.update({
-        members : new_member_list
+        memberList : new_member_list
       });
       res.status(200).send("Change Success");
     } catch(error) {
@@ -301,9 +303,9 @@ app.patch('/kickMember', async (req, res) => {                      //Expected: 
     return;
   }
   else {
-    let bus_info = await busdb.where('businessid', '==', req.body.business_id).get();
+    let bus_info = await busdb.where('businessId', '==', req.body.businessId).get();
     let has_permissions = false;
-    let new_member_list = bus_info.docs[0].get('members');
+    let new_member_list = bus_info.docs[0].get('memberList');
     let kickee_pos = "";
     for (let i = 0; i < new_member_list.length; i++) {
       if (new_member_list[i].email == req.body.kickeeEmail) {
@@ -314,7 +316,7 @@ app.patch('/kickMember', async (req, res) => {                      //Expected: 
       res.status(401).send("Kickee Email invalid or does not exist within the business");
       return;
     }
-    bus_info.docs[0].get('members').forEach(member => { // If kicker's role is Owner OR kicker's role is admin AND kickee's role is Employee
+    bus_info.docs[0].get('memberList').forEach(member => { // If kicker's role is Owner OR kicker's role is admin AND kickee's role is Employee
       if (((member.role == 'Owner') || (member.role == 'Admin' && new_member_list[kickee_pos].email == 'Employee')) && (member.email == req.body.kickerEmail)) {
         has_permissions = true;
       }
@@ -327,7 +329,7 @@ app.patch('/kickMember', async (req, res) => {                      //Expected: 
     bus_ref = busdb.doc(bus_info.docs[0].id);
     try {
       bus_ref.update({
-        members : new_member_list
+        memberList : new_member_list
       });
       res.status(200).send("Kick Success");
     } catch(error) {
@@ -342,9 +344,9 @@ app.patch('/businessOpen', async (req, res) => {                     //Expected 
     res.status(400).send("Incorrect Token");
     return;
   }
-  let bus_info = await busdb.where("businessid", '==', req.body.business_id).get();
+  let bus_info = await busdb.where("businessId", '==', req.body.businessId).get();
   has_permissions = false;
-  bus_info.docs[0].get('members').forEach(member => { // Check every member in the business and check for their roles
+  bus_info.docs[0].get('memberList').forEach(member => { // Check every member in the business and check for their roles
     if ((member.role == 'Owner' || member.role == 'Admin') && (member.email == req.body.email)) {
       has_permissions = true;
     }
@@ -375,9 +377,9 @@ app.patch('/businessClose', async (req, res) => {                     //Expected
     res.status(400).send("Incorrect Token");
     return;
   }
-  let bus_info = await busdb.where("businessid", '==', req.body.business_id).get();
+  let bus_info = await busdb.where("businessId", '==', req.body.businessId).get();
   has_permissions = false;
-  bus_info.docs[0].get('members').forEach(member => { // Check every member in the business and check for their roles
+  bus_info.docs[0].get('memberList').forEach(member => { // Check every member in the business and check for their roles
     if ((member.role == 'Owner' || member.role == 'Admin') && (member.email == req.body.email)) {
       has_permissions = true;
     }
