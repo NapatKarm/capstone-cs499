@@ -19,7 +19,7 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import CVIVIDNav from '../SharedComponent/Navbar'
-import Endpoint from '../../Endpoint';
+import {Endpoint} from '../../Endpoint';
 
 import './BusinessDetailsPage.css';
 
@@ -30,7 +30,7 @@ class BusinessDetailsPage extends Component {
             businessDetails: undefined,
             role: undefined,
             action: false,
-            businessOpened: false,
+            isopened: false,
             actionName: "",
             actionVictim: "",
             changingBPass: false,
@@ -50,7 +50,7 @@ class BusinessDetailsPage extends Component {
             if (roleGrab !== undefined) {
                 this.setState({
                     role: roleGrab.role,
-                    businessOpened: this.state.businessDetails.businessOpened
+                    isopened: this.state.businessDetails.isopened
                 })
                 this.updateDetails()
             }
@@ -92,7 +92,7 @@ class BusinessDetailsPage extends Component {
                 if (roleGrab !== undefined) {
                     this.setState({
                         role: roleGrab.role,
-                        businessOpened: this.state.businessDetails.businessOpened
+                        isopened: this.state.businessDetails.isopened
                     })
                 }
                 else {
@@ -269,7 +269,7 @@ class BusinessDetailsPage extends Component {
                 })
         }
         else if (this.state.actionName === "kick") {
-            await axios.put(`${Endpoint}/kickMember`, {
+            await axios.patch(`${Endpoint}/kickMember`, {
                 businessId: this.state.businessDetails.businessId,
                 kickerEmail: this.props.userData.email,
                 kickeeEmail: this.state.actionVictim,
@@ -323,7 +323,7 @@ class BusinessDetailsPage extends Component {
                         <div>
                             {this.state.businessDetails ? (
                                 ((this.state.role == "Admin") | (this.state.role == "Owner")) ? (
-                                    this.state.businessOpened ? (
+                                    this.state.isopened ? (
                                         <div>
                                             <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Change Passcode</Button>
                                             <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Open</Button>

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Endpoint from '../../Endpoint';
+import {Endpoint} from '../../components/Endpoint';
 
 // Action Types
 const USER_SIGNUP = "USER_SIGNUP";
@@ -64,8 +64,7 @@ const logInErrorCatch = (err) => {
 export const userSignupThunk = (firstName, lastName, email, password) => async (dispatch) => {
     try {
         // This is we will send sign up info to the backend and wait for response
-        await axios.post(`${Endpoint}/
-        signup`, {
+        await axios.post(`${Endpoint}/signup`, {
             firstname: firstName,
             lastname: lastName,
             email: email,
@@ -90,7 +89,7 @@ export const userSignupThunk = (firstName, lastName, email, password) => async (
 export const userLoginThunk = (email,password) => async (dispatch) => {
     try {
         // This is we will send log in info to the backend and wait for response
-        await axios.post(`(`${Endpoint}/signin`, {
+        await axios.post(`${Endpoint}/signin`, {
             email: email,
             password: password
         })
