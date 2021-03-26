@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Endpoint from '../../Endpoint';
+import {Endpoint} from '../../Endpoint';
 
 // Action Types
 const B_REG = "B_REG";
