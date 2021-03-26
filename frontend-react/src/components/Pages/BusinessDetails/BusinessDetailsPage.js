@@ -19,6 +19,7 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import CVIVIDNav from '../SharedComponent/Navbar'
+import Endpoint from '../../Endpoint';
 
 import './BusinessDetailsPage.css';
 
@@ -77,7 +78,7 @@ class BusinessDetailsPage extends Component {
     }
     updateDetails = async () => {
         console.log("UPDATING")
-        axios.post(`https://c-vivid-backend.herokuapp.com/getSingleBusinessData`, {
+        axios.post(`${Endpoint}/getSingleBusinessData`, {
             businessId: this.state.businessDetails.businessId,
             email: this.props.userData.email,
             token: this.props.userData.token
@@ -158,7 +159,7 @@ class BusinessDetailsPage extends Component {
 
     }
     BPassChange = async () => {
-        await axios.put(`https://c-vivid-backend.herokuapp.com/passcodeChange`, {
+        await axios.put(`${Endpoint}/passcodeChange`, {
             businessId: this.state.businessDetails.businessId,
             email: this.props.userData.email,
             token: this.props.userData.token,
@@ -231,7 +232,7 @@ class BusinessDetailsPage extends Component {
     }
     confirmAction = async () => {
         if (this.state.actionName === "promote") {
-            await axios.put(`https://c-vivid-backend.herokuapp.com/roleChange`, {
+            await axios.put(`${Endpoint}/roleChange`, {
                 businessId: this.state.businessDetails.businessId,
                 changerEmail: this.props.userData.email,
                 changeeEmail: this.state.actionVictim,
@@ -249,7 +250,7 @@ class BusinessDetailsPage extends Component {
                 })
         }
         else if (this.state.actionName === "demote") {
-            await axios.put(`https://c-vivid-backend.herokuapp.com/roleChange`, {
+            await axios.put(`${Endpoint}/roleChange`, {
                 businessId: this.state.businessDetails.businessId,
                 changerEmail: this.props.userData.email,
                 changeeEmail: this.state.actionVictim,
@@ -268,7 +269,7 @@ class BusinessDetailsPage extends Component {
                 })
         }
         else if (this.state.actionName === "kick") {
-            await axios.put(`https://c-vivid-backend.herokuapp.com/kickMember`, {
+            await axios.put(`${Endpoint}/kickMember`, {
                 businessId: this.state.businessDetails.businessId,
                 kickerEmail: this.props.userData.email,
                 kickeeEmail: this.state.actionVictim,

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Endpoint from '../../Endpoint';
 
 // Action Types
 const B_REG = "B_REG";
@@ -70,7 +71,7 @@ const userLogout = () => {
 // Thunks
 export const bRegisterThunk = (bname, baddress, email, businesspass) => async (dispatch) => {
     try {
-        await axios.post(`https://c-vivid-backend.herokuapp.com/businessRegister`, {
+        await axios.post(`${Endpoint}/businessRegister`, {
             businessname: bname,
             businessaddr: baddress,
             email: email,
@@ -93,7 +94,7 @@ export const bRegisterThunk = (bname, baddress, email, businesspass) => async (d
 
 export const bJoinThunk = (email,businessid,businesspass) => async (dispatch) => {
     try {
-        await axios.post(`https://c-vivid-backend.herokuapp.com/businessJoin`, {
+        await axios.post(`${Endpoint}/businessJoin`, {
             email: email,
             businessId: parseInt(businessid),
             businesspass: businesspass
@@ -116,7 +117,7 @@ export const bJoinThunk = (email,businessid,businesspass) => async (dispatch) =>
 export const bGetThunk = (email,token) => async (dispatch) => {
     try {
         console.log("UPDATING BUSINESS DATA WITH",email,token)
-        await axios.post(`https://c-vivid-backend.herokuapp.com/getBusinessData`, {
+        await axios.post(`${Endpoint}/getBusinessData`, {
             email: email,
             token: token
         })
