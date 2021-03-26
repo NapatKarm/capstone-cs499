@@ -19,6 +19,7 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import CVIVIDNav from '../SharedComponent/Navbar'
+import Endpoint from '../../Endpoint';
 
 import './BusinessDetailsPage.css';
 
@@ -59,8 +60,13 @@ class BusinessDetailsPage extends Component {
     }
     updateDetails = async () => {
         console.log("UPDATING")
+<<<<<<< Updated upstream
         axios.post(`https://c-vivid-backend.herokuapp.com/getSingleBusinessData`, {
             business_id: this.state.businessDetails.business_id,
+=======
+        axios.post(`${Endpoint}/getSingleBusinessData`, {
+            businessId: this.state.businessDetails.businessId,
+>>>>>>> Stashed changes
             email: this.props.userData.email,
             token: this.props.userData.token
         })
@@ -109,8 +115,13 @@ class BusinessDetailsPage extends Component {
         this.setState({ bPass: event.target.value })
     }
     BPassChange = async () => {
+<<<<<<< Updated upstream
         await axios.put(`https://c-vivid-backend.herokuapp.com/passcodeChange`, {
             business_id: this.state.businessDetails.business_id,
+=======
+        await axios.put(`${Endpoint}/passcodeChange`, {
+            businessId: this.state.businessDetails.businessId,
+>>>>>>> Stashed changes
             email: this.props.userData.email,
             token: this.props.userData.token,
             businesspass: this.state.bPass
@@ -180,8 +191,13 @@ class BusinessDetailsPage extends Component {
     }
     confirmAction = async () => {
         if (this.state.actionName === "promote") {
+<<<<<<< Updated upstream
             await axios.put(`https://c-vivid-backend.herokuapp.com/roleChange`, {
                 business_id: this.state.businessDetails.business_id,
+=======
+            await axios.put(`${Endpoint}/roleChange`, {
+                businessId: this.state.businessDetails.businessId,
+>>>>>>> Stashed changes
                 changerEmail: this.props.userData.email,
                 changeeEmail: this.state.actionVictim,
                 newRole: "Admin",
@@ -198,8 +214,13 @@ class BusinessDetailsPage extends Component {
                 })
         }
         else if (this.state.actionName === "demote") {
+<<<<<<< Updated upstream
             await axios.put(`https://c-vivid-backend.herokuapp.com/roleChange`, {
                 business_id: this.state.businessDetails.business_id,
+=======
+            await axios.put(`${Endpoint}/roleChange`, {
+                businessId: this.state.businessDetails.businessId,
+>>>>>>> Stashed changes
                 changerEmail: this.props.userData.email,
                 changeeEmail: this.state.actionVictim,
                 newRole: "Employee",
@@ -217,8 +238,13 @@ class BusinessDetailsPage extends Component {
                 })
         }
         else if (this.state.actionName === "kick") {
+<<<<<<< Updated upstream
             await axios.put(`https://c-vivid-backend.herokuapp.com/kickMember`, {
                 business_id: this.state.businessDetails.business_id,
+=======
+            await axios.put(`${Endpoint}/kickMember`, {
+                businessId: this.state.businessDetails.businessId,
+>>>>>>> Stashed changes
                 kickerEmail: this.props.userData.email,
                 kickeeEmail: this.state.actionVictim,
                 token: this.props.userData.token
