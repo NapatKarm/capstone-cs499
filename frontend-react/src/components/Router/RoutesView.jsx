@@ -14,6 +14,7 @@ import HomePage from '../Pages/Home/HomePage';
 import CounterPage from  '../Pages/Counter/CounterPage';
 import BusinessDetailsPage from '../Pages/BusinessDetails/BusinessDetailsPage'
 import AccessDenied from '../Pages/SharedComponent/AccessDenied';
+import TrackingPage from '../Pages/ActiveTracking/TrackingPage';
 
 
 class RoutesView extends Component {
@@ -21,6 +22,7 @@ class RoutesView extends Component {
         const {loggedIn} = this.props
         const {singleView} = this.props
         const AccessDeniedComponent = () => (<AccessDenied/>)
+        const TrackingPageComponent =() => (<TrackingPage bDetails={this.props.bDetails}/>)
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage socket={socket} logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
         const CounterPageComponent = () => (<CounterPage cInfo={this.props.cInfo} socket={socket} userData={this.props.userData} bDetails={this.props.bDetails}/>)
@@ -29,6 +31,7 @@ class RoutesView extends Component {
         return (
             <Router>
                 <Switch>
+                    <Route exact path="/tracking" render={TrackingPageComponent} />
                     <Route exact path="/denied" render={AccessDeniedComponent} />
                     <Route exact path="/test" render={TestLandingComponent} />
                     <Route exact path="/" render={LandingPageComponent} />

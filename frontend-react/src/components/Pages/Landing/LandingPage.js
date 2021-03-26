@@ -25,9 +25,10 @@ class LandingPage extends Component {
             this.props.history.push("/home");
         }
     }
-    toMap = () => {
+    toTrack = () => {
         console.log("LISTENING TO MAP, GET ALL DATA")
         // this.props.socket.emit("getAllData")
+        this.props.history.push("/tracking")
     }
     render() {
         return(
@@ -45,7 +46,7 @@ class LandingPage extends Component {
 
                             {/* vvv Link page vvv*/}
                             {/* ()=>  -- stop stuff from auto running*/}
-                            <Button onClick={()=>this.toMap()}style={{color: 'white', backgroundColor: '#e8333a', maxWidth: '325px', maxHeight: '50px', minWidth: '325px', minHeight: '50px'}}>GO TO THE MAP</Button>
+                            <Button onClick={()=>this.toTrack()}style={{color: 'white', backgroundColor: '#e8333a', maxWidth: '325px', maxHeight: '50px', minWidth: '325px', minHeight: '50px'}}>TRACK BUSINESSES</Button>
                             <p><br/>Businesses/Workers:</p>
                             <div className="actionButton">
                                 <Button onClick={()=>this.setState({rightState: "register"})} style={{color: 'black', backgroundColor: '#f7f6f6', maxWidth: '160px', maxHeight: '50px', minWidth: '160px', minHeight: '50px'}}>REGISTER</Button>
