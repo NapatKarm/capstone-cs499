@@ -17,7 +17,7 @@ import { green, red, cyan } from '@material-ui/core/colors';
 
 class ManagedBusinessTable extends Component {
     state = {
-        businessList: []
+        businessList: undefined
     }
     componentDidMount() {
         console.log("UHHH DEBUG PROPS",this.props.businessList)
@@ -104,9 +104,8 @@ class ManagedBusinessTable extends Component {
                                         </div>
                                         </div>
                                     </TableCell>
-
                                     <TableCell align="right" className="Tbuttons">
-                                        {business.businessOpened ?
+                                        {business.isopened ?
                                             (
                                                 <Button onClick={()=>this.joinTracker(business.businessId,business)} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Track</Button>
                                             ) :
