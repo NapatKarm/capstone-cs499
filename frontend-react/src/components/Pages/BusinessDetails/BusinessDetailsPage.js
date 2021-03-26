@@ -19,7 +19,7 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import CVIVIDNav from '../SharedComponent/Navbar'
-import Endpoint from '../../Endpoint';
+import {Endpoint} from '../../Endpoint';
 
 import './BusinessDetailsPage.css';
 
