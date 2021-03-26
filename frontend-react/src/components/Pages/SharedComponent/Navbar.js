@@ -26,7 +26,6 @@ class CVIVIDNav extends Component {
     }
     render() {
         return (
-            <div>
                 <AppBar position="static" style={{backgroundColor: "#8a0602" }}>
                     <Toolbar style={{display:'flex',justifyContent:'space-between'}}>
                         <div style={{display:'flex', alignItems:'center'}}>
@@ -55,7 +54,6 @@ class CVIVIDNav extends Component {
                             
                     </Toolbar>
                 </AppBar>
-            </div>
         )
     }
 }

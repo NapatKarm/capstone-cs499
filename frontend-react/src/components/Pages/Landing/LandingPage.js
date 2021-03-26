@@ -15,13 +15,20 @@ class LandingPage extends Component {
             rightState: "none"
         }
     }
-
+    // componentDidMount=()=>{
+    //     this.props.socket.on("updateMap",({ allData }) => {
+    //         console.log("from UPDATE MAP",allData)
+    //     })
+    // }
     componentDidUpdate=()=>{
         if (this.props.loggedIn){
             this.props.history.push("/home");
         }
     }
-
+    toMap = () => {
+        console.log("LISTENING TO MAP, GET ALL DATA")
+        // this.props.socket.emit("getAllData")
+    }
     render() {
         return(
             <div className="bodyT">
@@ -38,7 +45,7 @@ class LandingPage extends Component {
 
                             {/* vvv Link page vvv*/}
                             {/* ()=>  -- stop stuff from auto running*/}
-                            <Button style={{color: 'white', backgroundColor: '#e8333a', maxWidth: '325px', maxHeight: '50px', minWidth: '325px', minHeight: '50px'}}>GO TO THE MAP</Button>
+                            <Button onClick={()=>this.toMap()}style={{color: 'white', backgroundColor: '#e8333a', maxWidth: '325px', maxHeight: '50px', minWidth: '325px', minHeight: '50px'}}>GO TO THE MAP</Button>
                             <p><br/>Businesses/Workers:</p>
                             <div className="actionButton">
                                 <Button onClick={()=>this.setState({rightState: "register"})} style={{color: 'black', backgroundColor: '#f7f6f6', maxWidth: '160px', maxHeight: '50px', minWidth: '160px', minHeight: '50px'}}>REGISTER</Button>

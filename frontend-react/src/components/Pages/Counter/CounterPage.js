@@ -1,23 +1,12 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import PropTypes from 'prop-types';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import Switch from '@material-ui/core/Switch';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormGroup from '@material-ui/core/FormGroup';
-import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
+import CVIVIDNav from '../SharedComponent/Navbar'
 
 import './CounterPage.css';
 
@@ -111,51 +100,54 @@ class CounterPage extends Component {
             joinError: ""
         }
     }
-
     componentDidMount() {
-        this.props.socket.on("updateCounter",({ error, counter }) => {
+        if(this.props.cInfo){
+            this.setState({
+                capacity: this.props.cInfo.counter,
+                maxCap: this.props.cInfo.limit
+            })
+        }
+        this.props.socket.on("updateCounter",({ error, limit, counter }) => {
+            // console.log("Updated Counter",counter,limit,error)
             if(error!==undefined){
                 console.log("error: ",error);
                 this.setState({joinError:error});
             }
             if(counter!==undefined){
-                if(this.props.bDetails===undefined)
+                if(this.props.bDetails!==undefined)
                 {
-                    this.setState({capacity: counter})
+                    this.setState({capacity: counter, maxCap:limit})
                 }
             }
         })
+
     }
     addCapacity = ()=> {
         if (this.props.bDetails) {
-            this.props.socket.emit('addCount', {businessid: this.props.bDetails.business_id})
+            this.props.socket.emit('addCount', {businessId: this.props.bDetails.businessId})
         }
     }
     subCapacity = ()=> {
         if (this.state.capacity > 0) {
             if (this.props.bDetails) {
-                this.props.socket.emit('removeCount', {businessid: this.props.bDetails.business_id})
+                this.props.socket.emit('removeCount', {businessId: this.props.bDetails.businessId})
             }
         }   
     }
-
+    goBackHome = () => {
+        this.props.socket.emit('leaveBusiness', {businessId: this.props.bDetails.businessId})
+        this.props.history.push("/home")
+    }
     render() {
         return(
             <div>
                 <div className="navBar">
-                    <AppBar position="static" style={{backgroundColor: "#8a0602"}}>
-                        <Toolbar>
-                            <IconButton edge="start" color="inherit" aria-label="menu">
-                                <MenuIcon />
-                            </IconButton>
-                            <Typography variant="h6">
-                                C-Vivid
-                            </Typography>
-                        </Toolbar>
-                    </AppBar>
+                    <CVIVIDNav socket={this.props.socket} userData={this.props.userData} logout={()=>console.log("WAIT")}/>
                 </div>
+                
                 <div className="displayMax">
                     <div><b>Maximum Capacity: {this.state.maxCap}</b></div>
+                    <Button onClick={this.goBackHome} style={{ marginTop:'15px',padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white'}}>Home</Button>
                 </div>
                 <div className="circle">
                     {/* Add something to keep the number from going negative */}

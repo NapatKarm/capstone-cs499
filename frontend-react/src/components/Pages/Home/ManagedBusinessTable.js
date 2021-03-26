@@ -20,6 +20,7 @@ class ManagedBusinessTable extends Component {
         businessList: []
     }
     componentDidMount() {
+        console.log("UHHH DEBUG PROPS",this.props.businessList)
         this.setState({
             businessList: this.props.businessList,
         })
@@ -30,8 +31,27 @@ class ManagedBusinessTable extends Component {
             this.props.history.push("/details")
         }
     }
-    joinTracker = (bID) => {
-        this.props.socket.emit('joinTracker', {businessid:bID,email:this.props.userData.email})
+    joinTracker = (bID, information) => {
+        this.props.socket.emit('joinTracker', {businessId:bID,email:this.props.userData.email})
+        this.props.socket.on("joinCheck", ({ counter, limit, error }) => {
+            console.log("JOIN Response",counter,limit,error)
+            if(error!==undefined) this.setState({joinERR:error});
+            else if(counter!==undefined&&limit!==undefined) {
+                console.log("Time to reroute")
+                    var cInfo = {
+                        limit: limit,
+                        counter: counter
+                    }
+                    this.props.cUpdate(cInfo)
+                    if (this.props.cInfo){
+                        this.props.bView(information)
+                        if (this.props.bDetails) {
+                            this.props.history.push("/counter")
+                        }
+                    }
+                }
+            }
+        )
     }
     render() {
         return (
@@ -57,7 +77,7 @@ class ManagedBusinessTable extends Component {
                     <TableBody className="MTableBody">
                         {this.props.businessList ? (
                             this.props.businessList.length > 0 ? (this.props.businessList.map((business) => (
-                                <TableRow key={business.business_id}>
+                                <TableRow key={business.businessId}>
                                     <TableCell component="th" scope="row" align="left" style={{ textAlign: "center", width: "50px" }}>
                                         <StarBorderIcon fontSize="medium" style={{ color: '#8a0602' }} />
                                     </TableCell>
@@ -67,7 +87,7 @@ class ManagedBusinessTable extends Component {
                                     <TableCell className="MTableBody" align="left">
                                         <div>
                                             <div>
-                                                {business.business_id}
+                                                {business.businessId}
                                             </div>
                                             <div>
                                                 BusinessID
@@ -88,7 +108,7 @@ class ManagedBusinessTable extends Component {
                                     <TableCell align="right" className="Tbuttons">
                                         {business.businessOpened ?
                                             (
-                                                <Button onClick={()=>this.joinTracker(business.business_id)}className="MTableBody" style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Track</Button>
+                                                <Button onClick={()=>this.joinTracker(business.businessId,business)} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Track</Button>
                                             ) :
                                             (
                                                 <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Closed</Button>
@@ -98,7 +118,17 @@ class ManagedBusinessTable extends Component {
                                     </TableCell>
                                 </TableRow>
                             ))) : (
-                                <div className="MTableBody"> Currently not in any business</div>
+                                <TableRow>
+                                    <TableCell/>
+                                    <TableCell>
+                                    <div className="MTableBody"> Currently not in any business</div>
+                                    </TableCell>
+                                    <TableCell>
+                                    <div className="MTableBody"> Register or join a business to get started</div>
+                                    </TableCell>
+                                    <TableCell/>
+                                    <TableCell/>
+                                </TableRow>
                             )) : (
                             <TableRow key="loading">
                                 <TableCell />

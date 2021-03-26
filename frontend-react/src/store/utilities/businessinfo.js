@@ -96,7 +96,7 @@ export const bJoinThunk = (email,businessid,businesspass) => async (dispatch) =>
     try {
         await axios.post(`${Endpoint}/businessJoin`, {
             email: email,
-            business_id: parseInt(businessid),
+            businessId: parseInt(businessid),
             businesspass: businesspass
         })
         .then(res => {

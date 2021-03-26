@@ -30,12 +30,15 @@ class BusinessDetailsPage extends Component {
             businessDetails: undefined,
             role: undefined,
             action: false,
+            businessOpened: false,
             actionName: "",
             actionVictim: "",
             changingBPass: false,
             passError: "",
             openingBusiness: false,
-            limitNum: ""
+            limitNum: "",
+            openERR: "",
+            returnERR: ""
         }
     }
     componentDidMount() {
@@ -43,15 +46,30 @@ class BusinessDetailsPage extends Component {
             businessDetails: this.props.bDetails
         }, () => {
             console.log("Updated Business Details", this.state.businessDetails)
-            let roleGrab = this.state.businessDetails.members.find(element => element.email == this.props.userData.email)
+            let roleGrab = this.state.businessDetails.memberList.find(element => element.email == this.props.userData.email)
             if (roleGrab !== undefined) {
                 this.setState({
-                    role: roleGrab.role
+                    role: roleGrab.role,
+                    businessOpened: this.state.businessDetails.businessOpened
                 })
+                this.updateDetails()
             }
             else alert("Something is wrong, you are not in this business but you can still see it.")
 
         })
+    }
+    componentDidUpdate() {
+        this.props.socket.on("closeResponse", ({ success, error }) => {
+            console.log("REEEEE Close Response",success,error)
+            if(error!==undefined) this.setState({returnERR:"An Error has occurred, please try again"});
+            else if(success!==undefined) {
+                this.setState({
+                    action: false
+                })
+                this.updateDetails();
+                }
+            }
+        )
     }
     logout = () => {
         this.props.bUserLogout()
@@ -60,13 +78,8 @@ class BusinessDetailsPage extends Component {
     }
     updateDetails = async () => {
         console.log("UPDATING")
-<<<<<<< Updated upstream
-        axios.post(`https://c-vivid-backend.herokuapp.com/getSingleBusinessData`, {
-            business_id: this.state.businessDetails.business_id,
-=======
         axios.post(`${Endpoint}/getSingleBusinessData`, {
             businessId: this.state.businessDetails.businessId,
->>>>>>> Stashed changes
             email: this.props.userData.email,
             token: this.props.userData.token
         })
@@ -75,10 +88,11 @@ class BusinessDetailsPage extends Component {
                     businessDetails: res.data,
                     action: false
                 })
-                let roleGrab = this.state.businessDetails.members.find(element => element.email == this.props.userData.email)
+                let roleGrab = this.state.businessDetails.memberList.find(element => element.email == this.props.userData.email)
                 if (roleGrab !== undefined) {
                     this.setState({
-                        role: roleGrab.role
+                        role: roleGrab.role,
+                        businessOpened: this.state.businessDetails.businessOpened
                     })
                 }
                 else {
@@ -114,14 +128,39 @@ class BusinessDetailsPage extends Component {
     changeBPass = (event) => {
         this.setState({ bPass: event.target.value })
     }
+    BOpen = () => {
+        console.log("Should be running Business Open",this.state)
+        if(this.state.limitNum==="")
+        {
+            this.setState({openERR:"Please enter a limit"});
+        }
+        else 
+        {
+            this.props.socket.emit('openBusiness', { 
+                businessId: this.state.businessDetails.businessId,
+                businessname: this.state.businessDetails.businessname,
+                businessaddr: this.state.businessDetails.businessaddr,
+                limit: this.state.limitNum,
+                email: this.props.userData.email,
+                token: this.props.userData.token
+             })
+            this.props.socket.on("openResponse", ({ success, error }) => {
+                console.log("Open Response",success,error)
+                if(error!==undefined) this.setState({openERR:"An Error has occurred, please try again"});
+                else if(success!==undefined) {
+                    this.setState({
+                        openingBusiness: false
+                    })
+                    }
+                    this.updateDetails();
+                }
+            )
+        }
+
+    }
     BPassChange = async () => {
-<<<<<<< Updated upstream
-        await axios.put(`https://c-vivid-backend.herokuapp.com/passcodeChange`, {
-            business_id: this.state.businessDetails.business_id,
-=======
         await axios.put(`${Endpoint}/passcodeChange`, {
             businessId: this.state.businessDetails.businessId,
->>>>>>> Stashed changes
             email: this.props.userData.email,
             token: this.props.userData.token,
             businesspass: this.state.bPass
@@ -168,18 +207,20 @@ class BusinessDetailsPage extends Component {
             action: true
         })
     }
-    runClose = (bName) => {
+    runClose = () => {
         console.log("Closing")
         this.setState({
             actionName: "close",
-            actionVictim: bName,
+            actionVictim: this.state.businessDetails.businessname,
             action: true
         })
     }
     runOpen = () => {
         console.log("Opening")
         this.setState({
-            openingBusiness: true
+            openingBusiness: true,
+            openERR: "",
+            limitNum: ""
         })
     }
     changeLimit = (event) => {
@@ -191,13 +232,8 @@ class BusinessDetailsPage extends Component {
     }
     confirmAction = async () => {
         if (this.state.actionName === "promote") {
-<<<<<<< Updated upstream
-            await axios.put(`https://c-vivid-backend.herokuapp.com/roleChange`, {
-                business_id: this.state.businessDetails.business_id,
-=======
             await axios.put(`${Endpoint}/roleChange`, {
                 businessId: this.state.businessDetails.businessId,
->>>>>>> Stashed changes
                 changerEmail: this.props.userData.email,
                 changeeEmail: this.state.actionVictim,
                 newRole: "Admin",
@@ -214,13 +250,8 @@ class BusinessDetailsPage extends Component {
                 })
         }
         else if (this.state.actionName === "demote") {
-<<<<<<< Updated upstream
-            await axios.put(`https://c-vivid-backend.herokuapp.com/roleChange`, {
-                business_id: this.state.businessDetails.business_id,
-=======
             await axios.put(`${Endpoint}/roleChange`, {
                 businessId: this.state.businessDetails.businessId,
->>>>>>> Stashed changes
                 changerEmail: this.props.userData.email,
                 changeeEmail: this.state.actionVictim,
                 newRole: "Employee",
@@ -238,13 +269,8 @@ class BusinessDetailsPage extends Component {
                 })
         }
         else if (this.state.actionName === "kick") {
-<<<<<<< Updated upstream
-            await axios.put(`https://c-vivid-backend.herokuapp.com/kickMember`, {
-                business_id: this.state.businessDetails.business_id,
-=======
             await axios.put(`${Endpoint}/kickMember`, {
                 businessId: this.state.businessDetails.businessId,
->>>>>>> Stashed changes
                 kickerEmail: this.props.userData.email,
                 kickeeEmail: this.state.actionVictim,
                 token: this.props.userData.token
@@ -260,20 +286,23 @@ class BusinessDetailsPage extends Component {
                 })
         }
         else if (this.state.actionName === "close") {
-            await axios.put(`https://c-vivid-backend.herokuapp.com/businessClose`, {
-                business_id: this.state.businessDetails.business_id,
+            console.log("Should be running Business CLOSE",this.state)
+            this.props.socket.emit('closeBusiness', { 
+                businessId: this.state.businessDetails.businessId,
                 email: this.props.userData.email,
                 token: this.props.userData.token
-            })
-                .then(res => {
-                    console.log("Response from CLOSE", res);
+             })
+            this.props.socket.on("closeResponse", ({ success, error }) => {
+                console.log("Close Response",success,error)
+                if(error!==undefined) this.setState({returnERR:"An Error has occurred, please try again"});
+                else if(success!==undefined) {
+                    this.setState({
+                        action: false
+                    })
                     this.updateDetails();
-                })
-                .catch(err => {
-                    console.log("Error from CLOSE", err)
-                    alert("Something went wrong, check console")
-
-                })
+                    }
+                }
+            )
         }
         else console.log("No Action Set")
     }
@@ -294,17 +323,17 @@ class BusinessDetailsPage extends Component {
                         <div>
                             {this.state.businessDetails ? (
                                 ((this.state.role == "Admin") | (this.state.role == "Owner")) ? (
-                                    this.businessOpened ? (
+                                    this.state.businessOpened ? (
                                         <div>
                                             <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Change Passcode</Button>
                                             <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Open</Button>
-                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e' }} onClick={this.runClose}>Close</Button>
+                                            <Button className="forcedWhiteColor"style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e' }} onClick={this.runClose}>Close</Button>
                                         </div>
                                     ) : (
                                         <div>
                                             <Button onClick={this.changingBPass} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Change Passcode</Button>
                                             <Button onClick={this.runOpen} style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Open</Button>
-                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Close</Button>
+                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420' }} disabled>Close</Button>
                                         </div>
                                     )
                                 ) : ("")
@@ -322,7 +351,7 @@ class BusinessDetailsPage extends Component {
                                     <div>Role: {this.state.role}</div>
                                 </div>
                                 <div className="topRight">
-                                    <div>ID: {this.state.businessDetails.business_id} </div>
+                                    <div>ID: {this.state.businessDetails.businessId} </div>
                                     <div>Passcode: {this.state.businessDetails.businesspass}</div>
                                 </div>
                             </div>
@@ -339,7 +368,7 @@ class BusinessDetailsPage extends Component {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody className="workersTable">
-                                            {this.state.businessDetails.members.map((member) => (
+                                            {this.state.businessDetails.memberList.map((member) => (
                                                 <TableRow className="workersRow" key={member.email}>
                                                     <TableCell className="tableText" component="th" scope="row">
                                                         {member.firstname}
@@ -415,6 +444,7 @@ class BusinessDetailsPage extends Component {
                             <DialogContentText>
                                 Are you sure you want to {this.state.actionName} {this.state.actionVictim}?
                                  </DialogContentText>
+                                 {this.state.returnERR}
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={this.cancelAction} color="primary">
@@ -462,18 +492,17 @@ class BusinessDetailsPage extends Component {
                                 margin="dense"
                                 id="limit"
                                 label="Capacity"
-                                type="integer"
+                                type="number"
                                 onChange={this.changeLimit}
                                 fullWidth
                             />
-                            {this.state.passError}
+                            {this.state.openERR}
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={this.cancelOpening} color="primary">
                                 Cancel
                             </Button>
-                            {/* vvv Add an onclick vvv */}
-                            <Button color="primary">
+                            <Button  onClick={this.BOpen}color="primary">
                                 Open
                             </Button>
                         </DialogActions>
