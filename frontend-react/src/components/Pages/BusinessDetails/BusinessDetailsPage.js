@@ -404,17 +404,17 @@ class BusinessDetailsPage extends Component {
                                                                         (
                                                                             <TableCell align="center">
                                                                                 <ButtonGroup color="primary" aria-label="outlined primary button group">
-                                                                                    <Button onClick={() => this.runPromote(member.email)} disabled>Promote</Button>
-                                                                                    <Button onClick={() => this.runDemote(member.email)} disabled>Demote</Button>
-                                                                                    <Button onClick={() => this.runKick(member.email)} disabled>Kick</Button>
+                                                                                    <Button className="disabledButton" onClick={() => this.runPromote(member.email)} disabled>Promote</Button>
+                                                                                    <Button className="disabledButton" onClick={() => this.runDemote(member.email)} disabled>Demote</Button>
+                                                                                    <Button className="disabledButton" onClick={() => this.runKick(member.email)} disabled>Kick</Button>
                                                                                 </ButtonGroup>
                                                                             </TableCell>
                                                                         ) : (
                                                                             <TableCell align="center">
                                                                                 <ButtonGroup color="primary" aria-label="outlined primary button group">
-                                                                                    <Button onClick={() => this.runPromote(member.email)} disabled>Promote</Button>
-                                                                                    <Button onClick={() => this.runDemote(member.email)} disabled>Demote</Button>
-                                                                                    <Button onClick={() => this.runKick(member.email)}>Kick</Button>
+                                                                                    <Button className="disabledButton" onClick={() => this.runPromote(member.email)} disabled>Promote</Button>
+                                                                                    <Button className="disabledButton" onClick={() => this.runDemote(member.email)} disabled>Demote</Button>
+                                                                                    <Button className="clickableButton" onClick={() => this.runKick(member.email)}>Kick</Button>
                                                                                 </ButtonGroup>
                                                                             </TableCell>
                                                                         )
