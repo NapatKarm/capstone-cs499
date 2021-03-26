@@ -118,7 +118,17 @@ class ManagedBusinessTable extends Component {
                                     </TableCell>
                                 </TableRow>
                             ))) : (
-                                <div className="MTableBody"> Currently not in any business</div>
+                                <TableRow>
+                                    <TableCell/>
+                                    <TableCell>
+                                    <div className="MTableBody"> Currently not in any business</div>
+                                    </TableCell>
+                                    <TableCell>
+                                    <div className="MTableBody"> Register or join a business to get started</div>
+                                    </TableCell>
+                                    <TableCell/>
+                                    <TableCell/>
+                                </TableRow>
                             )) : (
                             <TableRow key="loading">
                                 <TableCell />
