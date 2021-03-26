@@ -28,7 +28,7 @@ class HomePage extends Component {
         super(props);
         this.state = {
             userData: {},
-            businessList: [],
+            businessList: undefined,
             registeringBusiness: false,
             joiningBusiness: false,
             bName: "",
@@ -58,7 +58,7 @@ class HomePage extends Component {
         })
         await this.props.bGet(this.state.userData.email,this.state.userData.token) 
         if(this.props.businessData) {
-            this.setState({businessList:this.props.businessData.businessList, registeringBusiness:false},()=>(console.log("BUSINESS DATAX",this.props.businessData)))    
+            this.setState({businessList:this.props.businessData, registeringBusiness:false},()=>(console.log("BUSINESS DATAX",this.props.businessData)))    
         }
     }
     cancelBReg = () => {
@@ -110,7 +110,7 @@ class HomePage extends Component {
         if(this.props.bRegError===undefined){
             await this.props.bGet(this.state.userData.email,this.state.userData.token) 
             if(this.props.businessData) {
-                this.setState({businessList:this.props.businessData.businessList, registeringBusiness:false},()=>(console.log(this.props.businessData)))    
+                this.setState({businessList:this.props.businessData, registeringBusiness:false},()=>(console.log(this.props.businessData)))    
             }
         }
         else this.setState({registerError:this.props.bRegError})
@@ -125,7 +125,7 @@ class HomePage extends Component {
         else {
             await this.props.bGet(this.state.userData.email,this.state.userData.token) 
             if(this.props.businessData) {
-                this.setState({businessList:this.props.businessData.businessList, joiningBusiness: false},()=>(console.log(this.props.businessData)))    
+                this.setState({businessList:this.props.businessData, joiningBusiness: false},()=>(console.log(this.props.businessData)))    
             }
         } 
     }

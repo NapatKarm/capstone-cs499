@@ -17,7 +17,7 @@ import { green, red, cyan } from '@material-ui/core/colors';
 
 class ManagedBusinessTable extends Component {
     state = {
-        businessList: []
+        businessList: undefined
     }
     componentDidMount() {
         console.log("UHHH DEBUG PROPS",this.props.businessList)
@@ -132,7 +132,7 @@ class ManagedBusinessTable extends Component {
                             <TableRow key="loading">
                                 <TableCell />
                                 <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
-                                    <div onClick={()=>console.log(this.props.businessList,this.state,"INFINFO")}style={{ justifyContent: "center", padding: "30px" }}><CircularProgress fontSize="small" /></div>
+                                    <div style={{ justifyContent: "center", padding: "30px" }}><CircularProgress fontSize="small" /></div>
                                 </TableCell>
                                 <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
                                     <div className="MTableBody"> Loading Data . . .</div>
