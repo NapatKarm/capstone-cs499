@@ -269,7 +269,7 @@ class BusinessDetailsPage extends Component {
                 })
         }
         else if (this.state.actionName === "kick") {
-            await axios.put(`${Endpoint}/kickMember`, {
+            await axios.patch(`${Endpoint}/kickMember`, {
                 businessId: this.state.businessDetails.businessId,
                 kickerEmail: this.props.userData.email,
                 kickeeEmail: this.state.actionVictim,
