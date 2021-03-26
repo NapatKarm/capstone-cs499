@@ -58,6 +58,6 @@
 
 .disabledButton {
     font-weight: normal!important;
-    color: black!important;
-    background-color: #d6d6d6!important;
+    color: gray!important;
+    background-color: #b9b9b9!important;
 }

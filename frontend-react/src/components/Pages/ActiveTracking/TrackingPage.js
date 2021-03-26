@@ -10,6 +10,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import SearchBar from "material-ui-search-bar";
 
 import './TrackingPage.css';
 import longLogo from '../../Imgs/long-logo.png';
@@ -19,15 +20,8 @@ class TrackingPage extends Component {
         super(props);
         this.state = {
             businessDetails: undefined,
-            action: false,
-            actionName: "",
-            actionVictim: "",
-            changingBPass: false,
-            passError: "",
-            openingBusiness: false,
-            limitNum: "",
-            openERR: "",
-            returnERR: ""
+            searched: "",
+            searchedVal: ""
         }
     }
 
@@ -36,6 +30,12 @@ class TrackingPage extends Component {
         this.props.history.push("/")
     }
 
+    cancelSearch = () => {
+        this.setState({searched: "blank"});
+        console.log(this.state.searched);
+        // requestSearch(this.state.searched);
+    };
+
     render() {
         return(
             <div className="TrackingBody">
@@ -43,7 +43,9 @@ class TrackingPage extends Component {
                     <Button onClick={this.goBackHome} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Register/Sign In</Button>
                 </div>
                 <div>
-                    Testing
+                <SearchBar
+                    
+                />
                 </div>
             </div>
         )
