@@ -54,7 +54,7 @@ class HomePage extends Component {
     }
     businessUpdate = async () => {
         this.setState({
-            businessList: undefined
+            businessList: []
         })
         await this.props.bGet(this.state.userData.email,this.state.userData.token) 
         if(this.props.businessData) {

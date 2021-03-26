@@ -104,9 +104,8 @@ class ManagedBusinessTable extends Component {
                                         </div>
                                         </div>
                                     </TableCell>
-
                                     <TableCell align="right" className="Tbuttons">
-                                        {business.businessOpened ?
+                                        {business.isopened ?
                                             (
                                                 <Button onClick={()=>this.joinTracker(business.businessId,business)} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Track</Button>
                                             ) :
@@ -133,7 +132,7 @@ class ManagedBusinessTable extends Component {
                             <TableRow key="loading">
                                 <TableCell />
                                 <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
-                                    <div style={{ justifyContent: "center", padding: "30px" }}><CircularProgress fontSize="small" /></div>
+                                    <div onClick={()=>console.log(this.props.businessList,this.state,"INFINFO")}style={{ justifyContent: "center", padding: "30px" }}><CircularProgress fontSize="small" /></div>
                                 </TableCell>
                                 <TableCell component="th" scope="row" style={{ textAlign: "center" }}>
                                     <div className="MTableBody"> Loading Data . . .</div>
