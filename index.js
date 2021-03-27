@@ -932,7 +932,7 @@ io.on('connection', (socket) => {
     await ioredis.set(businessId, json);
     await ioredis.set(businessId.toString()+"counter", 0);
 
-    await axios.put(`https://${process.env.EXPRESS_HOST}/businessOpen`, {businessId: businessId, email: email, token: token})
+    await axios.patch(`https://${process.env.EXPRESS_HOST}/businessOpen`, {businessId: businessId, email: email, token: token})
     .then(res => {
       socket.emit('openResponse', {success: "Success"});
     })
@@ -945,7 +945,7 @@ io.on('connection', (socket) => {
   socket.on('closeBusiness', async ({businessId, email, token}) => {
     await ioredis.del(businessId);
     await ioredis.del(businessId.toString()+"counter");
-    await axios.put(`https://${process.env.EXPRESS_HOST}/businessClose`, {businessId: businessId, email: email, token: token})
+    await axios.patch(`https://${process.env.EXPRESS_HOST}/businessClose`, {businessId: businessId, email: email, token: token})
     .then(res => {
       socket.emit('closeResponse', {success: "Success"});
     })
@@ -959,14 +959,16 @@ io.on('connection', (socket) => {
     if(await ioredis.exists(businessId)){
       console.log("join");
       socket.join(businessId);
-      const json = JSON.stringify({
-        email: email
-      });
-      await ioredis.set(socket.id, json);
+      // const json = JSON.stringify({
+      //   email: email
+      // });
+      await ioredis.set(socket.id, email);
       let business = await ioredis.get(businessId);
       let businessJson = JSON.parse(business);
 
-      socket.emit('joinCheck', { counter: await ioredis.get(businessId.toString()+"counter"), limit: businessJson.limit});
+      socket.emit('joinCheck', { 
+        counter: await ioredis.get(businessId.toString()+"counter"),
+        limit: businessJson.limit});
     }
     else{
       socket.emit('joinCheck', {error: "Business is closed"});
@@ -981,7 +983,16 @@ io.on('connection', (socket) => {
       await ioredis.incr(businessId.toString()+"counter");
 
       console.log(await ioredis.get(businessId.toString()+"counter"));
-      io.in(businessId).emit('updateCounter', {counter: await ioredis.get(businessId.toString()+"counter"), limit: businessJson.limit});
+
+      let time = Date();
+
+      io.in(businessId).emit('updateCounter', {
+        counter: await ioredis.get(businessId.toString()+"counter"),
+        limit: businessJson.limit,
+        changerEmail: await ioredis.get(socket.id),
+        changerType: "Incremented",
+        time: time
+      });
     }
   });
 
@@ -995,7 +1006,16 @@ io.on('connection', (socket) => {
         await ioredis.decr(businessId.toString()+"counter");
       }
       console.log(await ioredis.get(businessId.toString()+"counter"));
-      io.in(businessId).emit('updateCounter', {counter: await ioredis.get(businessId.toString()+"counter"), limit: businessJson.limit});
+
+      let time = Date();
+
+      io.in(businessId).emit('updateCounter', {
+        counter: await ioredis.get(businessId.toString()+"counter"),
+        limit: businessJson.limit,
+        changerEmail: await ioredis.get(socket.id),
+        changerType: "Decremented",
+        time: time
+      });
     }
   });
 
@@ -1006,7 +1026,17 @@ io.on('connection', (socket) => {
     business = JSON.stringify(businessJson);
 
     await ioredis.set(businessId, business);
-    io.in(businessId).emit('updateCounter', {counter: await ioredis.get(businessId.toString()+"counter"), limit: businessJson.limit})
+
+    let time = Date();
+
+    io.in(businessId).emit('updateCounter', {
+      counter: await ioredis.get(businessId.toString()+"counter"),
+      limit: businessJson.limit,
+      changerEmail: await ioredis.get(socket.id),
+      changerType: `Chagned limit to ${businessJson.limit}`,
+      time: time
+    })
+
     let newbusiness = await ioredis.get(businessId);
     let newBusinessJson = JSON.parse(newbusiness);
     console.log(newBusinessJson.limit);
@@ -1020,14 +1050,15 @@ io.on('connection', (socket) => {
   socket.on('getAllData', async () => {
     const rooms = await io.of('/').adapter.allRooms();
     var allData = []
-    rooms.forEach(async (businessId) => {
+    for(let it = rooms.values(), businessId = null; businessId = it.next().value;){
       let business = await ioredis.get(businessId);
       let counter = await ioredis.get(businessId.toString()+"counter");
+
       let businessJson = JSON.parse(business);
       businessJson.counter = counter;
       businessJson.businessId = businessId;
-      allData.push({businessJson});
-    });
+      allData.push(businessJson);
+    }
     socket.emit('updateMap', allData);
   });
 
