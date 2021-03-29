@@ -48,62 +48,65 @@ class TrackingPage extends Component {
     };
 
     render() {
-        return(
-            <div className="TrackingBody">
-                <div className="topButtons">
-                    <Button onClick={this.goBackHome} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Register/Sign In</Button>
+        return (
+                <div className="TrackingBody">
+                    <div className="topButtons">
+                        <Button onClick={this.goBackHome} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Register/Sign In</Button>
+                        <IconButton aria-label="refresh" onClick={() => this.refreshTB()} style={{ textAlign: "right" }}>
+                            <RefreshIcon style={{ color: "white" }} />
+                        </IconButton>
+                    </div>
+                    <div>
+                        <Paper>
+                            <SearchBar
+                                value={this.state.searched}
+                                onChange={(searchVal) => this.requestSearch(searchVal)}
+                                onCancelSearch={() => this.cancelSearch()}
+                            />
+                            <TableContainer className="trackTable">
+                                <Table className="searchTable">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell className="tableText tableHeaderText">BUSINESS NAME</TableCell>
+                                            <TableCell className="tableText tableHeaderText">ADDRESS</TableCell>
+                                            <TableCell className="tableText tableHeaderText">CURRENT CAPACITY</TableCell>
+                                            <TableCell className="tableText tableHeaderText">MAX CAPACITY</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody className="bListTable">
+                                        {this.state.filterBList ? (
+                                            this.state.filterBList.map((business) => (
+                                                <TableRow>
+                                                    <TableCell className="whiteText">
+                                                        {business.businessname}
+                                                    </TableCell>
+                                                    <TableCell className="whiteText">
+                                                        {business.businessaddr}
+                                                    </TableCell>
+                                                    <TableCell className="whiteText">
+                                                        {business.counter}
+                                                    </TableCell>
+                                                    <TableCell className="whiteText">
+                                                        {business.limit}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))) : (
+                                            <TableRow>
+                                                <TableCell>
+                                                    No Current Active Business
+                                        </TableCell>
+                                                <TableCell>
+                                                </TableCell>
+                                                <TableCell>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Paper>
+                    </div>
                 </div>
-                <div>
-                <Paper>
-                <SearchBar
-                    value={this.state.searched}
-                    onChange={(searchVal) => this.requestSearch(searchVal)}
-                    onCancelSearch={() => this.cancelSearch()}
-                />
-                <TableContainer>
-                    <Table className="searchTable">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell className="tableText large-text">Business Name</TableCell>
-                                <TableCell className="tableText large-text">Address</TableCell>
-                                <TableCell className="tableText large-text">Current Capacity</TableCell>
-                                <TableCell className="tableText large-text">Max Capacity</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody className="bListTable">
-                        {this.state.filterBList ? (
-                            this.state.filterBList.map((business) => (
-                                <TableRow>
-                                    <TableCell className="whiteText">
-                                        {business.businessname}
-                                    </TableCell>
-                                    <TableCell className="whiteText">
-                                        {business.businessaddr}
-                                    </TableCell>
-                                    <TableCell className="whiteText">
-                                        {business.counter}
-                                    </TableCell>
-                                    <TableCell className="whiteText">
-                                        {business.limit}
-                                    </TableCell>
-                                </TableRow>
-                            ))):(
-                                <TableRow>
-                                    <TableCell>
-                                        No Current Active Business
-                                    </TableCell>
-                                    <TableCell>
-                                    </TableCell>
-                                    <TableCell>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                </Paper>
-                </div>
-            </div>
         )
     }
 }
