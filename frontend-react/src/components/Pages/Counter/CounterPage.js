@@ -140,6 +140,11 @@ class CounterPage extends Component {
         })
 
     }
+    logout = () => {
+        this.props.bUserLogout()
+        this.props.userLogout()
+        this.props.history.push("/")
+    }
     addCapacity = ()=> {
         if (this.props.bDetails) {
             this.props.socket.emit('addCount', {businessId: this.props.bDetails.businessId})
@@ -162,9 +167,8 @@ class CounterPage extends Component {
         return(
             <div>
                 <div className="navBar">
-                    <CVIVIDNav socket={this.props.socket} userData={this.props.userData} logout={()=>console.log("WAIT")}/>
+                    <CVIVIDNav socket={this.props.socket} userData={this.props.userData} logout={this.logout}/>
                 </div>
-                
                 <div className="displayMax">
                     <div><b>Maximum Capacity: {this.state.maxCap}</b></div>
                     <Button onClick={this.goBackHome} style={{ marginTop:'15px',padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white'}}>Home</Button>
