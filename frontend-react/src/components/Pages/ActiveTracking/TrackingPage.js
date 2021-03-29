@@ -43,9 +43,27 @@ class TrackingPage extends Component {
                     <Button onClick={this.goBackHome} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Register/Sign In</Button>
                 </div>
                 <div>
-                <SearchBar
-                    
-                />
+                <SearchBar/>
+                <TableContainer>
+                    <Table className="searchTable">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell className="tableText large-text">Business Name</TableCell>
+                                <TableCell className="tableText large-text">Address</TableCell>
+                                <TableCell className="tableText large-text">Current Capacity</TableCell>
+                                <TableCell className="tableText large-text">Max Capacity</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody className="workersTable">
+                            <TableRow>
+                                <TableCell>Testing Name</TableCell>
+                                <TableCell>Testing Address</TableCell>
+                                <TableCell>Testing CCapacity</TableCell>
+                                <TableCell>Testing MCapacity</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
                 </div>
             </div>
         )
