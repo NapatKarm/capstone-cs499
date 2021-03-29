@@ -39,6 +39,7 @@
     background-color: #1c1c1c;
     color: white!important;
     padding: 20px!important;
+    border-bottom-color: #ffffff25!important;
 }
 
 .buttonText {
@@ -47,7 +48,11 @@
 }
 
 .large-text {
-    font-size: 21px!important;
+    font-weight: bold!important;
+    font-size:large!important;
+    /* padding-left: 5px!important; */
+    padding-bottom: 10px!important;
+    border-bottom-color: white!important;
 }
 
 .clickableButton {

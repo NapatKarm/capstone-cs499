@@ -361,10 +361,10 @@ class BusinessDetailsPage extends Component {
                                     <Table className="workersTable" size="small" aria-label="a dense table">
                                         <TableHead>
                                             <TableRow className="workersRow">
-                                                <TableCell className="tableText large-text">First name</TableCell>
-                                                <TableCell className="tableText large-text" align="right">Last name</TableCell>
-                                                <TableCell className="tableText large-text" align="right">Email</TableCell>
-                                                <TableCell className="tableText large-text" align="right">Role</TableCell>
+                                                <TableCell className="tableText large-text">FIRST NAME</TableCell>
+                                                <TableCell className="tableText large-text">LAST NAME</TableCell>
+                                                <TableCell className="tableText large-text">EMAIL</TableCell>
+                                                <TableCell className="tableText large-text">ROLE</TableCell>
                                                 <TableCell className="tableText large-text"></TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -374,9 +374,9 @@ class BusinessDetailsPage extends Component {
                                                     <TableCell className="tableText" component="th" scope="row">
                                                         {member.firstname}
                                                     </TableCell>
-                                                    <TableCell className="tableText" align="right">{member.lastname}</TableCell>
-                                                    <TableCell className="tableText" align="right">{member.email}</TableCell>
-                                                    <TableCell className="tableText" align="right" style={{width:'100px'}}>{member.role}</TableCell>
+                                                    <TableCell className="tableText">{member.lastname}</TableCell>
+                                                    <TableCell className="tableText">{member.email}</TableCell>
+                                                    <TableCell className="tableText" style={{width:'100px'}}>{member.role}</TableCell>
                                                     {(((this.state.role === "Owner") | (this.state.role === "Admin")) && (this.props.userData.email !== member.email)) ?
                                                         (
                                                             this.state.role === "Owner" ?
