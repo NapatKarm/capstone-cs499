@@ -26,7 +26,6 @@ class LandingPage extends Component {
         }
     }
     toTrack = () => {
-        console.log("LISTENING TO MAP, GET ALL DATA")
         this.props.socket.emit("getAllData")
         this.props.history.push("/tracking")
     }
