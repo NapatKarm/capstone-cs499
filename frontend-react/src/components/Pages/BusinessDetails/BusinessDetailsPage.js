@@ -71,6 +71,7 @@ class BusinessDetailsPage extends Component {
             }
         )
     }
+
     logout = () => {
         this.props.bUserLogout()
         this.props.userLogout()

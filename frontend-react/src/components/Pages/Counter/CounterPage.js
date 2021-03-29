@@ -107,8 +107,8 @@ class CounterPage extends Component {
                 maxCap: this.props.cInfo.limit
             })
         }
-        this.props.socket.on("updateCounter",({ error, limit, counter }) => {
-            // console.log("Updated Counter",counter,limit,error)
+        this.props.socket.on("updateCounter",({ error, limit, counter, changerEmail, changerType }) => {
+            console.log("Updated Counter",counter,limit,error,changerEmail,changerType)
             if(error!==undefined){
                 console.log("error: ",error);
                 this.setState({joinError:error});
