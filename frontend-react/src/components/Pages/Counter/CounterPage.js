@@ -7,7 +7,13 @@ import Box from '@material-ui/core/Box';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import CVIVIDNav from '../SharedComponent/Navbar'
-
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
 import './CounterPage.css';
 
 const theme = createMuiTheme({
@@ -97,7 +103,8 @@ class CounterPage extends Component {
         this.state = {
             capacity: 0,
             maxCap: 15,
-            joinError: ""
+            joinError: "",
+            actionLogs: []
         }
     }
     componentDidMount() {
@@ -107,8 +114,8 @@ class CounterPage extends Component {
                 maxCap: this.props.cInfo.limit
             })
         }
-        this.props.socket.on("updateCounter",({ error, limit, counter }) => {
-            // console.log("Updated Counter",counter,limit,error)
+        this.props.socket.on("updateCounter",({ error, limit, counter, changerEmail, changerType,time }) => {
+            console.log("Updated Counter",counter,limit,error,changerEmail,changerType,time)
             if(error!==undefined){
                 console.log("error: ",error);
                 this.setState({joinError:error});
@@ -116,7 +123,17 @@ class CounterPage extends Component {
             if(counter!==undefined){
                 if(this.props.bDetails!==undefined)
                 {
+                    var newDate = new Date(time);
+                    newDate = newDate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
                     this.setState({capacity: counter, maxCap:limit})
+                    var tempArr = this.state.actionLogs
+                    var tempObj = {
+                        email: changerEmail,
+                        type: changerType,
+                        time: newDate
+                    }
+                    tempArr.push(tempObj)
+                    this.setState({ actionLogs: tempArr})
                 }
             }
         })
@@ -160,6 +177,41 @@ class CounterPage extends Component {
                 <div className="whiteCircle"></div>
                 <div className="displayRemCap">
                     <div><b>Remaining Capacity: {this.state.maxCap-this.state.capacity}</b></div>
+                    <div>
+                    <TableContainer component={Paper}>
+                <Table aria-label="simple table" size="medium" style={{maxHeight:"440"}}>
+                    <TableHead>
+                        <TableRow >
+                            <TableCell >
+                                Email
+                            </TableCell>
+                            <TableCell>
+                                Action Type
+                            </TableCell>
+                            <TableCell>
+                                Time
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {this.state.actionLogs ? (
+                            this.state.actionLogs.map((action) => (
+                                <TableRow>
+                                    <TableCell>
+                                        {action.email}
+                                    </TableCell>
+                                    <TableCell>
+                                        {action.type}
+                                    </TableCell>
+                                    <TableCell>
+                                        {action.time}
+                                    </TableCell>
+                                </TableRow>
+                            ))):("")}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+                    </div>
                 </div>
                 <div className="backgroundButtons">
                 <div className="leftAdd" onClick={this.addCapacity}/>
