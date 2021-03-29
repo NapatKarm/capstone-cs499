@@ -909,6 +909,73 @@ app.patch('/businessClose', async (req, res) => {                     //Expected
   }
 });
 
+/**
+ * @swagger
+ * /businessDelete:
+ *   delete:
+ *     summary: Delete a Business
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               businessId:
+ *                 type: integer
+ *                 description: The business id.
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *               token:
+ *                 type: string
+ *                 description: The user's token.
+ *     responses:
+ *       '200':
+ *         description: Business Deleted.
+ *       '400':
+ *         description: Incorrect Token.
+ *       '401':
+ *         description: Not Enough Permissions.
+*/
+
+app.delete('/businessDelete', async (req, res) => { // expected request: businessId, email, token
+  let owner_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
+  if (owner_info.docs[0].get('token') != req.body.token || owner_info.empty) {
+    res.status(400).send("Incorrect Token");
+    return;
+  } 
+  else {
+    let bus_info = await busdb.where('businessId', '==', req.body.businessId).get();
+    let has_permissions = false;
+    bus_info.docs[0].get('memberList').forEach( member => { 
+      if ((member.role == 'Owner') && (member.email == req.body.email)) {
+        has_permissions = true;
+      }
+    });
+    if (has_permissions == false) {
+      res.status(401).send("Not enough permissions");
+      return;
+    }
+    
+    try {
+      // Iterate through bus' memberList and delete the business from their businessList
+      bus_info.docs[0].get('memberList').forEach( async (member) => { 
+        let member_info = await usersdb.where('email', '==', member.email).get();
+        let member_ref = usersdb.doc(member_info.docs[0].id);
+        await member_ref.update({
+          businessList : admin.firestore.FieldValue.arrayRemove(req.body.businessId)
+        });
+      });
+      let bus_ref = busdb.doc(bus_info.docs[0].id);
+      bus_ref.delete();
+      console.log("Business Successfully Deleted");
+      res.status(200).send("Business Successfully Deleted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
+
 async function isPartofBusiness(businessId, socket_id){
   const memberList = await io.of('/').adapter.sockets(new Set([businessId]));
   for (let it = memberList.values(), socketID = null; socketID = it.next().value;) { // iterate through a SET
