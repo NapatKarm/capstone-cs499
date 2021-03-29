@@ -184,6 +184,14 @@ class BusinessDetailsPage extends Component {
             action: false
         })
     }
+    deleteB = () => {
+        console.log("DELETING")
+        this.setState({
+            actionName: "delete",
+            actionVictim: "this business",
+            action: true
+        })
+    }
     runPromote = (changeeEmail) => {
         console.log("Promoting")
         this.setState({
@@ -305,6 +313,22 @@ class BusinessDetailsPage extends Component {
                 }
             )
         }
+        else if (this.state.actionName === "delete") {
+            await axios.delete(`${Endpoint}/businessDelete`, {data: {
+                businessId: this.state.businessDetails.businessId,
+                email: this.props.userData.email,
+                token: this.props.userData.token
+            }})
+                .then(res => {
+                    console.log("Response from DELETE", res);
+                    this.props.history.push("/home");
+                })
+                .catch(err => {
+                    console.log("Error from DELETE", err)
+                    alert("Something went wrong, check console")
+
+                })
+        }
         else console.log("No Action Set")
     }
     render() {
@@ -343,8 +367,13 @@ class BusinessDetailsPage extends Component {
                     </div>
                     {this.state.businessDetails ? (
                         <div>
-                            <div>
+                            <div className="NameDeleteDiv">
                                 <div className="businessNameTitle">{this.state.businessDetails.businessname}</div>
+                                {this.state.role === "Owner" ? (
+                                    <div className="deleteBusiness" onClick={this.deleteB}>Delete Business</div>
+                                ):(
+                                    ""
+                                )}
                             </div>
                             <div className="topInfo">
                                 <div>
@@ -383,7 +412,7 @@ class BusinessDetailsPage extends Component {
                                                                 (
                                                                     member.role === "Admin" ?
                                                                         (
-                                                                            <TableCell className="buttonText" align="center">
+                                                                            <TableCell className="buttonText buttonCell" align="center">
                                                                                 <ButtonGroup color="primary" aria-label="outlined primary button group">
                                                                                     <Button className="disabledButton" onClick={() => this.runPromote(member.email)} disabled>Promote</Button>
                                                                                     <Button className="clickableButton" onClick={() => this.runDemote(member.email)}>Demote</Button>
@@ -391,7 +420,7 @@ class BusinessDetailsPage extends Component {
                                                                                 </ButtonGroup>
                                                                             </TableCell>
                                                                         ) : (
-                                                                            <TableCell className="buttonText" align="center">
+                                                                            <TableCell className="buttonText buttonCell" align="center">
                                                                                 <ButtonGroup color="primary" aria-label="outlined primary button group">
                                                                                     <Button className="clickableButton" onClick={() => this.runPromote(member.email)}>Promote</Button>
                                                                                     <Button className="disabledButton" onClick={() => this.runDemote(member.email)} disabled>Demote</Button>
@@ -403,7 +432,7 @@ class BusinessDetailsPage extends Component {
                                                                 ) : (
                                                                     ((member.role === "Admin") | (member.role === "Owner")) ?
                                                                         (
-                                                                            <TableCell align="center">
+                                                                            <TableCell className="buttonCell" align="center">
                                                                                 <ButtonGroup color="primary" aria-label="outlined primary button group">
                                                                                     <Button className="disabledButton" onClick={() => this.runPromote(member.email)} disabled>Promote</Button>
                                                                                     <Button className="disabledButton" onClick={() => this.runDemote(member.email)} disabled>Demote</Button>
@@ -411,7 +440,7 @@ class BusinessDetailsPage extends Component {
                                                                                 </ButtonGroup>
                                                                             </TableCell>
                                                                         ) : (
-                                                                            <TableCell align="center">
+                                                                            <TableCell className="buttonCell" align="center">
                                                                                 <ButtonGroup color="primary" aria-label="outlined primary button group">
                                                                                     <Button className="disabledButton" onClick={() => this.runPromote(member.email)} disabled>Promote</Button>
                                                                                     <Button className="disabledButton" onClick={() => this.runDemote(member.email)} disabled>Demote</Button>
