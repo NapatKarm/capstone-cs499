@@ -22,7 +22,7 @@ class RoutesView extends Component {
         const {loggedIn} = this.props
         const {singleView} = this.props
         const AccessDeniedComponent = () => (<AccessDenied/>)
-        const TrackingPageComponent =() => (<TrackingPage bDetails={this.props.bDetails}/>)
+        const TrackingPageComponent =() => (<TrackingPage socket={socket} bDetails={this.props.bDetails}/>)
         const TestLandingComponent = () => (<TestLanding userSignup={this.props.userSignup} userLogin={this.props.userLogin} userLogout={this.props.userLogout} userData={this.props.userData} signupResult={this.props.signupResult}/>)
         const LandingPageComponent = () => (<LandingPage socket={socket} logInError={this.props.logInError} signUpError={this.props.signUpError} userSignup={this.props.userSignup} userLogin={this.props.userLogin} userData={this.props.userData} signupResult={this.props.signupResult} loggedIn={this.props.loggedIn}/>)
         const CounterPageComponent = () => (<CounterPage cInfo={this.props.cInfo} socket={socket} userData={this.props.userData} bDetails={this.props.bDetails}/>)
