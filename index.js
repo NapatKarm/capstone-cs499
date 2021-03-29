@@ -450,15 +450,16 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
     res.status(400).send("Incorrect Token");
   }
   else{
-    try{
-      let arr_of_bus = await busdb.where('businessId', 'in', user_info.docs[0].get('businessList')).get();
-      let bus_info = [];                // Must call doc.data() on each element because 
-      arr_of_bus.docs.forEach(doc => {  // The actual array contains lots of meta data 
-        bus_info.push(doc.data())
+    let bus_info = [];
+    if(user_info.docs[0].get('businessList').length != 0){
+      let arr_of_bus = await busdb.where('businessId', 'in', user_info.docs[0].get('businessList')).get(); 
+      arr_of_bus.docs.forEach(doc => {  // Must call doc.data() on each element because
+        bus_info.push(doc.data())       // The actual array contains lots of meta data 
       });
       res.status(200).send(bus_info);   //Response: {businessList[{business_id, businessname, businessaddr, businesspass, memberList[{firstname, lastname, email, role}]}]}
-    } catch (error) {
-      console.log(error);
+    }
+    else{
+      res.status(200).send(bus_info);
     }
   }
 });
