@@ -39,7 +39,8 @@ const bRegErrorCatch = (err) => {
     return {
         type: ERROR,
         payload: {
-            BRegError: err
+            BRegError: err,
+            Businesses: []
         }
     }
 }
@@ -57,7 +58,8 @@ const bGetErrorCatch = (err) => {
     return {
         type: ERROR,
         payload: {
-            BGetError: err
+            BGetError: err,
+            Businesses: []
         }
     }
 }
