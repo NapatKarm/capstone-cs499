@@ -10,6 +10,7 @@ import CVIVIDNav from '../SharedComponent/Navbar'
 
 import './CounterPage.css';
 
+
 const theme = createMuiTheme({
     palette: {
         primary: {
@@ -117,6 +118,14 @@ class CounterPage extends Component {
                 if(this.props.bDetails!==undefined)
                 {
                     this.setState({capacity: counter, maxCap:limit})
+                    var tempArr = this.state.actionLogs
+                    var tempObj = {
+                        email: changerEmail,
+                        type: changerType,
+                        time: newDate
+                    }
+                    tempArr.unshift(tempObj)
+                    this.setState({ actionLogs: tempArr})
                 }
             }
         })
@@ -138,6 +147,8 @@ class CounterPage extends Component {
         this.props.socket.emit('leaveBusiness', {businessId: this.props.bDetails.businessId})
         this.props.history.push("/home")
     }
+
+
     render() {
         return(
             <div>
@@ -158,12 +169,47 @@ class CounterPage extends Component {
                     <CircularProgressBackground></CircularProgressBackground>
                 </div>
                 <div className="whiteCircle"></div>
-                <div className="displayRemCap">
-                    <div><b>Remaining Capacity: {this.state.maxCap-this.state.capacity}</b></div>
-                </div>
                 <div className="backgroundButtons">
                 <div className="leftAdd" onClick={this.addCapacity}/>
                 <div className="rightAdd" onClick={this.subCapacity}/>
+                <div className="displayRemCap">
+                    <div><b>Remaining Capacity: {this.state.maxCap-this.state.capacity}</b></div>
+                    <div>
+                        <TableContainer className="logTable" component={Paper}>
+                            <Table stickyHeader className="scrollbar scrollbar-juicy-peach" aria-label="simple table" size="medium">
+                                <TableHead className="logHead">
+                                    <TableRow>
+                                        <TableCell>
+                                            Email
+                                        </TableCell>
+                                        <TableCell>
+                                            Action Type
+                                        </TableCell>
+                                        <TableCell>
+                                            Time
+                                        </TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody className="logBody">
+                                    {this.state.actionLogs ? (
+                                        this.state.actionLogs.map((action) => (
+                                            <TableRow>
+                                                <TableCell>
+                                                    {action.email}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {action.type}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {action.time}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))):("")}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </div>
+                </div>
                 </div>
             </div>
         )
