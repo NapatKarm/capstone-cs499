@@ -21,19 +21,30 @@ class TrackingPage extends Component {
         this.state = {
             businessDetails: undefined,
             searched: "",
-            searchedVal: ""
+            searchedVal: "",
+            businessList: [],
+            filterBList: []
         }
     }
-
+    componentDidMount=()=>{
+        this.props.socket.on("updateMap",({ allData }) => {
+            console.log("from UPDATE MAP",allData)
+            this.setState({businessList:allData,filterBList:allData},()=>{console.log("New Business List",this.state.businessList)})
+        })
+    }
     goBackHome = () => {
         // this.props.bClear()
         this.props.history.push("/")
     }
-
+    requestSearch = (searchedVal) => {
+        const filteredRows = this.state.businessList.filter((row) => {
+          return row.businessname.toLowerCase().includes(searchedVal.toLowerCase());
+        });
+        this.setState({ filterBList: filteredRows})
+      };
     cancelSearch = () => {
-        this.setState({searched: "blank"});
-        console.log(this.state.searched);
-        // requestSearch(this.state.searched);
+        this.setState({searched: ""});
+        this.requestSearch(this.state.searched);
     };
 
     render() {
@@ -43,7 +54,12 @@ class TrackingPage extends Component {
                     <Button onClick={this.goBackHome} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Register/Sign In</Button>
                 </div>
                 <div>
-                <SearchBar/>
+                <Paper>
+                <SearchBar
+                    value={this.state.searched}
+                    onChange={(searchVal) => this.requestSearch(searchVal)}
+                    onCancelSearch={() => this.cancelSearch()}
+                />
                 <TableContainer>
                     <Table className="searchTable">
                         <TableHead>
@@ -54,16 +70,38 @@ class TrackingPage extends Component {
                                 <TableCell className="tableText large-text">Max Capacity</TableCell>
                             </TableRow>
                         </TableHead>
-                        <TableBody className="workersTable">
-                            <TableRow>
-                                <TableCell>Testing Name</TableCell>
-                                <TableCell>Testing Address</TableCell>
-                                <TableCell>Testing CCapacity</TableCell>
-                                <TableCell>Testing MCapacity</TableCell>
-                            </TableRow>
+                        <TableBody className="bListTable">
+                        {this.state.filterBList ? (
+                            this.state.filterBList.map((business) => (
+                                <TableRow>
+                                    <TableCell className="whiteText">
+                                        {business.businessname}
+                                    </TableCell>
+                                    <TableCell className="whiteText">
+                                        {business.businessaddr}
+                                    </TableCell>
+                                    <TableCell className="whiteText">
+                                        {business.counter}
+                                    </TableCell>
+                                    <TableCell className="whiteText">
+                                        {business.limit}
+                                    </TableCell>
+                                </TableRow>
+                            ))):(
+                                <TableRow>
+                                    <TableCell>
+                                        No Current Active Business
+                                    </TableCell>
+                                    <TableCell>
+                                    </TableCell>
+                                    <TableCell>
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
+                </Paper>
                 </div>
             </div>
         )
