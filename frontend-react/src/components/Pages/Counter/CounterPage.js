@@ -178,44 +178,6 @@ class CounterPage extends Component {
                     <CircularProgressBackground></CircularProgressBackground>
                 </div>
                 <div className="whiteCircle"></div>
-                <div className="displayRemCap">
-                    <div><b>Remaining Capacity: {this.state.maxCap-this.state.capacity}</b></div>
-                    <div>
-                    <TableContainer component={Paper}>
-                <Table aria-label="simple table" size="medium" style={{maxHeight:"440"}}>
-                    <TableHead>
-                        <TableRow >
-                            <TableCell >
-                                Email
-                            </TableCell>
-                            <TableCell>
-                                Action Type
-                            </TableCell>
-                            <TableCell>
-                                Time
-                            </TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {this.state.actionLogs ? (
-                            this.state.actionLogs.map((action) => (
-                                <TableRow>
-                                    <TableCell>
-                                        {action.email}
-                                    </TableCell>
-                                    <TableCell>
-                                        {action.type}
-                                    </TableCell>
-                                    <TableCell>
-                                        {action.time}
-                                    </TableCell>
-                                </TableRow>
-                            ))):("")}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-                    </div>
-                </div>
                 <div className="backgroundButtons">
                 <div className="leftAdd" onClick={this.addCapacity}/>
                 <div className="rightAdd" onClick={this.subCapacity}/>
