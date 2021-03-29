@@ -11,7 +11,8 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import SearchBar from "material-ui-search-bar";
-
+import RefreshIcon from '@material-ui/icons/Refresh';
+import IconButton from '@material-ui/core/IconButton';
 import './TrackingPage.css';
 import longLogo from '../../Imgs/long-logo.png';
 
@@ -26,10 +27,13 @@ class TrackingPage extends Component {
             filterBList: []
         }
     }
-    componentDidMount=()=>{
-        this.props.socket.on("updateMap",({ allData }) => {
-            console.log("from UPDATE MAP",allData)
-            this.setState({businessList:allData,filterBList:allData},()=>{console.log("New Business List",this.state.businessList)})
+    componentDidMount = () => {
+        this.props.socket.on("updateMap", ({ allData }) => {
+            console.log("from UPDATE MAP", allData)
+            this.setState({ businessList: allData, filterBList: allData }, () => { console.log("New Business List", this.state.businessList) })
+        })
+        this.props.socket.on("test", ({ data }) => {
+            console.log("from DEBUGGGGG", data)
         })
     }
     goBackHome = () => {
@@ -38,14 +42,17 @@ class TrackingPage extends Component {
     }
     requestSearch = (searchedVal) => {
         const filteredRows = this.state.businessList.filter((row) => {
-          return row.businessname.toLowerCase().includes(searchedVal.toLowerCase());
+            return row.businessname.toLowerCase().includes(searchedVal.toLowerCase());
         });
-        this.setState({ filterBList: filteredRows})
-      };
+        this.setState({ filterBList: filteredRows })
+    };
     cancelSearch = () => {
-        this.setState({searched: ""});
+        this.setState({ searched: "" });
         this.requestSearch(this.state.searched);
     };
+    refreshTB = () => {
+        this.props.socket.emit("getAllData")
+    }
 
     render() {
         return (
