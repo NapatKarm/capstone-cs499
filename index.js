@@ -969,7 +969,8 @@ io.on('connection', (socket) => {
 
       socket.emit('joinCheck', { 
         counter: await ioredis.get(businessId.toString()+"counter"),
-        limit: businessJson.limit});
+        limit: businessJson.limit
+      });
     }
     else{
       socket.emit('joinCheck', {error: "Business is closed"});
@@ -983,8 +984,6 @@ io.on('connection', (socket) => {
 
       await ioredis.incr(businessId.toString()+"counter");
 
-      console.log(await ioredis.get(businessId.toString()+"counter"));
-
       let time = Date();
 
       io.in(businessId).emit('updateCounter', {
@@ -994,6 +993,19 @@ io.on('connection', (socket) => {
         changerType: "Incremented",
         time: time
       });
+
+      const rooms = await io.of('/').adapter.allRooms();
+      var allData = []
+      for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
+        let singleBusiness = await ioredis.get(business_id);
+        let counter = await ioredis.get(business_id.toString()+"counter");
+
+        let singleBusinessJson = JSON.parse(singleBusiness);
+        singleBusinessJson.counter = counter;
+        singleBusinessJson.businessId = business_id;
+        allData.push(singleBusinessJson);
+      }
+      io.emit('updateMap', {allData: allData});
     }
   });
 
@@ -1006,7 +1018,6 @@ io.on('connection', (socket) => {
       if(businessCounter > 0){
         await ioredis.decr(businessId.toString()+"counter");
       }
-      console.log(await ioredis.get(businessId.toString()+"counter"));
 
       let time = Date();
 
@@ -1017,30 +1028,54 @@ io.on('connection', (socket) => {
         changerType: "Decremented",
         time: time
       });
+
+      const rooms = await io.of('/').adapter.allRooms();
+      var allData = []
+      for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
+        let singleBusiness = await ioredis.get(business_id);
+        let counter = await ioredis.get(business_id.toString()+"counter");
+
+        let singleBusinessJson = JSON.parse(singleBusiness);
+        singleBusinessJson.counter = counter;
+        singleBusinessJson.businessId = business_id;
+        allData.push(singleBusinessJson);
+      }
+      io.emit('updateMap', {allData: allData});
     }
   });
 
   socket.on('limitChange', async ({businessId, limit}) => {
-    let business = await ioredis.get(businessId);
-    let businessJson = JSON.parse(business);
-    businessJson.limit = limit;
-    business = JSON.stringify(businessJson);
+    if(await isPartofBusiness(businessId, socket.id)){
+      let business = await ioredis.get(businessId);
+      let businessJson = JSON.parse(business);
+      businessJson.limit = limit;
+      business = JSON.stringify(businessJson);
 
-    await ioredis.set(businessId, business);
+      await ioredis.set(businessId, business);
 
-    let time = Date();
+      let time = Date();
 
-    io.in(businessId).emit('updateCounter', {
-      counter: await ioredis.get(businessId.toString()+"counter"),
-      limit: businessJson.limit,
-      changerEmail: await ioredis.get(socket.id),
-      changerType: `Chagned limit to ${businessJson.limit}`,
-      time: time
-    })
+      io.in(businessId).emit('updateCounter', {
+        counter: await ioredis.get(businessId.toString()+"counter"),
+        limit: businessJson.limit,
+        changerEmail: await ioredis.get(socket.id),
+        changerType: `Changed limit to ${businessJson.limit}`,
+        time: time
+      })
 
-    let newbusiness = await ioredis.get(businessId);
-    let newBusinessJson = JSON.parse(newbusiness);
-    console.log(newBusinessJson.limit);
+      const rooms = await io.of('/').adapter.allRooms();
+      var allData = []
+      for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
+        let singleBusiness = await ioredis.get(business_id);
+        let counter = await ioredis.get(business_id.toString()+"counter");
+
+        let singleBusinessJson = JSON.parse(singleBusiness);
+        singleBusinessJson.counter = counter;
+        singleBusinessJson.businessId = business_id;
+        allData.push(singleBusinessJson);
+      }
+      io.emit('updateMap', {allData: allData});
+    }
   });
 
   socket.on('leaveBusiness', async ({businessId}) => {
@@ -1051,16 +1086,16 @@ io.on('connection', (socket) => {
   socket.on('getAllData', async () => {
     const rooms = await io.of('/').adapter.allRooms();
     var allData = []
-    for(let it = rooms.values(), businessId = null; businessId = it.next().value;){
-      let business = await ioredis.get(businessId);
-      let counter = await ioredis.get(businessId.toString()+"counter");
+    for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
+      let singleBusiness = await ioredis.get(business_id);
+      let counter = await ioredis.get(business_id.toString()+"counter");
 
-      let businessJson = JSON.parse(business);
-      businessJson.counter = counter;
-      businessJson.businessId = businessId;
-      allData.push(businessJson);
+      let singleBusinessJson = JSON.parse(singleBusiness);
+      singleBusinessJson.counter = counter;
+      singleBusinessJson.businessId = business_id;
+      allData.push(singleBusinessJson);
     }
-    socket.emit('updateMap', allData);
+    socket.emit('updateMap', {allData: allData});
   });
 
   socket.on('disconnect', async () => {
