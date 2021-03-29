@@ -82,7 +82,7 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
   let existing_user = await usersdb.where('email', '==', req.body.email.toLowerCase()).get(); // QuerySnapshot
   //For security reasons, you do not disclose whether email or password is invalid
   try {
-    if(existing_user.empty) { 
+    if (existing_user.empty) { 
       res.status(422).send('Invalid email or password');
     }
     else if (!existing_user.empty && (existing_user.docs[0].get('email') != req.body.email.toLowerCase()) || (existing_user.docs[0].get('password') !=  req.body.password)) {
@@ -91,7 +91,7 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
     else {
       let new_token = uuidv4();
       let user_ref =  usersdb.doc(existing_user.docs[0].id);
-      user_ref.update({
+      await user_ref.update({
         token : new_token
       });
       existing_user = await usersdb.where('email', '==', req.body.email.toLowerCase()).get(); // Requery to get newly updated token value
@@ -131,12 +131,12 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
       }
       await busdb.add(businessInfo); 
       let counter_ref = busdb.doc("INCREMENTING_COUNTER");
-      counter_ref.update({ 
+      await counter_ref.update({ 
         counter: admin.firestore.FieldValue.increment(1)   // Really not intuitive because its different if using admin SDK 
       });
 
       owner_ref = usersdb.doc(owner.docs[0].id);
-      owner_ref.update({
+      await owner_ref.update({
         businessList: admin.firestore.FieldValue.arrayUnion(businessInfo.businessId)
       });
       res.status(200).send("Success");
@@ -175,10 +175,10 @@ app.post('/businessJoin', async (req, res) => {                    //Expected re
   let bus_ref = busdb.doc(existing_business.docs[0].id);         // References for pushing new data to arrays
   let user_ref = usersdb.doc(new_member_info.docs[0].id);
   try { 
-    bus_ref.update({
+    await bus_ref.update({
       memberList: admin.firestore.FieldValue.arrayUnion(new_member) // Add new member's info to business' member[]
     });
-    user_ref.update({                                            // Add business id to user's business[]
+    await user_ref.update({                                            // Add business id to user's business[]
       businessList: admin.firestore.FieldValue.arrayUnion(bus_info)
     });
     res.status(200).send('Successfully Joined'); 
@@ -248,7 +248,7 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
 
     bus_ref = busdb.doc(bus_info.docs[0].id);  // Ref for updating passcode
     try {
-      bus_ref.update({
+      await bus_ref.update({
         businesspass : req.body.businesspass
       });
       res.status(200).send("Change Success");
@@ -286,7 +286,7 @@ app.put('/roleChange', async (req, res) => {                      //Expected: {b
 
     bus_ref = busdb.doc(bus_info.docs[0].id);
     try {
-      bus_ref.update({
+      await bus_ref.update({
         memberList : new_member_list
       });
       res.status(200).send("Change Success");
@@ -328,7 +328,7 @@ app.patch('/kickMember', async (req, res) => {                      //Expected: 
     new_member_list.splice(kickee_pos, 1);
     bus_ref = busdb.doc(bus_info.docs[0].id);
     try {
-      bus_ref.update({
+      await bus_ref.update({
         memberList : new_member_list
       });
       res.status(200).send("Kick Success");
@@ -361,7 +361,7 @@ app.patch('/businessOpen', async (req, res) => {                     //Expected 
   else {
     let bus_ref = busdb.doc(bus_info.docs[0].id);
     try {
-      bus_ref.update({
+      await bus_ref.update({
         isopened : true
       });
       res.status(200).send('Business Opened');
@@ -394,7 +394,7 @@ app.patch('/businessClose', async (req, res) => {                     //Expected
   else {
     let bus_ref = busdb.doc(bus_info.docs[0].id);
     try {
-      bus_ref.update({
+      await bus_ref.update({
         isopened : false
       });
       res.status(200).send('Business Closed');
@@ -404,5 +404,42 @@ app.patch('/businessClose', async (req, res) => {                     //Expected
   }
 });
 
+app.delete('/businessDelete', async (req, res) => { // expected request: businessId, email, token
+  let owner_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
+  if (owner_info.docs[0].get('token') != req.body.token || owner_info.empty) {
+    res.status(400).send("Incorrect Token");
+    return;
+  } 
+  else {
+    let bus_info = await busdb.where('businessId', '==', req.body.businessId).get();
+    let has_permissions = false;
+    bus_info.docs[0].get('memberList').forEach( member => { 
+      if ((member.role == 'Owner') && (member.email == req.body.email)) {
+        has_permissions = true;
+      }
+    });
+    if (has_permissions == false) {
+      res.status(401).send("Not enough permissions");
+      return;
+    }
+    
+    try {
+      // Iterate through bus' memberList and delete the business from their businessList
+      bus_info.docs[0].get('memberList').forEach( async (member) => { 
+        let member_info = await usersdb.where('email', '==', member.email).get();
+        let member_ref = usersdb.doc(member_info.docs[0].id);
+        await member_ref.update({
+          businessList : admin.firestore.FieldValue.arrayRemove(req.body.businessId)
+        });
+      });
+      let bus_ref = busdb.doc(bus_info.docs[0].id);
+      bus_ref.delete();
+      console.log("Business Successfully Deleted");
+      res.status(200).send("Business Successfully Deleted");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`App is listening on Port ${port}`));
