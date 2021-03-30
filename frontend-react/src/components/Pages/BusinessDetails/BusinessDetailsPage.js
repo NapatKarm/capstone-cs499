@@ -58,19 +58,19 @@ class BusinessDetailsPage extends Component {
 
         })
     }
-    componentDidUpdate() {
-        this.props.socket.on("closeResponse", ({ success, error }) => {
-            console.log("REEEEE Close Response",success,error)
-            if(error!==undefined) this.setState({returnERR:"An Error has occurred, please try again"});
-            else if(success!==undefined) {
-                this.setState({
-                    action: false
-                })
-                this.updateDetails();
-                }
-            }
-        )
-    }
+    // componentDidUpdate() {
+    //     // this.props.socket.on("closeResponse", ({ success, error }) => {
+    //     //     console.log("REEEEE Close Response",success,error)
+    //     //     if(error!==undefined) this.setState({returnERR:"An Error has occurred, please try again"});
+    //     //     else if(success!==undefined) {
+    //     //         this.setState({
+    //     //             action: false
+    //     //         })
+    //     //         this.updateDetails();
+    //     //         }
+    //     //     }
+    //     // )
+    // }
 
     logout = () => {
         this.props.bUserLogout()
