@@ -2,6 +2,19 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Geocoder from '@mapbox/mapbox-gl-geocoder';
+// import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+// import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+// import mapboxgl from 'mapbox-gl/dist/mapbox-gl-csp';
+// import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
+// import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
+
+// mapboxgl.workerClass = MapboxWorker;
+// mapboxgl.accessToken = 'pk.eyJ1IjoibmFwYXRrYXJtIiwiYSI6ImNrbWRzejdmZTJwOGIyb29qem5kaGdnYWQifQ.0qB-jB0GW4iI1V3ban2fXQ.';
+// const geocoder = new MapboxGeocoder({
+//     accessToken: mapboxgl.accessToken,import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
+//     mapboxgl: mapboxgl
+// });
 
 class TestLanding extends Component {
     constructor(props) {
@@ -31,6 +44,9 @@ class TestLanding extends Component {
         return (
             <div>
                 <p>Welcome to the most gucci landing page</p>
+                <Geocoder
+                mapboxApiAccessToken={'pk.eyJ1IjoibmFwYXRrYXJtIiwiYSI6ImNrbWRzejdmZTJwOGIyb29qem5kaGdnYWQifQ.0qB-jB0GW4iI1V3ban2fXQ.'}
+             />
                 <div>
                     <TextField variant="filled" id="usernameinput" label="Username" color="primary" onChange={this.changeUsername} />
                 </div>
