@@ -404,6 +404,28 @@ app.patch('/businessClose', async (req, res) => {                     //Expected
   }
 });
 
+// request :  
+// { email, token, newPassword, 
+app.patch("/changePassword", async (req, res) => {
+    let user_info = await usersdb.where('password', '==', req.body.password).where('email', '==', req.body.email.toLowerCase()).get();
+    if (user_info.empty) {
+        res.status(400).send("Invalid username or password");
+        return;
+    }
+    else {
+        let user_ref = usersdb.doc(user_info.docs[0].id);
+        try {
+            await user_ref.update({
+                password : req.body.password
+            });
+            res.status(200).send("Password successfully changed");
+            return;
+        } catch (err) {
+            console.log(error);
+        }
+    }
+});
+
 app.delete('/businessDelete', async (req, res) => { // expected request: businessId, email, token
   let owner_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
   if (owner_info.docs[0].get('token') != req.body.token || owner_info.empty) {
