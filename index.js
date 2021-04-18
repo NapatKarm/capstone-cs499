@@ -1060,6 +1060,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('closeBusiness', async ({businessId, email, token}) => {
+    io.in(businessId).emit('businessClose', {error: "The business has been closed."});
     await ioredis.del(businessId);
     await ioredis.del(businessId.toString()+"counter");
     await axios.patch(`https://${process.env.EXPRESS_HOST}/businessClose`, {businessId: businessId, email: email, token: token})
