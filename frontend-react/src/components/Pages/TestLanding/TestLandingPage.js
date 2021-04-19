@@ -2,13 +2,25 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Geocoder from 'react-mapbox-gl-geocoder'
+
+const mapAccess = {
+    mapboxApiAccessToken: "pk.eyJ1IjoibmFwYXRrYXJtIiwiYSI6ImNrbWRzejdmZTJwOGIyb29qem5kaGdnYWQifQ.0qB-jB0GW4iI1V3ban2fXQ"
+}
+
+const queryParams = {
+    country: 'us',
+    state: 'NY'
+}
+ 
 
 class TestLanding extends Component {
     constructor(props) {
         super(props);
         this.state = {
             username: "",
-            password: ""
+            password: "",
+            viewport: {}
         }
     }
     changeUsername = (event) => {
@@ -27,10 +39,22 @@ class TestLanding extends Component {
     logOut = () => {
         this.props.userLogout()
     }
+    onSelected = (viewport, item) => {
+        console.log("TESTING",viewport,item)
+        this.setState({viewport})
+    }
     render() {
+        const { viewport } = this.state;
         return (
             <div>
                 <p>Welcome to the most gucci landing page</p>
+                <Geocoder
+                    {...mapAccess} hideOnSelect={true}
+                    onSelected={this.onSelected}
+                    value=""              
+                    queryParams={queryParams}
+                    viewport={viewport}  
+                />
                 <div>
                     <TextField variant="filled" id="usernameinput" label="Username" color="primary" onChange={this.changeUsername} />
                 </div>
