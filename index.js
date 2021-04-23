@@ -279,6 +279,8 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
         'businessId' : incrementing_id.docs[0].get('counter'),
         'businesspass': req.body.businesspass,
         'isopened' : false,
+        'lat' : req.body.lat,
+        'long' : req.body.long,
         'memberList': [{                              //Member Info Structure
           'firstname': owner.docs[0].get('firstname'),
           'lastname': owner.docs[0].get('lastname'),
@@ -1062,6 +1064,14 @@ io.on('connection', (socket) => {
         time: time
       });
 
+      let bus_list = await busdb.where('isopened', '==', true).get();
+      let coordinatesMap = {}
+      bus_list.forEach(async (business) => {
+        var businessData = business.data();
+        var bId = businessData.businessId;
+        coordinatesMap[bId] = {lat: businessData.lat, long: businessData.long};
+      });
+
       const rooms = await io.of('/').adapter.allRooms();
       var allData = []
       for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
@@ -1071,6 +1081,8 @@ io.on('connection', (socket) => {
         let singleBusinessJson = JSON.parse(singleBusiness);
         singleBusinessJson.counter = counter;
         singleBusinessJson.businessId = business_id;
+        singleBusinessJson.lat = coordinatesMap[business_id].lat;
+        singleBusinessJson.long = coordinatesMap[business_id].long;
         allData.push(singleBusinessJson);
       }
       io.emit('updateMap', {allData: allData});
@@ -1097,6 +1109,14 @@ io.on('connection', (socket) => {
         time: time
       });
 
+      let bus_list = await busdb.where('isopened', '==', true).get();
+      let coordinatesMap = {}
+      bus_list.forEach(async (business) => {
+        var businessData = business.data();
+        var bId = businessData.businessId;
+        coordinatesMap[bId] = {lat: businessData.lat, long: businessData.long};
+      });
+
       const rooms = await io.of('/').adapter.allRooms();
       var allData = []
       for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
@@ -1106,6 +1126,8 @@ io.on('connection', (socket) => {
         let singleBusinessJson = JSON.parse(singleBusiness);
         singleBusinessJson.counter = counter;
         singleBusinessJson.businessId = business_id;
+        singleBusinessJson.lat = coordinatesMap[business_id].lat;
+        singleBusinessJson.long = coordinatesMap[business_id].long;
         allData.push(singleBusinessJson);
       }
       io.emit('updateMap', {allData: allData});
@@ -1129,7 +1151,15 @@ io.on('connection', (socket) => {
         changerEmail: await ioredis.get(socket.id),
         changerType: `Changed limit to ${businessJson.limit}`,
         time: time
-      })
+      });
+
+      let bus_list = await busdb.where('isopened', '==', true).get();
+      let coordinatesMap = {}
+      bus_list.forEach(async (business) => {
+        var businessData = business.data();
+        var bId = businessData.businessId;
+        coordinatesMap[bId] = {lat: businessData.lat, long: businessData.long};
+      });
 
       const rooms = await io.of('/').adapter.allRooms();
       var allData = []
@@ -1140,6 +1170,8 @@ io.on('connection', (socket) => {
         let singleBusinessJson = JSON.parse(singleBusiness);
         singleBusinessJson.counter = counter;
         singleBusinessJson.businessId = business_id;
+        singleBusinessJson.lat = coordinatesMap[business_id].lat;
+        singleBusinessJson.long = coordinatesMap[business_id].long;
         allData.push(singleBusinessJson);
       }
       io.emit('updateMap', {allData: allData});
@@ -1152,6 +1184,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('getAllData', async () => {
+    let bus_list = await busdb.where('isopened', '==', true).get();
+    let coordinatesMap = {}
+    bus_list.forEach(async (business) => {
+      var businessData = business.data();
+      var bId = businessData.businessId;
+      coordinatesMap[bId] = {lat: businessData.lat, long: businessData.long};
+    });
+
     const rooms = await io.of('/').adapter.allRooms();
     var allData = []
     for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
@@ -1161,6 +1201,8 @@ io.on('connection', (socket) => {
       let singleBusinessJson = JSON.parse(singleBusiness);
       singleBusinessJson.counter = counter;
       singleBusinessJson.businessId = business_id;
+      singleBusinessJson.lat = coordinatesMap[business_id].lat;
+      singleBusinessJson.long = coordinatesMap[business_id].long;
       allData.push(singleBusinessJson);
     }
     socket.emit('updateMap', {allData: allData});
