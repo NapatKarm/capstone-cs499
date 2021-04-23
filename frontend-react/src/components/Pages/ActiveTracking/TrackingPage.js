@@ -15,6 +15,16 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
 import './TrackingPage.css';
 import longLogo from '../../Imgs/long-logo.png';
+import ReactMapGL from 'react-map-gl';
+import {Container, Col, Row} from 'reactstrap';
+// import Geocoder from 'react-mapbox-gl-geocoder';
+
+const mapStyle = {
+    width: '80%',
+    height: '100%'
+}
+
+const mapboxApiKey = 'pk.eyJ1IjoibmFwYXRrYXJtIiwiYSI6ImNrbWRzejdmZTJwOGIyb29qem5kaGdnYWQifQ.0qB-jB0GW4iI1V3ban2fXQ';
 
 class TrackingPage extends Component {
     constructor(props) {
@@ -23,10 +33,14 @@ class TrackingPage extends Component {
             businessDetails: undefined,
             searched: "",
             searchedVal: "",
-            businessList: [],
-            filterBList: []
+            viewport: {
+                latitude: 45.50884,
+                longitude: -73.58781,
+                zoom: 15
+            }
         }
     }
+
     componentDidMount = () => {
         this.props.socket.on("updateMap", ({ allData }) => {
             console.log("from UPDATE MAP", allData)
@@ -55,6 +69,7 @@ class TrackingPage extends Component {
     }
 
     render() {
+        const { viewport } = this.state;
         return (
                 <div className="TrackingBody">
                     <div className="topButtons trackTopButtons">
@@ -111,6 +126,23 @@ class TrackingPage extends Component {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
+                            <Container fluid={true}>
+                                <Row>
+                                    <Col><h2>Mapbox Tutorial</h2></Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <ReactMapGL
+                                            mapboxApiAccessToken={mapboxApiKey}
+                                            mapStyle="mapbox://styles/mapbox/streets-v11"
+                                            {...viewport}
+                                            {...mapStyle}
+                                            onViewportChange={(viewport) => this.setState({viewport})}
+                                        >
+                                        </ReactMapGL>
+                                    </Col>
+                                </Row>
+                            </Container>
                         </Paper>
                     </div>
                 </div>

@@ -232,6 +232,28 @@ class BusinessDetailsPage extends Component {
             limitNum: ""
         })
     }
+    joinTracker = (bID, information) => {
+        this.props.socket.emit('joinTracker', {businessId:bID,email:this.props.userData.email})
+        this.props.socket.on("joinCheck", ({ counter, limit, error }) => {
+            console.log("JOIN Response",counter,limit,error)
+            if(error!==undefined) this.setState({joinERR:error});
+            else if(counter!==undefined&&limit!==undefined) {
+                console.log("Time to reroute")
+                    var cInfo = {
+                        limit: limit,
+                        counter: counter
+                    }
+                    this.props.cUpdate(cInfo)
+                    if (this.props.cInfo){
+                        this.props.bView(information)
+                        if (this.props.bDetails) {
+                            this.props.history.push("/counter")
+                        }
+                    }
+                }
+            }
+        )
+    }
     changeLimit = (event) => {
         this.setState({ limitNum: event.target.value })
     }
@@ -351,14 +373,14 @@ class BusinessDetailsPage extends Component {
                                     this.state.isopened ? (
                                         <div>
                                             <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Change Passcode</Button>
-                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Open</Button>
+                                            <Button onClick={()=>this.joinTracker(this.state.businessDetails.businessId,this.state.businessDetails)} style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: 'white', color: 'black'}}>Track</Button>
                                             <Button className="forcedWhiteColor"style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e' }} onClick={this.runClose}>Close</Button>
                                         </div>
                                     ) : (
                                         <div>
                                             <Button onClick={this.changingBPass} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Change Passcode</Button>
-                                            <Button onClick={this.runOpen} style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Open</Button>
-                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420' }} disabled>Close</Button>
+                                            <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Track</Button>
+                                            <Button onClick={this.runOpen} style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white'}}>Open</Button>
                                         </div>
                                     )
                                 ) : ("")
