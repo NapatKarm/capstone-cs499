@@ -279,6 +279,8 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
         'businessId' : incrementing_id.docs[0].get('counter'),
         'businesspass': req.body.businesspass,
         'isopened' : false,
+        'lat' : req.body.lat,
+        'long' : req.body.long,
         'memberList': [{                              //Member Info Structure
           'firstname': owner.docs[0].get('firstname'),
           'lastname': owner.docs[0].get('lastname'),
