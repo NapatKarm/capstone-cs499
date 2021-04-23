@@ -474,7 +474,7 @@ app.delete('/businessDelete', async (req, res) => { // expected request: busines
         });
       });
       let bus_ref = busdb.doc(bus_info.docs[0].id);
-      bus_ref.delete();
+      await bus_ref.delete();
       console.log("Business Successfully Deleted");
       res.status(200).send("Business Successfully Deleted");
     } catch (error) {
