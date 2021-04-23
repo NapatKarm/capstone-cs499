@@ -127,8 +127,9 @@ class HomePage extends Component {
         }
     }
     onSelected = (viewport, item) => {
-        console.log("TESTING",viewport,item)
+        console.log("TESTING",item)
         this.setState({viewport})
+        // this.setState({bAddress: item.place_name})
     }
     render() {
         const { viewport } = this.state;
@@ -178,16 +179,30 @@ class HomePage extends Component {
                                 <DialogContentText>
                                     Fill this out and bam you CREATE business hummie
                                 </DialogContentText>
-                                <TextField
-                                    autoFocus
+                                <div class="form_group field">
+                                    <div>
+                                        <form>
+                                            <div class="omrs-input-group">
+                                                <label onChange={this.changeBName} class="omrs-input-underlined">
+                                                <input required/>
+                                                <span class="omrs-input-label">Normal</span>
+                                                </label>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                {/* <TextField}
+                                    {/* autoFocus
                                     margin="dense"
                                     id="BName"
                                     label="Business Name"
                                     type="string"
-                                    onChange={this.changeBName}
+                                    
                                     fullWidth
-                                />
+                                /> */}
                                 <Geocoder
+                                    id="BAddress"
+                                    className="omrs-input-group"
                                     {...mapAccess} hideOnSelect={false}
                                     onSelected={this.onSelected}
                                     value=""
