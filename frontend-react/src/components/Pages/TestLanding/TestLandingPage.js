@@ -9,8 +9,7 @@ const mapAccess = {
 }
 
 const queryParams = {
-    country: 'us',
-    state: 'NY'
+    country: 'us'
 }
  
 
