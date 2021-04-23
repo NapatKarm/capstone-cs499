@@ -22,6 +22,20 @@
     text-align: right;
 }
 
+.NameDeleteDiv {
+    display: flex;
+    align-items: flex-end;
+}
+
+.deleteBusiness {
+    padding-left: 10px;
+    color: gray;
+}
+
+.deleteBusiness:hover {
+    color: #b9b9b9;
+}
+
 .businessNameTitle{
     font-size:40px;
     font-weight:bold;
@@ -39,6 +53,14 @@
     background-color: #1c1c1c;
     color: white!important;
     padding: 20px!important;
+    border-bottom-color: #ffffff25!important;
+}
+
+.buttonCell {
+    background-color: #1c1c1c;
+    color: white!important;
+    padding-right: 0px!important;
+    border-bottom-color: #ffffff25!important;
 }
 
 .buttonText {
@@ -47,7 +69,11 @@
 }
 
 .large-text {
-    font-size: 21px!important;
+    font-weight: bold!important;
+    font-size:large!important;
+    /* padding-left: 5px!important; */
+    padding-bottom: 10px!important;
+    border-bottom-color: white!important;
 }
 
 .clickableButton {

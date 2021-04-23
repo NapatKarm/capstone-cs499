@@ -14,14 +14,9 @@ import CVIVIDNav from '../SharedComponent/Navbar'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import './HomePage.css';
-
-
+import Geocoder from 'react-mapbox-gl-geocoder'
 import ManagedBusinessTable from './ManagedBusinessTable'
-
-var geocoder = new MapboxGeocoder({
-    accessToken: 'pk.eyJ1IjoibmFwYXRrYXJtIiwiYSI6ImNrbWRzejdmZTJwOGIyb29qem5kaGdnYWQifQ.0qB-jB0GW4iI1V3ban2fXQ',
-    types: 'country,region,place,postcode,locality,neighborhood'
-});
+import {mapAccess,queryParams} from '../SharedComponent/Shared';
 
 class HomePage extends Component {
     constructor(props) {
@@ -36,7 +31,8 @@ class HomePage extends Component {
             bPass: "",
             bID: "",
             joinError: "",
-            registerError: undefined
+            registerError: undefined,
+            viewport: {}
         }
     }
     componentDidMount = async () => {
@@ -45,7 +41,8 @@ class HomePage extends Component {
         }, () => {
             if (this.state.userData) {
                 this.businessUpdate()
-        }})
+            }
+        })
     }
     logout = () => {
         this.props.bUserLogout()
@@ -56,9 +53,9 @@ class HomePage extends Component {
         this.setState({
             businessList: undefined
         })
-        await this.props.bGet(this.state.userData.email,this.state.userData.token) 
-        if(this.props.businessData) {
-            this.setState({businessList:this.props.businessData, registeringBusiness:false},()=>(console.log("BUSINESS DATAX",this.props.businessData)))    
+        await this.props.bGet(this.state.userData.email, this.state.userData.token)
+        if (this.props.businessData) {
+            this.setState({ businessList: this.props.businessData, registeringBusiness: false }, () => (console.log("BUSINESS DATAX", this.props.businessData)))
         }
     }
     cancelBReg = () => {
@@ -104,70 +101,75 @@ class HomePage extends Component {
         this.setState({ bPass: event.target.value })
     }
     regBusiness = async () => {
-        
+
         await this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass)
-        console.log(this.props.bRegError,"Look at reg info!#################")
-        if(this.props.bRegError===undefined){
-            await this.props.bGet(this.state.userData.email,this.state.userData.token) 
-            if(this.props.businessData) {
-                this.setState({businessList:this.props.businessData, registeringBusiness:false},()=>(console.log(this.props.businessData)))    
+        console.log(this.props.bRegError, "Look at reg info!#################")
+        if (this.props.bRegError === undefined) {
+            await this.props.bGet(this.state.userData.email, this.state.userData.token)
+            if (this.props.businessData) {
+                this.setState({ businessList: this.props.businessData, registeringBusiness: false }, () => (console.log(this.props.businessData)))
             }
         }
-        else this.setState({registerError:this.props.bRegError})
+        else this.setState({ registerError: this.props.bRegError })
 
 
     }
     joinBusiness = async () => {
-        await this.props.bJoin(this.state.userData.email,this.state.bID,this.state.bPass)
-        if(this.props.bJoinError){
-            this.setState({joinError: this.props.bJoinError},()=>(console.log("This should have ran",this.state.joinError)))
+        await this.props.bJoin(this.state.userData.email, this.state.bID, this.state.bPass)
+        if (this.props.bJoinError) {
+            this.setState({ joinError: this.props.bJoinError }, () => (console.log("This should have ran", this.state.joinError)))
         }
         else {
-            await this.props.bGet(this.state.userData.email,this.state.userData.token) 
-            if(this.props.businessData) {
-                this.setState({businessList:this.props.businessData, joiningBusiness: false},()=>(console.log(this.props.businessData)))    
+            await this.props.bGet(this.state.userData.email, this.state.userData.token)
+            if (this.props.businessData) {
+                this.setState({ businessList: this.props.businessData, joiningBusiness: false }, () => (console.log(this.props.businessData)))
             }
-        } 
+        }
     }
-        render() {
+    onSelected = (viewport, item) => {
+        console.log("TESTING",viewport,item)
+        this.setState({viewport})
+    }
+    render() {
+        const { viewport } = this.state;
         return (
             <div className="homePage">
                 <div>
-                    <CVIVIDNav socket={this.props.socket} userData={this.props.userData} logout={this.logout}/>
+                    <CVIVIDNav socket={this.props.socket} userData={this.props.userData} logout={this.logout} />
                 </div>
                 <div>
                     <div>
                         <div className="topButtonGroup">
-                        <div className="topButtonBox" onClick={this.startBReg}>
-                            <div>
-                                <div className="topText">
-                                    REGISTER
+                            <div className="topButtonBox" onClick={this.startBReg}>
+                                <div>
+                                    <div className="topText">
+                                        REGISTER
+                                    </div>
+                                    <div className="buttomText">
+                                        Business
+                                    </div>
                                 </div>
-                                <div className="buttomText">
-                                    Business
-                                </div>
-                            </div>
-                            <div>
-                                <BusinessIcon fontSize="large"/>
-                            </div>
-                        </div>
-                        <div className="topButtonBox" onClick={this.startBJoin}>
-                            <div>
-                                <div className="topText">
-                                    JOIN
-                                </div>
-                                <div className="buttomText">
-                                    Business
+                                <div>
+                                    <BusinessIcon fontSize="large" />
                                 </div>
                             </div>
-                            <div>
-                                <BusinessCenterIcon fontSize="large"/>
+                            <div className="topButtonBox" onClick={this.startBJoin}>
+                                <div>
+                                    <div className="topText">
+                                        JOIN
+                                    </div>
+                                    <div className="buttomText">
+                                        Business
+                                    </div>
+                                </div>
+                                <div>
+                                    <BusinessCenterIcon fontSize="large" />
+                                </div>
                             </div>
-                        </div>
                         </div>
                     </div>
                     <div className="BusinessTable">
-                        <ManagedBusinessTable  cUpdate={this.props.cUpdate} cInfo={this.props.cInfo} userData={this.props.userData}socket={this.props.socket} logout={this.logout} businessUpdate={this.businessUpdate} history={this.props.history}bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView}/>
+                        <ManagedBusinessTable cUpdate={this.props.cUpdate} cInfo={this.props.cInfo} userData={this.props.userData} socket={this.props.socket} logout={this.logout} businessUpdate={this.businessUpdate} history={this.props.history} bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView} />
                     </div>
                     <div className="BusinessRegisterComponent">
                         <Dialog open={this.state.registeringBusiness} onClose={this.cancelBReg} aria-labelledby="form-dialog-title">
@@ -175,7 +177,7 @@ class HomePage extends Component {
                             <DialogContent>
                                 <DialogContentText>
                                     Fill this out and bam you CREATE business hummie
-                                 </DialogContentText>
+                                </DialogContentText>
                                 <TextField
                                     autoFocus
                                     margin="dense"
@@ -185,7 +187,13 @@ class HomePage extends Component {
                                     onChange={this.changeBName}
                                     fullWidth
                                 />
-                                {/* {geocoder.addTo('#geocoder')} */}
+                                <Geocoder
+                                    {...mapAccess} hideOnSelect={false}
+                                    onSelected={this.onSelected}
+                                    value=""
+                                    queryParams={queryParams}
+                                    viewport={viewport}
+                                />
                                 <TextField
                                     autoFocus
                                     margin="dense"
@@ -223,7 +231,7 @@ class HomePage extends Component {
                             <DialogContent>
                                 <DialogContentText>
                                     Fill this out and bam you JOIN business hummie
-                                 </DialogContentText>
+                                </DialogContentText>
                                 <TextField
                                     autoFocus
                                     margin="dense"

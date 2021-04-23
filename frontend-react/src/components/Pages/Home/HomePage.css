@@ -36,6 +36,7 @@
 .MBusinessTable{
     background-color: #1c1c1c !important;
     color: white !important;
+    max-height: 64vh;
 }
 .MTableBody{
     color: white !important;

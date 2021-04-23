@@ -116,7 +116,6 @@ class CounterPage extends Component {
             })
         }
         this.props.socket.on("updateCounter",({ error, limit, counter, changerEmail, changerType,time }) => {
-            console.log("Updated Counter",counter,limit,error,changerEmail,changerType,time)
             if(error!==undefined){
                 console.log("error: ",error);
                 this.setState({joinError:error});

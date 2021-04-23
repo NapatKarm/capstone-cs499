@@ -72,7 +72,7 @@ class TrackingPage extends Component {
         const { viewport } = this.state;
         return (
                 <div className="TrackingBody">
-                    <div className="topButtons">
+                    <div className="topButtons trackTopButtons">
                         <Button onClick={this.goBackHome} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Register/Sign In</Button>
                         <IconButton aria-label="refresh" onClick={() => this.refreshTB()} style={{ textAlign: "right" }}>
                             <RefreshIcon style={{ color: "white" }} />
@@ -89,10 +89,10 @@ class TrackingPage extends Component {
                                 <Table className="searchTable">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell className="tableText tableHeaderText">BUSINESS NAME</TableCell>
-                                            <TableCell className="tableText tableHeaderText">ADDRESS</TableCell>
-                                            <TableCell className="tableText tableHeaderText">CURRENT CAPACITY</TableCell>
-                                            <TableCell className="tableText tableHeaderText">MAX CAPACITY</TableCell>
+                                            <TableCell className="tableText large-text">BUSINESS NAME</TableCell>
+                                            <TableCell className="tableText large-text">ADDRESS</TableCell>
+                                            <TableCell className="tableText large-text">CURRENT CAPACITY</TableCell>
+                                            <TableCell className="tableText large-text">MAX CAPACITY</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody className="bListTable">
