@@ -25,7 +25,22 @@
     color: white !important;
     border-bottom-color: #ffffff25!important;
 }
-
+.mapSide {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    padding: 0 !important;
+}
+.leftSide-map {
+    width: 30%;
+    align-self: center;
+    height: 90%;
+    margin-left: 2%;
+    padding: 0 !important;
+    background-color: #191919 !important;
+    border-radius: 15px;
+    position: absolute;
+}
 .tableText {
     background-color: #1c1c1c;
     color: white!important;
