@@ -122,6 +122,8 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
         'businessId' : incrementing_id.docs[0].get('counter'),
         'businesspass': req.body.businesspass,
         'isopened' : false,
+        'lat' : req.body.lat,
+        'long' : req.body.long,
         'memberList': [{                              //Member Info Structure
           'firstname': owner.docs[0].get('firstname'),
           'lastname': owner.docs[0].get('lastname'),
@@ -194,12 +196,29 @@ app.get('/getBusinessData', async (req, res) => {                   //Expected R
     res.status(400).send("Incorrect Token");
   }
   else{
-    let arr_of_bus = await busdb.where('businessId', 'in', user_info.docs[0].get('businessList')).get();
-    let bus_info = [];                // Must call doc.data() on each element because 
-    arr_of_bus.docs.forEach(doc => {  // The actual array contains lots of meta data 
-      bus_info.push(doc.data())
-    });
-    res.status(200).send(bus_info);   //Response: {businessList[{business_id, businessname, businessaddr, businesspass, memberList[{firstname, lastname, email, role}]}]}
+    try {
+      let bus_info = [];   // Must call doc.data() on each element because the actual array contains lots of meta data 
+      let query_array = [];
+      const user_bus_list = user_info.docs[0].get('businessList');
+  
+      for (let i = 0; i < Math.ceil( user_info.docs[0].get('businessList').length / 10 ); i++) {
+        let j = 0;
+        let k = 0;
+        if (user_bus_list.length < 10) {
+          k = user_bus_list.length;
+        }
+        query_array = user_bus_list.slice(j, k); // 0 - 9, 10 - 19, 20 - 29, etc.
+        let arr_of_bus = await busdb.where('businessId', 'in', query_array).get();             
+        arr_of_bus.docs.forEach(doc => {  
+          bus_info.push(doc.data())
+        });
+        j = j + 9;
+        k = j + 10;
+      }
+      res.status(200).send(bus_info);   //Response: {businessList[{business_id, businessname, businessaddr, businesspass, memberList[{firstname, lastname, email, role}]}]}
+    } catch (error) {
+        console.log(error);
+    }
   }
 });
 
@@ -407,23 +426,23 @@ app.patch('/businessClose', async (req, res) => {                     //Expected
 // request :  
 // { email, token, newPassword, 
 app.patch("/changePassword", async (req, res) => {
-    let user_info = await usersdb.where('password', '==', req.body.password).where('email', '==', req.body.email.toLowerCase()).get();
-    if (user_info.empty) {
-        res.status(400).send("Invalid username or password");
-        return;
+  let user_info = await usersdb.where('password', '==', req.body.password).where('email', '==', req.body.email.toLowerCase()).get();
+  if (user_info.empty) {
+    res.status(400).send("Invalid username or password");
+    return;
+  }
+  else {
+    let user_ref = usersdb.doc(user_info.docs[0].id);
+    try {
+      await user_ref.update({
+        password : req.body.password
+      });
+      res.status(200).send("Password successfully changed");
+      return;
+    } catch (err) {
+      console.log(error);
     }
-    else {
-        let user_ref = usersdb.doc(user_info.docs[0].id);
-        try {
-            await user_ref.update({
-                password : req.body.password
-            });
-            res.status(200).send("Password successfully changed");
-            return;
-        } catch (err) {
-            console.log(error);
-        }
-    }
+  }
 });
 
 app.delete('/businessDelete', async (req, res) => { // expected request: businessId, email, token
