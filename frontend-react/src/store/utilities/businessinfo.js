@@ -70,13 +70,15 @@ const userLogout = () => {
     }
 }
 // Thunks
-export const bRegisterThunk = (bname, baddress, email, businesspass) => async (dispatch) => {
+export const bRegisterThunk = (bname, baddress, email, businesspass,blat,blong) => async (dispatch) => {
     try {
         await axios.post(`${Endpoint}/businessRegister`, {
             businessname: bname,
             businessaddr: baddress,
             email: email,
-            businesspass: businesspass
+            businesspass: businesspass,
+            lat: blat,
+            long: blong
         })
         .then(res => {
             console.log("Response from Business Register",res);

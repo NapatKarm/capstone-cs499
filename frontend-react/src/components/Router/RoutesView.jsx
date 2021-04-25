@@ -79,7 +79,7 @@ const mapDispatch = (dispatch) => {
         bUserLogout: () => dispatch(bUserLogoutThunk()),
         bGet: (email,token) => dispatch(bGetThunk(email,token)),
         bJoin: (email,businessid,businesspass) => dispatch(bJoinThunk(email,businessid,businesspass)),
-        bRegister: (bname, baddress, email, businesspass) => dispatch(bRegisterThunk(bname, baddress, email, businesspass)),
+        bRegister: (bname, baddress, email, businesspass,blat,blong) => dispatch(bRegisterThunk(bname, baddress, email, businesspass,blat,blong)),
         bView: (business) => dispatch(bViewThunk(business)),
         bClear: ()=> dispatch(bClearThunk()),
         cUpdate: (cInfo)=> dispatch(cUpdateThunk(cInfo)),

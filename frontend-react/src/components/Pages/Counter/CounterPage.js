@@ -185,7 +185,7 @@ class CounterPage extends Component {
                 <div className="leftAdd" onClick={this.addCapacity}/>
                 <div className="rightAdd" onClick={this.subCapacity}/>
                 <div className="displayRemCap">
-                    <div><b>Remaining Capacity: {this.state.maxCap-this.state.capacity}</b></div>
+                    <div><b>Remaining Space: {this.state.maxCap-this.state.capacity}</b></div>
                     <div>
                         <TableContainer className="logTable" component={Paper}>
                             <Table stickyHeader className="scrollbar scrollbar-juicy-peach" aria-label="simple table" size="medium">
