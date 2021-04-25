@@ -82,7 +82,7 @@ class TrackingPage extends Component {
                         onViewportChange={(viewport) => this.setState({ viewport })}
                     />
                 </div>
-                <div className="leftSide">
+                <div className="leftSide-map">
                     <div className="topButtons trackTopButtons">
                         <Button onClick={this.goBackHome} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Register/Sign In</Button>
                         <IconButton aria-label="refresh" onClick={() => this.refreshTB()} style={{ textAlign: "right" }}>
@@ -102,28 +102,26 @@ class TrackingPage extends Component {
                             <TableContainer className="trackTable">
                                 <Table className="searchTable">
                                     <TableHead>
-                                        <TableRow>
+                                        {/* <TableRow>
                                             <TableCell className="tableText large-text">BUSINESS NAME</TableCell>
                                             <TableCell className="tableText large-text">ADDRESS</TableCell>
                                             <TableCell className="tableText large-text">CURRENT CAPACITY</TableCell>
                                             <TableCell className="tableText large-text">MAX CAPACITY</TableCell>
-                                        </TableRow>
+                                        </TableRow> */}
                                     </TableHead>
                                     <TableBody className="bListTable">
                                         {this.state.filterBList ? (
                                             this.state.filterBList.map((business) => (
                                                 <TableRow>
                                                     <TableCell className="whiteText">
-                                                        {business.businessname}
-                                                    </TableCell>
-                                                    <TableCell className="whiteText">
-                                                        {business.businessaddr}
-                                                    </TableCell>
-                                                    <TableCell className="whiteText">
-                                                        {business.counter}
-                                                    </TableCell>
-                                                    <TableCell className="whiteText">
-                                                        {business.limit}
+                                                        <div>
+                                                            <h6>{business.businessname}</h6>
+                                                            {business.businessaddr}
+                                                        </div>
+                                                        <div>
+                                                            CURRENT: {business.counter}
+                                                            MAXIMUM: {business.limit}
+                                                        </div>
                                                     </TableCell>
                                                 </TableRow>
                                             ))) : (

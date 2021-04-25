@@ -36,10 +36,10 @@
     height: 100vh;
     padding: 0 !important;
 }
-.leftSide {
+.leftSide-map {
     width: 30%;
     align-self: center;
-    height: 85%;
+    height: 90%;
     margin-left: 2%;
     padding: 0 !important;
     background-color: #191919 !important;
