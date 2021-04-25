@@ -3,6 +3,7 @@ import { Link, withRouter } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Geocoder from 'react-mapbox-gl-geocoder'
+import ReactMapGL from 'react-map-gl';
 
 const mapAccess = {
     mapboxApiAccessToken: "pk.eyJ1IjoibmFwYXRrYXJtIiwiYSI6ImNrbWRzejdmZTJwOGIyb29qem5kaGdnYWQifQ.0qB-jB0GW4iI1V3ban2fXQ"
@@ -19,7 +20,11 @@ class TestLanding extends Component {
         this.state = {
             username: "",
             password: "",
-            viewport: {}
+            viewport: {
+                latitude: 40.767824,
+                longitude: -73.964216,
+                zoom: 15
+            }
         }
     }
     changeUsername = (event) => {
@@ -54,6 +59,14 @@ class TestLanding extends Component {
                     queryParams={queryParams}
                     viewport={viewport}  
                 />
+                <ReactMapGL
+                {...mapAccess}
+                width="500px"
+                height="500px"
+                mapStyle="mapbox://styles/mapbox/streets-v11"
+                {...viewport}
+                onViewportChange={(viewport) => this.setState({viewport})}
+                ></ReactMapGL>
                 <div>
                     <TextField variant="filled" id="usernameinput" label="Username" color="primary" onChange={this.changeUsername} />
                 </div>

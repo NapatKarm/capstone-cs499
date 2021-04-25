@@ -1,12 +1,17 @@
 .TrackingBody {
     background-color: #191919;
     height: 100vh;
-    padding: 0 50px 0 50px;
+    width: 100vw;
+    /* padding: 0 50px 0 50px; */
+    display: flex;
+    flex-direction: row;
 }
 
 .trackTopButtons {
     padding-top: 30px;
     padding-bottom: 15px;
+    margin-left: 15px;
+    margin-right: 10px;
 }
 
 .trackTable {

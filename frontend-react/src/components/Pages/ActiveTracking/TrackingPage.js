@@ -16,7 +16,7 @@ import IconButton from '@material-ui/core/IconButton';
 import './TrackingPage.css';
 import longLogo from '../../Imgs/long-logo.png';
 import ReactMapGL from 'react-map-gl';
-import {Container, Col, Row} from 'reactstrap';
+import { Container, Col, Row } from 'reactstrap';
 // import Geocoder from 'react-mapbox-gl-geocoder';
 
 const mapStyle = {
@@ -34,8 +34,8 @@ class TrackingPage extends Component {
             searched: "",
             searchedVal: "",
             viewport: {
-                latitude: 45.50884,
-                longitude: -73.58781,
+                latitude: 40.767824,
+                longitude: -73.964216,
                 zoom: 15
             }
         }
@@ -91,11 +91,14 @@ class TrackingPage extends Component {
                     </div>
                     <div>
                         <Paper>
+                            <div style={{marginLeft:"2%",marginRight:'2%',backgroundColor:'#191919'}}>
                             <SearchBar
                                 value={this.state.searched}
                                 onChange={(searchVal) => this.requestSearch(searchVal)}
                                 onCancelSearch={() => this.cancelSearch()}
+                                placeholder="Search active business..."
                             />
+                            </div>
                             <TableContainer className="trackTable">
                                 <Table className="searchTable">
                                     <TableHead>
@@ -125,7 +128,7 @@ class TrackingPage extends Component {
                                             <TableRow>
                                                 <TableCell>
                                                     No Current Active Business
-                                        </TableCell>
+                                                </TableCell>
                                                 <TableCell>
                                                 </TableCell>
                                                 <TableCell>
@@ -135,26 +138,10 @@ class TrackingPage extends Component {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
-                            <Container fluid={true}>
-                                <Row>
-                                    <Col><h2>Mapbox Tutorial</h2></Col>
-                                </Row>
-                                <Row>
-                                    <Col>
-                                        <ReactMapGL
-                                            mapboxApiAccessToken={mapboxApiKey}
-                                            mapStyle="mapbox://styles/mapbox/streets-v11"
-                                            {...viewport}
-                                            {...mapStyle}
-                                            onViewportChange={(viewport) => this.setState({viewport})}
-                                        >
-                                        </ReactMapGL>
-                                    </Col>
-                                </Row>
-                            </Container>
                         </Paper>
                     </div>
                 </div>
+            </div>
         )
     }
 }
