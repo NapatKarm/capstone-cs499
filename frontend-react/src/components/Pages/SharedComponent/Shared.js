@@ -3,6 +3,6 @@ export const mapAccess = {
 }
 
 export const queryParams = {
-    country: 'us'
+    bbox:[-74.03434261891601,40.69692107460892,-73.88472842806385,40.83890220499791]
 }
  
