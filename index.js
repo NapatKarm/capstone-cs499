@@ -1,65 +1,19 @@
-require('dotenv').config();
 const express = require('express');
+const bodyParser = require('body-parser')
 const app = express();
-const server = require('http').createServer(app);
-const io = require('socket.io')(server, { 
-  cors: {
-    origins: "*"
-  }
-});
-const redisadapter = require('socket.io-redis');
-const Redis = require("ioredis");
-const ioredis = new Redis({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  password: process.env.REDIS_PASSWORD
-});
-io.adapter(redisadapter({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  auth_pass: process.env.REDIS_PASSWORD
-}));
-
-const axios = require('axios');
 const cors = require('cors');
-const {v4: uuidv4} = require('uuid');
-
-/////////////////////////////////////SWAGGER/////////////////////////////
-
-const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-
-const swaggerDefinition = {
-  openapi: '3.0.0',
-  info: {
-    title: 'C-Vivid Express API Documentation',
-    version: '1.0.0',
-  },
-};
-
-const options = {
-  swaggerDefinition,
-  // Paths to files containing OpenAPI definitions
-  apis: ['index.js'],
-};
-
-const swaggerSpec = swaggerJSDoc(options);
-
-/////////////////////////////////////////////////////////////////////////////
-
-
+const { v4: uuidv4 } = require('uuid');
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
+app.use(bodyParser.json());
 
 // Connect to FireBase
-var admin = require("firebase-admin");
-var serviceAccount = require("./service-account.json");
+var admin = require('firebase-admin');
+var serviceAccount = require('./service-account.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://c-vivid-default-rtdb.firebaseio.com"
+  databaseURL: 'https://c-vivid-default-rtdb.firebaseio.com'
 });
 
 const db = admin.firestore();
@@ -67,40 +21,37 @@ const db = admin.firestore();
 const usersdb = db.collection('users'); 
 const busdb = db.collection('business');
 
-app.get('/', function (req, res) {
-  let time = Date();
-  res.send(`Current Time: ${time}`);
-});
+// Default testing endpoint
+app.get('/', async function (req, res) {
+  // user_info = await usersdb.where('email', '==', req.body.email).get();
+  // user_bus = await busdb.where('bussinessid', 'in', user_info.docs[0].get(businessList)).get();
+  // user_bus.forEach(doc => {
+  //   console.log(doc.data())
+  // });
+  some_bus = await busdb.where('businessId', 'in', [0, 1]).get();
+  some_bus.docs.forEach(doc => {
+    console.log(doc.data())
+  });
+  some_bus_ref = busdb.doc(some_bus.docs[0].id);
+  new_member = {                             
+    'firstname': "testing",
+    'lastname': "123 test",
+    'email': "some test email",
+    'role': 'Employee'
+  };
+  // try {
+  //   some_bus_ref.update({                                            // Add business info to user's business[]
+  //     memberList: admin.firestore.FieldValue.arrayUnion(new_member)
+  //   });
+  //   console.log("sucessfully updated array");
+  //   some_bus = await busdb.where('businessId','==', 0).get();
+  //   res.send(some_bus.docs[0].get('memberList'));
+  // } catch (error) {
+  //   console.log(error);
+  // }
 
-/**
- * @swagger
- * /signup:
- *   post:
- *     summary: Signup User
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               firstname:
- *                 type: string
- *                 description: The user's firstname.
- *               lastname:
- *                 type: string
- *                 description: The user's lastname.
- *               email:
- *                 type: string
- *                 description: The user's email.
- *               password:
- *                 type: string
- *                 description: The user's password.
- *     responses:
- *      '200':
- *        description: Successfully Created.
- *      '400':
- *        description: Email is already taken.
-*/
+  // res.send('hello world');
+});
 
 // Sign-up end point
 app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastname, email, password}
@@ -126,53 +77,12 @@ app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastn
   }
 });
 
-/**
- * @swagger
- * /signin:
- *   post:
- *     summary: Sign in with user credientials
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 description: The user's email.
- *               password:
- *                 type: string
- *                 description: The user's password.
- *     responses:
- *       '200':
- *         description: Success.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 firstname:
- *                   type: string
- *                   description: The user's first name.
- *                 lastname:
- *                   type: string
- *                   description: The user's last name.
- *                 email:
- *                   type: string
- *                   description: The user's email.
- *                 token:
- *                   type: string
- *                   description: The user's token.
- *       '401':
- *         description: Incorrect Email or Password.
-*/
-
 // Sign-in Endpoint
 app.post('/signin', async (req, res) => {         //Expected request: {email, password}
   let existing_user = await usersdb.where('email', '==', req.body.email.toLowerCase()).get(); // QuerySnapshot
   //For security reasons, you do not disclose whether email or password is invalid
   try {
-    if(existing_user.empty) { 
+    if (existing_user.empty) { 
       res.status(422).send('Invalid email or password');
     }
     else if (!existing_user.empty && (existing_user.docs[0].get('email') != req.body.email.toLowerCase()) || (existing_user.docs[0].get('password') !=  req.body.password)) {
@@ -195,73 +105,6 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
     console.log(error);
   }
 });
-
-/**
- * @swagger
- * /businessRegister:
- *   post:
- *     summary: Register a business
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               businessname:
- *                 type: string
- *                 description: The business' name.
- *               businessaddr:
- *                 type: string
- *                 description: The business' address.
- *               businesspass:
- *                 type: string
- *                 description: The business' passcode.
- *               email:
- *                 type: string
- *                 description: The business owner's email.
- *     responses:
- *       '200':
- *         description: Success.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 businessId:
- *                   type: integer
- *                   description: The business id.
- *                 businessname:
- *                   type: string
- *                   description: The business name.
- *                 businessaddr:
- *                   type: string
- *                   description: The business address.
- *                 businesspass:
- *                   type: string
- *                   description: The business pass.
- *                 isopened:
- *                   type: boolean
- *                   description: The business open/close status.
- *                 memberList:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       firstname:
- *                         type: string
- *                         description: The member's first name.
- *                       lastname:
- *                         type: string
- *                         description: The member's last name.
- *                       email:
- *                         type: string
- *                         description: The member's email.
- *                       role:
- *                         type: string
- *                         description: The member's role at the business.
- *       '400':
- *         description: Business Already Registered.
-*/
 
 // Business Register Endpoint
 app.post('/businessRegister', async (req, res) => {     //Expected request: { businessname, businessaddr, owner_email, businesspass, first name, last name} (owner: email?)
@@ -298,45 +141,14 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
       await owner_ref.update({
         businessList: admin.firestore.FieldValue.arrayUnion(businessInfo.businessId)
       });
-      res.status(200).send(businessInfo);
+      res.status(200).send("Success");
     } catch(error) {
       console.log(error);
     }
   }
 });
 
-/**
- * @swagger
- * /businessJoin:
- *   post:
- *     summary: Join a business as a new member
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 description: The user's email.
- *               businesspass:
- *                 type: string
- *                 description: The business passcode.
- *               businessId:
- *                 type: string
- *                 description: The business id.
- *     responses:
- *       '200':
- *         description: Success.
- *       '404':
- *         description: Business Not Found.
- *       '401':
- *         description: Incorrect Passcode.
- *       '400':
- *         description: User already registered.
-*/
-
-// Business Join Endpoint
+// I think it works
 app.post('/businessJoin', async (req, res) => {                    //Expected request: {email, businesspass, businessId}
   const existing_business = await busdb.where('businesspass', '==', req.body.businesspass).where('businessId', '==', req.body.businessId).get();
   if (existing_business.empty) {                                       // Non-existing Business, false = empty document
@@ -444,11 +256,9 @@ app.post('/businessJoin', async (req, res) => {                    //Expected re
 */
 
 //Refresh
-app.post('/getBusinessData', async (req, res) => {                   //Expected Request {email, token}
+app.get('/getBusinessData', async (req, res) => {                   //Expected Request {email, token}
   let user_info = await usersdb.where('token', '==', req.body.token).get();
-  console.log("Email", req.body.email);
-  console.log("Token", req.body.token);
-  if (user_info.empty) {
+  if (user_info.docs[0].get('token') != req.body.token) {
     res.status(400).send("Incorrect Token");
   }
   else{
@@ -535,9 +345,8 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
 // Get Single Business Data Endpoint
 app.post('/getSingleBusinessData', async (req, res) => {            //Expected: {business_id, email, token}
   let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
-  if (user_info.empty) {
+  if (user_info.docs[0].get('token') != req.body.token) {
     res.status(400).send("Incorrect Token");
-    return;
   }
 
   let is_member = false;
@@ -548,54 +357,19 @@ app.post('/getSingleBusinessData', async (req, res) => {            //Expected: 
   });
   if (is_member == false) {
     res.status(400).send("Not a member of this business");
-    return;
   }
 
   try {
     let business_info = await busdb.where('businessId', '==', req.body.businessId).get();
     res.status(200).send(business_info.docs[0].data());  
-    return;
   } catch (error) {
     console.log(error);
   }
 });
 
-/**
- * @swagger
- * /passcodeChange:
- *   put:
- *     summary: Change business passcode
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               businessId:
- *                 type: integer
- *                 description: The business id.
- *               email:
- *                 type: string
- *                 description: The user's email.
- *               token:
- *                 type: string
- *                 description: The user's token.
- *               businesspass:
- *                 type: string
- *                 description: The business' passcode.
- *     responses:
- *       '200':
- *         description: Change Success.
- *       '400':
- *         description: Incorrect Token.
- *       '401':
- *         description: Not Enough Permissions.
-*/
-
-// Passcode Change Endpoint
 app.put('/passcodeChange', async (req, res) => {                    //Expected: { business_id, email, token, businesspass}
   let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
-  if(user_info.empty){
+  if(user_info.docs[0].get('token') != req.body.token){
     res.status(400).send("Incorrect Token");
     return;
   }
@@ -624,46 +398,9 @@ app.put('/passcodeChange', async (req, res) => {                    //Expected: 
   }
 });
 
-
-/**
- * @swagger
- * /roleChange:
- *   put:
- *     summary: Change employee role.
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               businessId:
- *                 type: integer
- *                 description: The business id.
- *               changerEmail:
- *                 type: string
- *                 description: The changer's email.
- *               changeeEmail:
- *                 type: string
- *                 description: The changee's email.
- *               newRole:
- *                 type: string
- *                 description: The new role for the changee.
- *               token:
- *                 type: string
- *                 description: The user's token.
- *     responses:
- *       '200':
- *         description: Change Success.
- *       '400':
- *         description: Incorrect Token.
- *       '403':
- *         description: Not Enough Permissions.
-*/
-
-// Role Change Endpoint
 app.put('/roleChange', async (req, res) => {                      //Expected: {business_id, (owners)changerEmail, changeeEmail, newRole, token}
   let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.changerEmail.toLowerCase()).get();
-  if (user_info.empty) {
+  if (user_info.docs[0].get('token') != req.body.token) {
     res.status(400).send("Incorrect Token");
     return;
   }
@@ -699,91 +436,9 @@ app.put('/roleChange', async (req, res) => {                      //Expected: {b
   }
 });
 
-/**
- * @swagger
- * /changePassword:
- *   patch:
- *     summary: Change the user's word
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 description: The user's email.
- *               password:
- *                 type: string
- *                 description: The user's old password.
- *               newPassword:
- *                 type: string
- *                 description: The user's new password.
- *     responses:
- *       '200':
- *         description: Success.
- *       '400':
- *         description: "Invalid Email or Password."
-*/
-
-// request :  
-// { email, token, newPassword, 
-app.patch("/changePassword", async (req, res) => {
-  let user_info = await usersdb.where('password', '==', req.body.password).where('email', '==', req.body.email.toLowerCase()).get();
-  if (user_info.empty) {
-      res.status(400).send("Invalid email or password");
-      return;
-  }
-  else {
-      let user_ref = usersdb.doc(user_info.docs[0].id);
-      try {
-          await user_ref.update({
-              password : req.body.password
-          });
-          res.status(200).send("Password successfully changed");
-          return;
-      } catch (err) {
-          console.log(error);
-      }
-  }
-});
-
-/**
- * @swagger
- * /kickMember:
- *   patch:
- *     summary: Kick member.
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               businessId:
- *                 type: integer
- *                 description: The business id.
- *               kickerEmail:
- *                 type: string
- *                 description: The kicker's email.
- *               kickeeEmail:
- *                 type: string
- *                 description: The kickee's email.
- *               token:
- *                 type: string
- *                 description: The user's token.
- *     responses:
- *       '200':
- *         description: Kick Success.
- *       '400':
- *         description: Incorrect Token.
- *       '403':
- *         description: Not Enough Permissions.
-*/
-
-// Kick Member Endpoint
 app.patch('/kickMember', async (req, res) => {                      //Expected: {business_id, kickerEmail, kickeeEmail, token}
   let kicker_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.kickerEmail.toLowerCase()).get();
-  if (kicker_info.empty) {
+  if (kicker_info.docs[0].get('token') != req.body.token) {
     res.status(400).send("Incorrect Token");
     return;
   }
@@ -812,26 +467,9 @@ app.patch('/kickMember', async (req, res) => {                      //Expected: 
     }
     new_member_list.splice(kickee_pos, 1);
     bus_ref = busdb.doc(bus_info.docs[0].id);
-
-    let kickee_info = await usersdb.where('email', '==', req.body.kickeeEmail.toLowerCase()).get();
-    let new_business_list = kickee_info.docs[0].get('businessList');
-    let business_pos = "";
-
-    for (let i = 0; i < new_business_list.length; i++) {
-      if (new_business_list[i] == req.body.businessId) {
-        business_pos = i;
-      }
-    }
-    new_business_list.splice(business_pos, 1);
-
-    let kickee_ref =  usersdb.doc(kickee_info.docs[0].id);
-
     try {
       await bus_ref.update({
         memberList : new_member_list
-      });
-      await kickee_ref.update({
-        businessList : new_business_list
       });
       res.status(200).send("Kick Success");
     } catch(error) {
@@ -839,33 +477,6 @@ app.patch('/kickMember', async (req, res) => {                      //Expected: 
     }
   }
 });
-
-/**
- * @swagger
- * /businessOpen:
- *   patch:
- *     summary: Mark business as open
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               businessId:
- *                 type: integer
- *                 description: The business id.
- *               email:
- *                 type: string
- *                 description: The user's email.
- *               token:
- *                 type: string
- *                 description: The user's token.
- *     responses:
- *       '200':
- *         description: Business Opened.
- *       '404':
- *         description: Business Already Opened.
-*/
 
 app.patch('/businessOpen', async (req, res) => {                     //Expected Request {business_id, email, token}
   let changer_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
@@ -960,34 +571,27 @@ app.patch('/businessClose', async (req, res) => {                     //Expected
   }
 });
 
-/**
- * @swagger
- * /businessDelete:
- *   delete:
- *     summary: Delete a Business
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               businessId:
- *                 type: integer
- *                 description: The business id.
- *               email:
- *                 type: string
- *                 description: The user's email.
- *               token:
- *                 type: string
- *                 description: The user's token.
- *     responses:
- *       '200':
- *         description: Business Deleted.
- *       '400':
- *         description: Incorrect Token.
- *       '401':
- *         description: Not Enough Permissions.
-*/
+// request :  
+// { email, token, newPassword, 
+app.patch("/changePassword", async (req, res) => {
+  let user_info = await usersdb.where('password', '==', req.body.password).where('email', '==', req.body.email.toLowerCase()).get();
+  if (user_info.empty) {
+    res.status(400).send("Invalid username or password");
+    return;
+  }
+  else {
+    let user_ref = usersdb.doc(user_info.docs[0].id);
+    try {
+      await user_ref.update({
+        password : req.body.password
+      });
+      res.status(200).send("Password successfully changed");
+      return;
+    } catch (err) {
+      console.log(error);
+    }
+  }
+});
 
 app.delete('/businessDelete', async (req, res) => { // expected request: businessId, email, token
   let owner_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
@@ -1018,7 +622,7 @@ app.delete('/businessDelete', async (req, res) => { // expected request: busines
         });
       });
       let bus_ref = busdb.doc(bus_info.docs[0].id);
-      bus_ref.delete();
+      await bus_ref.delete();
       console.log("Business Successfully Deleted");
       res.status(200).send("Business Successfully Deleted");
     } catch (error) {
