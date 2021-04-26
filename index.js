@@ -203,12 +203,12 @@ app.get('/getBusinessData', async (req, res) => {                   //Expected R
   
       for (let i = 0; i < Math.ceil( user_info.docs[0].get('businessList').length / 10 ); i++) {
         let j = 0;
-        let k = 0;
+        let k = 9;
         if (user_bus_list.length < 10) {
           k = user_bus_list.length;
         }
         query_array = user_bus_list.slice(j, k); // 0 - 9, 10 - 19, 20 - 29, etc.
-        let arr_of_bus = await busdb.where('businessId', 'in', query_array).get();             
+        let arr_of_bus = await busdb.where('businessId', 'in', query_array).get();          
         arr_of_bus.docs.forEach(doc => {  
           bus_info.push(doc.data())
         });
