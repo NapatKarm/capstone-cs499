@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -14,9 +12,7 @@ import SearchBar from "material-ui-search-bar";
 import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
 import './TrackingPage.css';
-import longLogo from '../../Imgs/long-logo.png';
-import ReactMapGL from 'react-map-gl';
-import { Container, Col, Row } from 'reactstrap';
+import ReactMapGL, {Marker} from 'react-map-gl';
 // import Geocoder from 'react-mapbox-gl-geocoder';
 
 const mapStyle = {
@@ -30,14 +26,14 @@ class TrackingPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            businessDetails: undefined,
+            businessList: undefined,
             searched: "",
             searchedVal: "",
             viewport: {
                 latitude: 40.767824,
                 longitude: -73.964216,
                 zoom: 15
-            }
+            },
         }
     }
 
@@ -80,7 +76,19 @@ class TrackingPage extends Component {
                         height="100%"
                         {...viewport}
                         onViewportChange={(viewport) => this.setState({ viewport })}
-                    />
+                    >
+                    { this.state.businessList!=undefined ? (
+                                                this.state.businessList.map((business) => 
+                                                <Marker
+                                                    longitude={business.long}
+                                                    latitude={business.lat}
+                                                >
+                                                    <div className="marker temporary marker"><span ><div className="markerText">{business.limit-business.counter}</div></span></div>
+                                                </Marker>
+                                            )
+                    ):("")}
+
+                    </ReactMapGL>
                 </div>
                 <div className="leftSide-map">
                     <div className="topButtons trackTopButtons">
@@ -115,12 +123,11 @@ class TrackingPage extends Component {
                                                 <TableRow>
                                                     <TableCell className="whiteText">
                                                         <div>
-                                                            <h6>{business.businessname}</h6>
+                                                            <div className="businessHeader">{business.businessname}</div>
                                                             {business.businessaddr}
                                                         </div>
                                                         <div>
-                                                            CURRENT: {business.counter}
-                                                            MAXIMUM: {business.limit}
+                                                            Spaces Left: {business.limit-business.counter}
                                                         </div>
                                                     </TableCell>
                                                 </TableRow>
