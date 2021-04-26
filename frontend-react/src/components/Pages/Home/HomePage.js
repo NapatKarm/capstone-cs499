@@ -143,7 +143,7 @@ class HomePage extends Component {
     }
     onSelected = (viewport, item) => {
         console.log("TESTING",item)
-        this.setState({blong:item.center[0],blat:item.center[1],registerError:""})
+        this.setState({blong:item.center[1],blat:item.center[0],registerError:""})
         this.changeBAddress(item.place_name)
         // this.setState({bAddress: item.place_name})
     }
