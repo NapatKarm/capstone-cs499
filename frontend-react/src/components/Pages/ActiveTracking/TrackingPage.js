@@ -13,6 +13,7 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
 import './TrackingPage.css';
 import ReactMapGL, {Marker} from 'react-map-gl';
+import PopupComponent from './PopupComponent';
 // import Geocoder from 'react-mapbox-gl-geocoder';
 
 const mapStyle = {
@@ -28,13 +29,15 @@ class TrackingPage extends Component {
         this.state = {
             filterBList: [],
             businessList: [],
+            businessDetails: undefined,
+            markerPopupState: "false",
             searched: "",
             searchedVal: "",
             viewport: {
                 latitude: 40.767824,
                 longitude: -73.964216,
                 zoom: 15
-            },
+            }
         }
     }
 
@@ -71,6 +74,9 @@ class TrackingPage extends Component {
     refreshTB = () => {
         this.props.socket.emit("getAllData")
     }
+    businessMarker = (business) => {
+        this.setState({markerPopupState: "true", businessDetails: business})
+    }
 
     render() {
         const { viewport } = this.state;
@@ -90,13 +96,17 @@ class TrackingPage extends Component {
                                                 <Marker
                                                     longitude={business.long}
                                                     latitude={business.lat}
+                                                    onClick={()=>this.businessMarker(business)}
                                                 >
-                                                    <div className="marker temporary marker"><span ><div className="markerText">{business.limit-business.counter}</div></span></div>
+                                                    <div className="marker temporary marker"><span><div className="markerText">{business.limit-business.counter}</div></span></div>
                                                 </Marker>
                                             )
                     ):("")}
 
                     </ReactMapGL>
+                    <div className="markerPopup">
+                        {this.state.markerPopupState==="false" ? ("") : (<PopupComponent businessDetails={this.state.businessDetails}/>)}
+                    </div>
                 </div>
                 <div className="leftSide-map">
                     <div className="topButtons trackTopButtons">
