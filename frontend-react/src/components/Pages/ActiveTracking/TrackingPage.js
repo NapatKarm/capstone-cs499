@@ -30,6 +30,7 @@ class TrackingPage extends Component {
             businessList: [],
             searched: "",
             searchedVal: "",
+            selectedBusiness: "",
             viewport: {
                 latitude: 40.767824,
                 longitude: -73.964216,
@@ -48,9 +49,6 @@ class TrackingPage extends Component {
                 this.setState({ filterBList: filteredRows })
             })
         })
-        this.props.socket.on("test", ({ data }) => {
-            console.log("from DEBUGGGGG", data)
-        })
     }
     goBackHome = () => {
         // this.props.bClear()
@@ -64,6 +62,16 @@ class TrackingPage extends Component {
             this.setState({ filterBList: filteredRows })
         })
     };
+    viewChange = (lat,long,id) => {
+        this.setState({
+            selectedBusiness:id,
+            viewport: {
+                ...this.state.viewport,
+                latitude: lat,
+                longitude: long
+            }
+        })
+    }
     cancelSearch = () => {
         this.setState({ searched: "" });
         this.requestSearch(this.state.searched);
@@ -87,12 +95,24 @@ class TrackingPage extends Component {
                     >
                     { this.state.businessList!=undefined ? (
                                                 this.state.businessList.map((business) => 
-                                                <Marker
-                                                    longitude={business.long}
-                                                    latitude={business.lat}
-                                                >
-                                                    <div className="marker temporary marker"><span ><div className="markerText">{business.limit-business.counter}</div></span></div>
-                                                </Marker>
+                                                business.businessId == this.state.selectedBusiness ?
+                                                    (
+                                                        <Marker
+                                                        longitude={business.long}
+                                                        latitude={business.lat}
+                                                    >
+                                                        <div className="cmarker temporary cmarker"><span ><div className="markerText">{business.limit-business.counter}</div></span></div>
+                                                    </Marker>
+                                                    ):(
+                                                        <Marker
+                                                        longitude={business.long}
+                                                        latitude={business.lat}
+                                                    >
+                                                        <div className="marker temporary marker"><span ><div className="markerText">{business.limit-business.counter}</div></span></div>
+                                                    </Marker>
+                                                    )
+                                                
+
                                             )
                     ):("")}
 
@@ -129,7 +149,7 @@ class TrackingPage extends Component {
                                         {this.state.filterBList.length!=0 ? (
                                             this.state.filterBList.map((business) => (
                                                 <TableRow>
-                                                    <TableCell className="whiteText">
+                                                    <TableCell className="businessCell" onClick={()=>this.viewChange(business.lat,business.long,business.businessId)}>
                                                         <div>
                                                             <div className="businessHeader">{business.businessname}</div>
                                                             {business.businessaddr}

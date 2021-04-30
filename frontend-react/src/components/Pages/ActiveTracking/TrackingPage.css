@@ -83,9 +83,50 @@
   .temporary-marker span {
     background: #D3D3D3;
   }
-
+  .cmarker {
+    width:0;
+    height:0;
+  }
+  
+  .cmarker  span {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    box-sizing:border-box;
+    width: 30px;
+    height: 30px;
+    color:#fff;
+    background: #d31919;
+    border:solid 2px;
+    border-radius: 0 70% 70%;
+    box-shadow:0 0 2px #000;
+    cursor: pointer;
+    transform-origin:0 0;
+    transform: rotateZ(-135deg);
+  }
+  
+  .cmarker b {
+    transform: rotateZ(135deg)
+  }
+  .cmarkerText {
+      transform: rotateZ(135deg) !important
+  }
+  .temporary-cmarker span {
+    background: #D3D3D3;
+  }
   .businessHeader {
       font-weight: bold;
       font-size: 20px;
       padding-bottom: 2%;
+  }
+
+  .businessCell {
+    color: white !important;
+    transition: 0.2s;
+  }
+  .businessCell:hover {
+    background-color: #242424 !important;
+  }
+  .businessCell:active {
+    background-color: #313131 !important;
   }
