@@ -242,6 +242,12 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
  *                 isopened:
  *                   type: boolean
  *                   description: The business open/close status.
+ *                 lat:
+ *                   type: float
+ *                   description: The business' latitude.
+ *                 lon:
+ *                   type: float
+ *                   description: The business' longitude.
  *                 memberList:
  *                   type: array
  *                   items:
@@ -1079,10 +1085,12 @@ io.on('connection', (socket) => {
     if(await ioredis.exists(businessId)){
       console.log("join");
       socket.join(businessId);
-      // const json = JSON.stringify({
-      //   email: email
-      // });
-      await ioredis.set(socket.id, email);
+      const json = JSON.stringify({
+        email: email,
+        socketId: socket.id
+      });
+      
+      await ioredis.set(socket.id, json);
       let business = await ioredis.get(businessId);
       let businessJson = JSON.parse(business);
 
@@ -1096,6 +1104,24 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('kickMember', async ({businessId, kickerEmail, kickeeEmail, token}) => {
+    if(await ioredis.exists(businessId)){
+      let user = await ioredis.get(socket.id);
+      if(user != null){
+        let userJson = JSON.parse(user);
+        io.to(userJson.socketId).emit('kicked', { success: "Success"})
+      }
+    }
+
+    await axios.patch(`https://${process.env.EXPRESS_HOST}/kickMember`, {businessId: businessId, kickerEmail: kickerEmail, kickeeEmail: kickeeEmail, token: token})
+    .then(res => {
+      socket.emit('kickResponse', {success: "Success"});
+    })
+    .catch(err => {
+      socket.emit('kickResponse', {error: "Error"});
+    })
+  });
+
   socket.on('addCount', async ({businessId}) => {
     if(await isPartofBusiness(businessId, socket.id)){
       let business = await ioredis.get(businessId);
@@ -1105,10 +1131,13 @@ io.on('connection', (socket) => {
 
       let time = Date();
 
+      let user = await ioredis.get(socket.id);
+      let userJson = JSON.parse(user);
+
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
         limit: businessJson.limit,
-        changerEmail: await ioredis.get(socket.id),
+        changerEmail: userJson.email,
         changerType: "Incremented",
         time: time
       });
@@ -1150,10 +1179,13 @@ io.on('connection', (socket) => {
 
       let time = Date();
 
+      let user = await ioredis.get(socket.id);
+      let userJson = JSON.parse(user);
+
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
         limit: businessJson.limit,
-        changerEmail: await ioredis.get(socket.id),
+        changerEmail: userJson.email,
         changerType: "Decremented",
         time: time
       });
@@ -1194,10 +1226,13 @@ io.on('connection', (socket) => {
 
       let time = Date();
 
+      let user = await ioredis.get(socket.id);
+      let userJson = JSON.parse(user);
+
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
         limit: businessJson.limit,
-        changerEmail: await ioredis.get(socket.id),
+        changerEmail: userJson.email,
         changerType: `Changed limit to ${businessJson.limit}`,
         time: time
       });
