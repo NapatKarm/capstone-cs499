@@ -130,3 +130,60 @@
   .businessCell:active {
     background-color: #313131 !important;
   }
+
+  .markerPopup {
+    width: 25%;
+    align-self: center;
+    height: 50%;
+    bottom: 5%;
+    margin-left: 73%;
+    padding: 0 !important;
+    color: white;
+    text-align: center;
+    background-color: #191919 !important;
+    border-radius: 15px;
+    position: absolute;
+    z-index: 0!important; 
+  }
+
+  .circle-popup {
+    position: absolute;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    top: 55%;
+    left: 55%;
+    margin-top: -50px;
+    margin-left: -50px;
+    width: 75px !important;
+    height: 75px !important;
+    z-index: 2!important;
+}
+
+  .circleUnder-popup {
+    position: absolute;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    top: 55%;
+    left: 55%;
+    margin-top: -50px;
+    margin-left: -50px;
+    width: 75px!important;
+    height: 75px!important;
+    z-index: 1!important;
+}
+
+.circleProgress-popup {
+    height: 75px!important;
+    width: 75px!important;
+}
+
+.circleFont-popup {
+    font-size: 15px!important;
+    opacity: 100%!important;
+}
+
+.bottomDiv-popup {
+    margin-top: 75px;
+}

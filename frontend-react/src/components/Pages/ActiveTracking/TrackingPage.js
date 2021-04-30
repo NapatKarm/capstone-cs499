@@ -118,14 +118,17 @@ class TrackingPage extends Component {
                                                     >
                                                         <div className="marker temporary marker"><span ><div className="markerText">{business.limit-business.counter}</div></span></div>
                                                     </Marker>
-                                                    )
+                                                    )//, ()=>{
+                                                    //     if(business.businessId == this.state.businessDetails.businessId){
+                                                    //         this.setState({businessDetails: business})
+                                                    // }},
                                             )
                     ):("")}
 
                     </ReactMapGL>
-                    <div className="markerPopup">
-                        {this.state.markerPopupState==="false" ? ("") : (<PopupComponent businessDetails={this.state.businessDetails}/>)}
-                    </div>
+                </div>
+                <div>
+                    {this.state.markerPopupState==="false" ? ("") : (<div className="markerPopup"><PopupComponent businessDetails={this.state.businessDetails}/></div>)}
                 </div>
                 <div className="leftSide-map">
                     <div className="topButtons trackTopButtons">
