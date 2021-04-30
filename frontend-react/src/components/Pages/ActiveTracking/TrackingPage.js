@@ -91,7 +91,7 @@ class TrackingPage extends Component {
                     </div>
                     <div>
                         <Paper>
-                            <div style={{marginLeft:"2%",marginRight:'2%',backgroundColor:'#191919'}}>
+                            <div style={{paddingLeft:"3%",paddingRight:'3%',backgroundColor:'#191919'}}>
                             <SearchBar
                                 value={this.state.searched}
                                 onChange={(searchVal) => this.requestSearch(searchVal)}
