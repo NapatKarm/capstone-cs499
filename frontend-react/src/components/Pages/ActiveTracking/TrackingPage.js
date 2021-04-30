@@ -30,7 +30,8 @@ class TrackingPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            businessDetails: undefined,
+            filterBList: [],
+            businessList: [],
             searched: "",
             searchedVal: "",
             viewport: {
@@ -117,7 +118,7 @@ class TrackingPage extends Component {
                                         </TableRow> */}
                                     </TableHead>
                                     <TableBody className="bListTable">
-                                        {this.state.filterBList ? (
+                                        {this.state.filterBList.length!=0 ? (
                                             this.state.filterBList.map((business) => (
                                                 <TableRow>
                                                     <TableCell className="whiteText">
@@ -133,7 +134,7 @@ class TrackingPage extends Component {
                                                 </TableRow>
                                             ))) : (
                                             <TableRow>
-                                                <TableCell>
+                                                <TableCell className="whiteText">
                                                     No Current Active Business
                                                 </TableCell>
                                                 <TableCell>
