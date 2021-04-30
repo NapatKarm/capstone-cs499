@@ -242,6 +242,12 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
  *                 isopened:
  *                   type: boolean
  *                   description: The business open/close status.
+ *                 lat:
+ *                   type: float
+ *                   description: The business' latitude.
+ *                 lon:
+ *                   type: float
+ *                   description: The business' longitude.
  *                 memberList:
  *                   type: array
  *                   items:
