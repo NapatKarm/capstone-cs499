@@ -701,6 +701,55 @@ app.put('/roleChange', async (req, res) => {                      //Expected: {b
 
 /**
  * @swagger
+ * /changePassword:
+ *   patch:
+ *     summary: Change the user's word
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *               password:
+ *                 type: string
+ *                 description: The user's old password.
+ *               newPassword:
+ *                 type: string
+ *                 description: The user's new password.
+ *     responses:
+ *       '200':
+ *         description: Success.
+ *       '400':
+ *         description: "Invalid Email or Password."
+*/
+
+// request :  
+// { email, token, newPassword, 
+app.patch("/changePassword", async (req, res) => {
+  let user_info = await usersdb.where('password', '==', req.body.password).where('email', '==', req.body.email.toLowerCase()).get();
+  if (user_info.empty) {
+      res.status(400).send("Invalid email or password");
+      return;
+  }
+  else {
+      let user_ref = usersdb.doc(user_info.docs[0].id);
+      try {
+          await user_ref.update({
+              password : req.body.password
+          });
+          res.status(200).send("Password successfully changed");
+          return;
+      } catch (err) {
+          console.log(error);
+      }
+  }
+});
+
+/**
+ * @swagger
  * /kickMember:
  *   patch:
  *     summary: Kick member.
