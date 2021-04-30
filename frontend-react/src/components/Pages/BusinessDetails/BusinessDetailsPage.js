@@ -42,6 +42,23 @@ class BusinessDetailsPage extends Component {
         }
     }
     componentDidMount() {
+        this.props.socket.on("kickResponse",({ success, error }) => {
+            if(error!==undefined){
+                console.log("Kick error: ",error);
+                alert("Something went wrong check the console")
+            }
+            if(success!==undefined){
+                console.log("Successfully kicked user")
+                this.updateDetails();
+            }
+        })
+        this.props.socket.on("kicked",({success}) => {
+            console.log("KICKED SOCKETS",success)
+            if(success!==undefined){
+                alert("You have been removed from the business")
+                this.props.history.push("/home");
+            }
+        })
         this.setState({
             businessDetails: this.props.bDetails
         }, () => {
@@ -55,7 +72,6 @@ class BusinessDetailsPage extends Component {
                 this.updateDetails()
             }
             else alert("Something is wrong, you are not in this business but you can still see it.")
-
         })
     }
     // componentDidUpdate() {
@@ -95,10 +111,6 @@ class BusinessDetailsPage extends Component {
                         role: roleGrab.role,
                         isopened: this.state.businessDetails.isopened
                     })
-                }
-                else {
-                    alert("You have been removed from the business")
-                    this.props.history.push("/home");
                 }
             })
             .catch(err => {
@@ -176,7 +188,6 @@ class BusinessDetailsPage extends Component {
             .catch(err => {
                 console.log("Error from PASS CHANGE", err)
                 alert("Something went wrong, check console")
-
             })
     }
     cancelAction = () => {
@@ -277,7 +288,6 @@ class BusinessDetailsPage extends Component {
                 .catch(err => {
                     console.log("Error from PROMOTE", err)
                     alert("Something went wrong, check console")
-
                 })
         }
         else if (this.state.actionName === "demote") {
@@ -291,30 +301,19 @@ class BusinessDetailsPage extends Component {
                 .then(res => {
                     console.log("Response from DEMOTE", res);
                     this.updateDetails();
-
                 })
                 .catch(err => {
                     console.log("Error from DEMOTE", err)
                     alert("Something went wrong, check console")
-
                 })
         }
         else if (this.state.actionName === "kick") {
-            await axios.patch(`${Endpoint}/kickMember`, {
+            this.props.socket.emit('kickMember', {
                 businessId: this.state.businessDetails.businessId,
                 kickerEmail: this.props.userData.email,
                 kickeeEmail: this.state.actionVictim,
                 token: this.props.userData.token
             })
-                .then(res => {
-                    console.log("Response from KICK", res);
-                    this.updateDetails();
-                })
-                .catch(err => {
-                    console.log("Error from KICK", err)
-                    alert("Something went wrong, check console")
-
-                })
         }
         else if (this.state.actionName === "close") {
             console.log("Should be running Business CLOSE",this.state)

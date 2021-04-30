@@ -115,6 +115,13 @@ class CounterPage extends Component {
                 maxCap: this.props.cInfo.limit
             })
         }
+        this.props.socket.on("kicked",({success}) => {
+            console.log("KICKED SOCKETS",success)
+            if(success!==undefined){
+                this.props.socket.emit('leaveBusiness', {businessId: this.props.bDetails.businessId})
+                this.props.history.push("/home")
+            }
+        })
         this.props.socket.on("updateCounter",({ error, limit, counter, changerEmail, changerType,time }) => {
             if(error!==undefined){
                 console.log("error: ",error);
