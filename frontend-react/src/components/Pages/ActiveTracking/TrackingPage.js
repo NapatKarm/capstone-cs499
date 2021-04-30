@@ -44,7 +44,12 @@ class TrackingPage extends Component {
     componentDidMount = () => {
         this.props.socket.on("updateMap", ({ allData }) => {
             console.log("from UPDATE MAP", allData)
-            this.setState({ businessList: allData, filterBList: allData }, () => { console.log("New Business List", this.state.businessList) })
+            this.setState({ businessList: allData }, () => { 
+                const filteredRows = this.state.businessList.filter((row) => {
+                    return row.businessname.toLowerCase().includes(this.state.searchedVal.toLowerCase());
+                });
+                this.setState({ filterBList: filteredRows })
+            })
         })
         this.props.socket.on("test", ({ data }) => {
             console.log("from DEBUGGGGG", data)
@@ -55,10 +60,12 @@ class TrackingPage extends Component {
         this.props.history.push("/")
     }
     requestSearch = (searchedVal) => {
-        const filteredRows = this.state.businessList.filter((row) => {
-            return row.businessname.toLowerCase().includes(searchedVal.toLowerCase());
-        });
-        this.setState({ filterBList: filteredRows })
+        this.setState({ searchedVal: searchedVal }, () => { 
+            const filteredRows = this.state.businessList.filter((row) => {
+                return row.businessname.toLowerCase().includes(this.state.searchedVal.toLowerCase());
+            });
+            this.setState({ filterBList: filteredRows })
+        })
     };
     cancelSearch = () => {
         this.setState({ searched: "" });
