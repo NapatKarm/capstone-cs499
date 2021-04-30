@@ -25,7 +25,10 @@ class HomePage extends Component {
             userData: {},
             businessList: undefined,
             registeringBusiness: false,
+            addrSelected:false,
             joiningBusiness: false,
+            blat: undefined,
+            blong: undefined,
             bName: "",
             bAddress: "",
             bPass: "",
@@ -70,7 +73,10 @@ class HomePage extends Component {
             bAddress: "",
             bPass: "",
             bID: "",
-            registerError: undefined
+            blat: undefined,
+            blong: undefined,
+            registerError: undefined,
+            addrSelected:false
         })
     }
     cancelBJoin = () => {
@@ -94,41 +100,51 @@ class HomePage extends Component {
     changeBID = (event) => {
         this.setState({ bID: event.target.value })
     }
-    changeBAddress = (event) => {
-        this.setState({ bAddress: event.target.value })
+    changeBAddress = (newAddr) => {
+        this.setState({ bAddress: newAddr,addrSelected:true})
     }
     changeBPass = (event) => {
         this.setState({ bPass: event.target.value })
     }
     regBusiness = async () => {
-
-        await this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass)
-        console.log(this.props.bRegError, "Look at reg info!#################")
-        if (this.props.bRegError === undefined) {
-            await this.props.bGet(this.state.userData.email, this.state.userData.token)
-            if (this.props.businessData) {
-                this.setState({ businessList: this.props.businessData, registeringBusiness: false }, () => (console.log(this.props.businessData)))
+        if(this.state.bName=="") this.setState({registerError: "Please enter a business name"})
+        else if(this.state.bPass=="") this.setState({registerError: "Please enter a business pass"})
+        else if(this.state.addrSelected==false) this.setState({registerError: "Please select a valid address"})
+        else
+        {
+            await this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass,this.state.blong, this.state.blat)
+            console.log(this.props.bRegError, "Look at reg info!#################")
+            if (this.props.bRegError === undefined) {
+                await this.props.bGet(this.state.userData.email, this.state.userData.token)
+                if (this.props.businessData) {
+                    this.setState({ businessList: this.props.businessData, registeringBusiness: false }, () => (console.log(this.props.businessData)))
+                }
             }
+            else this.setState({ registerError: this.props.bRegError })
         }
-        else this.setState({ registerError: this.props.bRegError })
 
 
     }
     joinBusiness = async () => {
-        await this.props.bJoin(this.state.userData.email, this.state.bID, this.state.bPass)
-        if (this.props.bJoinError) {
-            this.setState({ joinError: this.props.bJoinError }, () => (console.log("This should have ran", this.state.joinError)))
-        }
-        else {
-            await this.props.bGet(this.state.userData.email, this.state.userData.token)
-            if (this.props.businessData) {
-                this.setState({ businessList: this.props.businessData, joiningBusiness: false }, () => (console.log(this.props.businessData)))
+        if(this.state.bID=="") this.setState({ joinError:"Please enter a business ID"})
+        else if(this.state.bPass=="") this.setState({ joinError:"Please enter a business pass"})
+        else{
+            await this.props.bJoin(this.state.userData.email, this.state.bID, this.state.bPass)
+            if (this.props.bJoinError) {
+                this.setState({ joinError: this.props.bJoinError }, () => (console.log("This should have ran", this.state.joinError)))
+            }
+            else {
+                await this.props.bGet(this.state.userData.email, this.state.userData.token)
+                if (this.props.businessData) {
+                    this.setState({ businessList: this.props.businessData, joiningBusiness: false }, () => (console.log(this.props.businessData)))
+                }
             }
         }
     }
     onSelected = (viewport, item) => {
         console.log("TESTING",item)
-        this.setState({viewport})
+        this.setState({blong:item.center[1],blat:item.center[0],registerError:""})
+        this.changeBAddress(item.place_name)
         // this.setState({bAddress: item.place_name})
     }
     render() {
@@ -173,43 +189,42 @@ class HomePage extends Component {
                         <ManagedBusinessTable cUpdate={this.props.cUpdate} cInfo={this.props.cInfo} userData={this.props.userData} socket={this.props.socket} logout={this.logout} businessUpdate={this.businessUpdate} history={this.props.history} bDetails={this.props.bDetails} businessList={this.state.businessList} bView={this.props.bView} />
                     </div>
                     <div className="BusinessRegisterComponent">
-                        <Dialog open={this.state.registeringBusiness} onClose={this.cancelBReg} aria-labelledby="form-dialog-title">
+                        <Dialog
+                            fullWidth
+                            maxWidth="md"
+                            open={this.state.registeringBusiness} 
+                            onClose={this.cancelBReg} 
+                            aria-labelledby="form-dialog-title"
+                        >
                             <DialogTitle id="form-dialog-title">Business Registration</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
                                     Fill this out and bam you CREATE business hummie
                                 </DialogContentText>
-                                <div class="form_group field">
+                                {/* <div className="form_group field">
                                     <div>
                                         <form>
-                                            <div class="omrs-input-group">
-                                                <label onChange={this.changeBName} class="omrs-input-underlined">
+                                            <div className="omrs-input-group">
+                                                <label onChange={this.changeBName} className="omrs-input-underlined">
                                                 <input required/>
-                                                <span class="omrs-input-label">Normal</span>
+                                                <span className="omrs-input-label">Normal</span>
                                                 </label>
                                             </div>
                                         </form>
                                     </div>
-                                </div>
-                                {/* <TextField}
-                                    {/* autoFocus
+                                </div> */}
+                                <TextField
+                                    autoFocus
                                     margin="dense"
                                     id="BName"
                                     label="Business Name"
                                     type="string"
-                                    
                                     fullWidth
-                                /> */}
-                                <Geocoder
-                                    id="BAddress"
-                                    className="omrs-input-group"
-                                    {...mapAccess} hideOnSelect={false}
-                                    onSelected={this.onSelected}
-                                    value=""
-                                    queryParams={queryParams}
-                                    viewport={viewport}
+                                    onChange={this.changeBName}
+                                    
                                 />
-                                <TextField
+
+                                {/* <TextField
                                     autoFocus
                                     margin="dense"
                                     id="BAddress"
@@ -218,7 +233,7 @@ class HomePage extends Component {
                                     type="string"
                                     onChange={this.changeBAddress}
                                     fullWidth
-                                />
+                                /> */}
                                 <TextField
                                     autoFocus
                                     margin="dense"
@@ -228,7 +243,21 @@ class HomePage extends Component {
                                     onChange={this.changeBPass}
                                     fullWidth
                                 />
-                                {this.state.registerError}
+                                <div className="addrSearchBox">
+                                <DialogContentText>
+                                    Search and select your business address
+                                </DialogContentText>
+                                <Geocoder
+                                    id="BAddress"
+                                    {...mapAccess} hideOnSelect={false}
+                                    onSelected={this.onSelected}
+                                    value=""
+                                    queryParams={queryParams}
+                                    viewport={viewport}
+                                    updateInputOnSelect
+                                />
+                                </div>
+                                <div style={{color:"red"}}>{this.state.registerError}</div>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={this.cancelBReg} color="primary">
@@ -241,7 +270,11 @@ class HomePage extends Component {
                         </Dialog>
                     </div>
                     <div className="BusinessJoinComponent">
-                        <Dialog open={this.state.joiningBusiness} onClose={this.cancelBJoin} aria-labelledby="form-dialog-title">
+                        <Dialog
+                            open={this.state.joiningBusiness} 
+                            onClose={this.cancelBJoin} 
+                            aria-labelledby="form-dialog-title"
+                        >
                             <DialogTitle id="form-dialog-title">Joining a Business</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
@@ -265,7 +298,7 @@ class HomePage extends Component {
                                     onChange={this.changeBPass}
                                     fullWidth
                                 />
-                                {this.state.joinError}
+                                <div style={{color:"red"}}>{this.state.joinError}</div>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={this.cancelBJoin} color="primary">
