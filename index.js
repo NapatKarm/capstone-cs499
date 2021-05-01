@@ -172,6 +172,7 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
   let existing_user = await usersdb.where('email', '==', req.body.email.toLowerCase()).get(); // QuerySnapshot
   //For security reasons, you do not disclose whether email or password is invalid
   try {
+    console.log("SIGNIN", existing_user.empty)
     if(existing_user.empty) { 
       res.status(422).send('Invalid email or password');
     }
@@ -180,6 +181,7 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
     }
     else {
       let new_token = uuidv4();
+      console.log("TOKEN GENERATION:", new_token)
       let user_ref =  usersdb.doc(existing_user.docs[0].id);
       await user_ref.update({
         token : new_token
@@ -188,8 +190,8 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
       existing_user = existing_user.docs[0].data();
       delete existing_user['password'];
       delete existing_user['businessList'];
-      res.status(200).send(existing_user);
       console.log('Successful Log In')
+      res.status(200).send(existing_user);
     }
   } catch(error) {
     console.log(error);
@@ -541,6 +543,8 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
 // Get Single Business Data Endpoint
 app.post('/getSingleBusinessData', async (req, res) => {            //Expected: {business_id, email, token}
   let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
+  console.log("TOKEN:", req.body.token)
+  console.log("user_info.empty", user_info.empty)
   if (user_info.empty) {
     res.status(400).send("Incorrect Token");
     return;
@@ -552,6 +556,7 @@ app.post('/getSingleBusinessData', async (req, res) => {            //Expected: 
       is_member = true;
     }
   });
+  console.log("is_member", is_member)
   if (is_member == false) {
     res.status(400).send("Not a member of this business");
     return;
@@ -1046,7 +1051,17 @@ async function isPartofBusiness(businessId, socket_id){
 io.on('connection', (socket) => {
   console.log(`user ${socket.id} has connected`);
 
-  socket.leave(socket.id);
+  //socket.leave(socket.id);
+
+  socket.on('userInit', async ({email}) => {
+    // const json = JSON.stringify({
+    //   email: email,
+    //   socketId: socket.id
+    // })
+    // console.log(json)
+    await ioredis.set(socket.id, email)
+    await ioredis.set(email, socket.id)
+  })
 
   socket.on('openBusiness', async ({businessId, businessname, businessaddr, limit, email, token}) => {
     const json = JSON.stringify({
@@ -1085,12 +1100,7 @@ io.on('connection', (socket) => {
     if(await ioredis.exists(businessId)){
       console.log("join");
       socket.join(businessId);
-      const json = JSON.stringify({
-        email: email,
-        socketId: socket.id
-      });
       
-      await ioredis.set(socket.id, json);
       let business = await ioredis.get(businessId);
       let businessJson = JSON.parse(business);
 
@@ -1105,13 +1115,17 @@ io.on('connection', (socket) => {
   });
 
   socket.on('kickMember', async ({businessId, kickerEmail, kickeeEmail, token}) => {
-    if(await ioredis.exists(businessId)){
-      let user = await ioredis.get(socket.id);
-      if(user != null){
-        let userJson = JSON.parse(user);
-        io.to(userJson.socketId).emit('kicked', { success: "Success"})
-      }
-    }
+    // let user = await ioredis.get(socket.id);
+    // console.log("KICK MEMBER:", user)
+    // if(user != null){
+    //   let userJson = JSON.parse(user);
+    //   console.log("ID to be kicked", userJson.socketId)
+    //   io.to(userJson.socketId).emit('kicked', { success: "Success"})
+    // }
+    let kickeeId = await ioredis.get(kickeeEmail)
+    console.log("Email to be kicked", kickeeEmail)
+    console.log("ID to be kicked", kickeeId)
+    socket.to(kickeeId).emit('kicked', {success: "Success"})
 
     await axios.patch(`https://${process.env.EXPRESS_HOST}/kickMember`, {businessId: businessId, kickerEmail: kickerEmail, kickeeEmail: kickeeEmail, token: token})
     .then(res => {
@@ -1131,13 +1145,13 @@ io.on('connection', (socket) => {
 
       let time = Date();
 
-      let user = await ioredis.get(socket.id);
-      let userJson = JSON.parse(user);
+      // let user = await ioredis.get(socket.id);
+      // let userJson = JSON.parse(user);
 
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
         limit: businessJson.limit,
-        changerEmail: userJson.email,
+        changerEmail: await ioredis.get(socket.id),
         changerType: "Incremented",
         time: time
       });
@@ -1179,13 +1193,13 @@ io.on('connection', (socket) => {
 
       let time = Date();
 
-      let user = await ioredis.get(socket.id);
-      let userJson = JSON.parse(user);
+      // let user = await ioredis.get(socket.id);
+      // let userJson = JSON.parse(user);
 
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
         limit: businessJson.limit,
-        changerEmail: userJson.email,
+        changerEmail: await ioredis.get(socket.id),
         changerType: "Decremented",
         time: time
       });
@@ -1226,13 +1240,13 @@ io.on('connection', (socket) => {
 
       let time = Date();
 
-      let user = await ioredis.get(socket.id);
-      let userJson = JSON.parse(user);
+      // let user = await ioredis.get(socket.id);
+      // let userJson = JSON.parse(user);
 
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
         limit: businessJson.limit,
-        changerEmail: userJson.email,
+        changerEmail: await ioredis.get(socket.id),
         changerType: `Changed limit to ${businessJson.limit}`,
         time: time
       });
@@ -1264,7 +1278,6 @@ io.on('connection', (socket) => {
 
   socket.on('leaveBusiness', async ({businessId}) => {
     socket.leave(businessId);
-    await ioredis.del(socket.id);
   });
 
   socket.on('getAllData', async () => {
@@ -1293,9 +1306,10 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', async () => {
-    const user = await ioredis.get(socket.id);
-    if(user != null){
+    const userEmail = await ioredis.get(socket.id);
+    if(userEmail != null){
       await ioredis.del(socket.id);
+      await ioredis.del(userEmail);
     }
     console.log(`user ${socket.id} disconnected`);
   });
