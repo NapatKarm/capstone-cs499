@@ -483,82 +483,27 @@ app.delete('/businessDelete', async (req, res) => { // expected request: busines
   }
 });
 
-// app.get('/businessGraph', async (req, res) => {
-//   try {
-//     some_bus_id = await busdb.where('businessId', '==', req.body.businessId).get();
-        
-//     the_id = some_bus_id.docs[0].id;
-//     bus_logs = await busdb.doc(the_id)
-//       .collection('logs')
-//       .where('date', '==', req.body.date)
-//       .get();
-
-//     bus_data = bus_logs.docs[0].data();
-//     // bus_logs.forEach( (doc) => {
-//     //     console.log(doc.data())
-//     // });
-//     console.log(bus_logs.size);
-//     console.log(bus_data);
-//     res.send(bus_data);
-//   } catch(error) {
-//       console.log(error);
-//   }
-// });
-
-//{
-//     "actions": [
-//         {
-//             "email" : "whateveremail@email.com"
-//             "actiontype" : "Increment",
-//             "time" : "18:06:42",
-
-//         },
-//         {
-//             "email" : "whateveremail@email.com"
-//             "actiontype" : "Decrement",
-//             "time" : "18:06:42",
+app.get('/businessGraph', async (req, res) => {
+    try {
+        some_bus_id = await busdb.where('businessId', '==', req.body.businessId).get();
             
-//         },
-//                 {
-//             "email" : "whateveremail@email.com"
-//             "actiontype" : "Increment",
-//             "time" : "18:06:42",
+        the_id = some_bus_id.docs[0].id;
+        bus_logs = await busdb.doc(the_id)
+            .collection('logs')
+            .where('date', '==', req.body.date)
+            .get();
 
-//         },
-//         {
-//             "email" : "whateveremail@email.com"
-//             "actiontype" : "Decrement",
-//             "time" : "18:06:42",
-            
-//         },
-//                 {
-//             "email" : "whateveremail@email.com"
-//             "actiontype" : "Increment",
-//             "time" : "19:06:42",
-
-//         },
-//         {
-//             "email" : "whateveremail@email.com"
-//             "actiontype" : "Decrement",
-//             "time" : "19:06:42",
-            
-//         },
-//                 {
-//             "email" : "whateveremail@email.com"
-//             "actiontype" : "Increment",
-//             "time" : "19:06:42",
-
-//         },
-//         {
-//             "email" : "whateveremail@email.com"
-//             "actiontype" : "Decrement",
-//             "time" : "19:06:42",
-            
-//         },
-//     ],
-//     "date": "May 03 2021"
-// }
-
+        bus_data = bus_logs.docs[0].data();
+        // bus_logs.forEach( (doc) => {
+        //     console.log(doc.data())
+        // });
+        console.log(bus_logs.size);
+        console.log(bus_data);
+        res.send(bus_data);
+    } catch(error) {
+        console.log(error);
+    }
+});
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`App is listening on Port ${port}`));
