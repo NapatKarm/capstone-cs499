@@ -1079,6 +1079,20 @@ io.on('connection', (socket) => {
     .catch(err => {
       socket.emit('openResponse', {error: "Error"});
     })
+
+    let time = Date(); 
+
+    let today = time.getMonth() + '/' + time.getDay() + '/' + time.getYear();
+    busInfo = await busdb.where('businessId', '==', businessId).get();
+    busRef = busdb.doc(busInfo.docs[0].id);
+    busLogs = await busRef.collection('logs').where('date', '==', today).get();
+    if (busLogs.empty) {
+      let logs = {
+        'date' : today,
+        'actions' : []
+      };
+      await busRef.collection('logs').add(logs);
+    }
     console.log("open");
   });
 
@@ -1150,7 +1164,20 @@ io.on('connection', (socket) => {
 
       let businessDoc = await busdb.where('businessId', '==', businessId).get();
       let businessLogRef = busdb.doc(businessDoc.docs[0].id).collection('logs');
-      
+      let today = time.getMonth() + '/' + time.getDay() + '/' + time.getYear();
+      let businessInfo = await busdb.where('businessId', '==', businessId).get();
+      let businessRef = busdb.doc(businessInfo.docs[0].id).collection('logs');
+      let businessLogRef = await businessRef.where('date', '==', today).get();
+
+      time = Date();
+      let actionData = {
+        'email' : await ioredis.get(socket.id),
+        'type' : 'increment',
+        'time' : time.getHours() + ':' + time.getMinutes() + ':' + time.getSeconds()
+      };
+      businessLogRef.update({
+        actions : admin.firestore.FieldValue.arrayUnion(actionData)
+      });
 
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
