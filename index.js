@@ -23,6 +23,13 @@ const busdb = db.collection('business');
 
 // Default testing endpoint
 app.get('/', async function (req, res) {
+  let data = {
+    'test' : 1,
+    'param2' : 2
+  };
+  let test = await busdb.add(data);
+  let test_ref = await test.collection('logs').add(data);
+  console.log(test_ref);
   // user_info = await usersdb.where('email', '==', req.body.email).get();
   // user_bus = await busdb.where('bussinessid', 'in', user_info.docs[0].get(businessList)).get();
   // user_bus.forEach(doc => {
@@ -108,7 +115,11 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
 
 // Business Register Endpoint
 app.post('/businessRegister', async (req, res) => {     //Expected request: { businessname, businessaddr, owner_email, businesspass, first name, last name} (owner: email?)
-  const existing_business = await busdb.where('businessaddr', '==', req.body.businessaddr).get();  //
+  const existing_business = await busdb
+    .where('businessaddr', '==', req.body.businessaddr)
+    .where('lat', '==', req.body.lat)
+    .where('long', '==', req.body.long)
+    .get();  
   const owner = await usersdb.where('email','==', req.body.email.toLowerCase()).get();                           // Owner's Information
   if (!existing_business.empty) {   //Business already registered, cannot have 2 businessList on same address
     res.status(400).send('Business Already Registered');
@@ -131,7 +142,17 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
           'role': 'Owner'
         }]
       }
-      await busdb.add(businessInfo); 
+
+      // When calling db.collection(), a collection is created if it does not exist. 
+      bus_ref = await busdb.add(businessInfo); 
+      let businessLogs = {
+        'date' : "",
+        'actions' : []
+      };
+      bus_logs = await bus_ref
+        .collection('logs')
+        .add(businessLogs);
+
       let counter_ref = busdb.doc("INCREMENTING_COUNTER");
       await counter_ref.update({ 
         counter: admin.firestore.FieldValue.increment(1)   // Really not intuitive because its different if using admin SDK 
@@ -141,6 +162,7 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
       await owner_ref.update({
         businessList: admin.firestore.FieldValue.arrayUnion(businessInfo.businessId)
       });
+
       res.status(200).send("Success");
     } catch(error) {
       console.log(error);
