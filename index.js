@@ -222,7 +222,7 @@ app.get('/getBusinessData', async (req, res) => {                   //Expected R
       let query_array = [];
       const user_bus_list = user_info.docs[0].get('businessList');
   
-      for (let i = 0; i < Math.ceil( user_info.docs[0].get('businessList').length / 10 ); i++) {
+      for (let i = 0; i < Math.ceil( user_info.docs[0].get('businessList').length / 10 ); i++) {  // Handle membership of > 10 businesses
         let j = 0;
         let k = 9;
         if (user_bus_list.length < 10) {
