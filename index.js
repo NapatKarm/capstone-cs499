@@ -170,7 +170,6 @@ app.post('/businessRegister', async (req, res) => {     //Expected request: { bu
   }
 });
 
-// I think it works
 app.post('/businessJoin', async (req, res) => {                    //Expected request: {email, businesspass, businessId}
   const existing_business = await busdb.where('businesspass', '==', req.body.businesspass).where('businessId', '==', req.body.businessId).get();
   if (existing_business.empty) {                                       // Non-existing Business, false = empty document
@@ -235,7 +234,11 @@ app.get('/getBusinessData', async (req, res) => {                   //Expected R
           bus_info.push(doc.data())
         });
         j = j + 9;
-        k = j + 10;
+        if (j + 10 > user_bus_list.length) {  // If the range extends the length of the array, set k equal to the remaining elements
+          k = user_bus_list.length - j - 1
+        } else {
+          k =  j + 10;
+        }
       }
       res.status(200).send(bus_info);   //Response: {businessList[{business_id, businessname, businessaddr, businesspass, memberList[{firstname, lastname, email, role}]}]}
     } catch (error) {
