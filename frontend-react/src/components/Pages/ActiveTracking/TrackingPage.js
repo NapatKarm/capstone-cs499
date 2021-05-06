@@ -14,7 +14,8 @@ import IconButton from '@material-ui/core/IconButton';
 import './TrackingPage.css';
 import ReactMapGL, {Marker} from 'react-map-gl';
 import PopupComponent from './PopupComponent';
-// import Geocoder from 'react-mapbox-gl-geocoder';
+import Geocoder from 'react-mapbox-gl-geocoder'
+import {mapAccess,queryParams} from '../SharedComponent/Shared';
 
 const mapStyle = {
     width: '80%',
@@ -34,6 +35,7 @@ class TrackingPage extends Component {
             searched: "",
             searchedVal: "",
             selectedBusiness: "",
+            addrSelection: undefined,
             viewport: {
                 latitude: 40.767824,
                 longitude: -73.964216,
@@ -72,7 +74,8 @@ class TrackingPage extends Component {
                 ...this.state.viewport,
                 latitude: lat,
                 longitude: long
-            }
+            },
+            addrSelection: undefined
         })
     }
     cancelSearch = () => {
@@ -85,12 +88,16 @@ class TrackingPage extends Component {
     businessMarker = (business) => {
         this.setState({markerPopupState: "true", businessDetails: business})
     }
+    onSelected = (viewport,item) => {
+        this.setState({viewport, addrSelection:viewport})
 
+    }
     render() {
         const { viewport } = this.state;
         return (
             <div className="TrackingBody">
                 <div className="mapSide">
+
                     <ReactMapGL
                         mapboxApiAccessToken={mapboxApiKey}
                         mapStyle="mapbox://styles/mapbox/light-v10"
@@ -124,7 +131,12 @@ class TrackingPage extends Component {
                                                     // }},
                                             )
                     ):("")}
-
+                    { this.state.addrSelection ? 
+                    (   <Marker 
+                        longitude={this.state.addrSelection.longitude}
+                        latitude={this.state.addrSelection.latitude}>
+                        <div className="cmarker temporary cmarker"><span ><div className="markerText">X</div></span></div>
+                        </Marker>):("")}
                     </ReactMapGL>
                 </div>
                 <div>
@@ -186,8 +198,23 @@ class TrackingPage extends Component {
                                 </Table>
                             </TableContainer>
                         </Paper>
+
                     </div>
+
                 </div>
+                <div className="addrSearchBar">
+                    <div className="actualSearch">
+                    <Geocoder
+                        id="BAddress"
+                        {...mapAccess} hideOnSelect={false}
+                        onSelected={this.onSelected}
+                        value=""
+                        queryParams={queryParams}
+                        viewport={viewport}
+                        updateInputOnSelect
+                    />
+                    </div>
+                    </div>
             </div>
         )
     }
