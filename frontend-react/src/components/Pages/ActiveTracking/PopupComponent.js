@@ -114,7 +114,7 @@ class PopupComponent extends Component {
         <div className="display-popup">
             <div className="pop-up-header"><h1>{this.props.businessDetails.businessname}</h1></div>
             <div className="displayMax-popup">
-                <div><b>Remaining Space: {this.props.businessDetails.counter}</b><br/>
+                <div><b>Current Occupants: {this.props.businessDetails.counter}</b><br/>
                     <b>Maximum Capacity: {this.props.businessDetails.limit}</b></div>
             </div>
             <div className="circleProgress-popup">
@@ -127,8 +127,6 @@ class PopupComponent extends Component {
                 {/* <div className="whiteCircle-popup"></div> */}
             </div>
             <div className="bottomDiv-popup"><p>Address: {this.props.businessDetails.businessaddr}</p></div>
-            
-            {console.log(this.props.businessDetails)}
         </div>
     )
   };
