@@ -30,9 +30,16 @@
 }
 
 .actionButton {
-    width: 100%;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
+}
+
+.registerButton {
+    margin-right: 0.2rem!important;
+}
+
+.loginButton {
+    margin-left: 0.2rem!important;
 }
 
 .leftSide {
