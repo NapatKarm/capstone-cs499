@@ -91,12 +91,12 @@ class TrackingPage extends Component {
         this.props.socket.emit("getAllData")
     }
     businessMarker = (business) => {
-        console.log("Business",business)
-        let location = {
-            latitude: business.lat,
-            longitude: business.long
-        }
-        this.setState({markerPopupState: "true", businessDetails: business, addrSelection:location})
+        // console.log("Business",business)
+        // let location = {
+        //     latitude: business.lat,
+        //     longitude: business.long
+        // }
+        this.setState({markerPopupState: "true", businessDetails: business,selectedBusiness:business.businessId})
     }
     onSelected = (viewport,item) => {
         if(this.state.businessList.length>0){
