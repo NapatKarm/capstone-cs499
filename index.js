@@ -1080,9 +1080,22 @@ io.on('connection', (socket) => {
       socket.emit('openResponse', {error: "Error"});
     })
 
-    let time = Date(); 
+    let time = new Date(); 
+    if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
+        let month = '0' + time.getMonth();
+    }
+    else {
+        let month = time.getMonth();
+    }
+    if (time.getDate() < 10) {
+        let day = '0' + time.getDate();
+    }
+    else {
+        let day = time.getDate();
+    }
+    let today = month + '/' + day + '/' + time.getYear();
 
-    let today = time.getMonth() + '/' + time.getDay() + '/' + time.getYear();
+
     busInfo = await busdb.where('businessId', '==', businessId).get();
     busRef = busdb.doc(busInfo.docs[0].id);
     busLogs = await busRef.collection('logs').where('date', '==', today).get();
