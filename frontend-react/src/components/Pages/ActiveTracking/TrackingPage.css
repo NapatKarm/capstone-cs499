@@ -141,7 +141,6 @@
 .businessCell:active {
   background-color: #313131 !important;
 }
-
 .markerPopup {
   width: 30%;
   height: 25%;
@@ -169,4 +168,3 @@
 .lineBar{
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-}
