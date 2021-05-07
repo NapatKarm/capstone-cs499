@@ -23,6 +23,42 @@ const busdb = db.collection('business');
 
 // Default testing endpoint
 app.get('/', async function (req, res) {
+  let businessId = 10;
+  let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
+  let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
+  hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
+  hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
+  let month, day = "";
+  let time = new Date();
+
+  if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
+    month = '0' + ( time.getMonth() + 1 );
+  }
+  else {
+    month = time.getMonth();
+  }
+  if (time.getDate() < 10) {
+    day = '0' + time.getDate();
+  }
+  else {
+    day = time.getDate();
+  }
+  let today = month + '/' + day + '/' + time.getFullYear();
+
+  let businessInfo = await busdb.where('businessId', '==', businessId).get();  
+  let businessLogRef = busdb.doc(businessInfo.docs[0].id).collection('logs');                            
+  let todaysLog = await businessLogRef.where('date', '==', today).get();
+  let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
+
+  let actionData = {
+    'email' : "email",
+    'type' : 0,
+    'time' : hourFormat,
+    'utc' : currentTimeUTC  
+  };
+  todaysLogRef.update({
+    actions : admin.firestore.FieldValue.arrayUnion(actionData)
+  });
 //   let data = {
 //     'test' : 1,
 //     'param2' : 2
