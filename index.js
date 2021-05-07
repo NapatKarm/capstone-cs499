@@ -1081,19 +1081,20 @@ io.on('connection', (socket) => {
     })
 
     let time = new Date(); 
+    let month, day = "";
     if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
-        let month = '0' + time.getMonth();
+      month = '0' + ( time.getMonth() + 1 );
     }
     else {
-        let month = time.getMonth();
+      month = time.getMonth();
     }
     if (time.getDate() < 10) {
-        let day = '0' + time.getDate();
+      day = '0' + time.getDate();
     }
     else {
-        let day = time.getDate();
+      day = time.getDate();
     }
-    let today = month + '/' + day + '/' + time.getYear();
+    let today = month + '/' + day + '/' + time.getFullYear();
 
 
     busInfo = await busdb.where('businessId', '==', businessId).get();
