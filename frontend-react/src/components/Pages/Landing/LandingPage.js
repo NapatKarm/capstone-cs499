@@ -40,7 +40,7 @@ class LandingPage extends Component {
                                 Welcome to C-Vivid
                             </div>
                             <div className="aboutP">
-                                <p>Some two line preach about nothing at all in general - lorum ipsum dolar sit amet, consectetur adipiscing elit. Proin phareta lorem aba aba aba</p>
+                                <p>C-Vivid is a capacity management app aiming to broadcast exact population within stores. Although created for usage during the 2020-2021 Coronavirus pandemic, this app makes it easier to monitor population and prepare routes before heading out.</p>
                             </div>
 
                             {/* vvv Link page vvv*/}

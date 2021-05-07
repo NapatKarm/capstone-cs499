@@ -30,9 +30,9 @@
 }
 
 .actionButton {
-    width: 325px;
+    width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
 }
 
 .leftSide {
@@ -40,7 +40,7 @@
     flex-direction: column;
     text-align: center;
     font-size: 12px;
-    width: 325px;
+    width: 50vh;
     padding-left: 50px;
     padding-top: 50px;
 }
@@ -97,7 +97,6 @@
     align-self: left!important;
     text-align: left !important;
     padding-bottom: 25px;
-
 }
 
 .errorText {
