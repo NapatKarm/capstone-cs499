@@ -31,32 +31,31 @@ app.get('/', async function (req, res) {
 //   let test_ref = await test.collection('logs').add(data);
 //   console.log(test_ref);
 
-    let currentTimeUTC = Date.now()                        // currentTime in UTC
+    let currentTimeUTC = Date.now();                        // currentTime in UTC
     let hourFormat = new Date(0);                          // Sets the date to start
-    hourFormat.setUTCMilliseconds(currentTimeUTC);         // Add offset to make it current time
-    hourFormat = hourFormat.toLocaleTimeString('en-GB');   // HH:MM:SS format (24 hour)
+    hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
+    hourFormat = hourFormat.toLocaleTimeString('en-GB');   // HH:MM:SS format (24 hour), en-GB = English Great Britain
 
+    let today = 
 
 
     let businessInfo = await busdb.where('businessId', '==', req.body.businessId).get();  
     let businessLogRef = busdb
-        .doc(businessDoc.docs[0].id)
-        .collection('logs');                            
-    let businessRef = busdb
         .doc(businessInfo.docs[0].id)
-        .collection('logs');
-    let businessLogRef = await businessRef.where('date', '==', today).get();
+        .collection('logs');                            
+    let todaysLog = await businessLogRef.where('date', '==', today).get();
 
     time = Date();
     let actionData = {
         'email' : "email",
         'type' : 1,
         'time' : hourFormat,
-        'utc' : currentTimeUTC
+        'utc' : currentTimeUTC  
     };
-    businessLogRef.update({
-    actions : admin.firestore.FieldValue.arrayUnion(actionData)
+    todaysLog.update({
+        actions : admin.firestore.FieldValue.arrayUnion(actionData)
     });
+    res.send("Good");
   // user_info = await usersdb.where('email', '==', req.body.email).get();
   // user_bus = await busdb.where('bussinessid', 'in', user_info.docs[0].get(businessList)).get();
   // user_bus.forEach(doc => {
