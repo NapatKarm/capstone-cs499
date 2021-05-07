@@ -1254,7 +1254,7 @@ io.on('connection', (socket) => {
         await ioredis.decr(businessId.toString()+"counter");
       }
 
-      let time = Date();
+      
 
       // let user = await ioredis.get(socket.id);
       // let userJson = JSON.parse(user);
@@ -1295,6 +1295,7 @@ io.on('connection', (socket) => {
         actions : admin.firestore.FieldValue.arrayUnion(actionData)
       });
 
+      time = Date();
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
         limit: businessJson.limit,
