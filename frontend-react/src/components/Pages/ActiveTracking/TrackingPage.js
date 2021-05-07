@@ -45,13 +45,18 @@ class TrackingPage extends Component {
     }
 
     componentDidMount = () => {
+        this.props.socket.emit("getAllData")
         this.props.socket.on("updateMap", ({ allData }) => {
-            console.log("from UPDATE MAP", allData)
+            //console.log("from UPDATE MAP", allData)
             this.setState({ businessList: allData }, () => { 
                 const filteredRows = this.state.businessList.filter((row) => {
                     return row.businessname.toLowerCase().includes(this.state.searchedVal.toLowerCase());
                 });
                 this.setState({ filterBList: filteredRows })
+                if(this.state.businessDetails!=undefined){
+                    let tempBusiness = this.state.businessList.find(business => business.businessId == this.state.businessDetails.businessId)
+                    this.setState({businessDetails:tempBusiness})
+                }
             })
         })
     }
@@ -86,10 +91,22 @@ class TrackingPage extends Component {
         this.props.socket.emit("getAllData")
     }
     businessMarker = (business) => {
-        this.setState({markerPopupState: "true", businessDetails: business})
+        console.log("Business",business)
+        let location = {
+            latitude: business.lat,
+            longitude: business.long
+        }
+        this.setState({markerPopupState: "true", businessDetails: business, addrSelection:location})
     }
     onSelected = (viewport,item) => {
-        this.setState({viewport, addrSelection:viewport})
+        if(this.state.businessList.length>0){
+            let SBusiness = this.state.businessList.find(business => (business.long == viewport.longitude && business.lat == viewport.latitude))
+            if(SBusiness!=undefined){
+                this.setState({viewport,selectedBusiness:SBusiness.businessId})
+            }
+            else this.setState({viewport, addrSelection:viewport,selectedBusiness:undefined})
+        }
+        else this.setState({viewport, addrSelection:viewport,selectedBusiness:undefined})
 
     }
     render() {
