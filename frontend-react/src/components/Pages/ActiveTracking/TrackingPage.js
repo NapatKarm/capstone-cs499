@@ -14,7 +14,8 @@ import IconButton from '@material-ui/core/IconButton';
 import './TrackingPage.css';
 import ReactMapGL, {Marker} from 'react-map-gl';
 import PopupComponent from './PopupComponent';
-// import Geocoder from 'react-mapbox-gl-geocoder';
+import Geocoder from 'react-mapbox-gl-geocoder'
+import {mapAccess,queryParams} from '../SharedComponent/Shared';
 
 const mapStyle = {
     width: '80%',
@@ -29,11 +30,11 @@ class TrackingPage extends Component {
         this.state = {
             filterBList: [],
             businessList: [],
-            businessDetails: undefined,
-            markerPopupState: "false",
+            businessDetails: false,
             searched: "",
             searchedVal: "",
             selectedBusiness: "",
+            addrSelection: undefined,
             viewport: {
                 latitude: 40.767824,
                 longitude: -73.964216,
@@ -43,13 +44,18 @@ class TrackingPage extends Component {
     }
 
     componentDidMount = () => {
+        this.props.socket.emit("getAllData")
         this.props.socket.on("updateMap", ({ allData }) => {
-            console.log("from UPDATE MAP", allData)
+            //console.log("from UPDATE MAP", allData)
             this.setState({ businessList: allData }, () => { 
                 const filteredRows = this.state.businessList.filter((row) => {
                     return row.businessname.toLowerCase().includes(this.state.searchedVal.toLowerCase());
                 });
                 this.setState({ filterBList: filteredRows })
+                if(this.state.businessDetails!=undefined){
+                    let tempBusiness = this.state.businessList.find(business => business.businessId == this.state.businessDetails.businessId)
+                    this.setState({businessDetails:tempBusiness})
+                }
             })
         })
     }
@@ -72,7 +78,8 @@ class TrackingPage extends Component {
                 ...this.state.viewport,
                 latitude: lat,
                 longitude: long
-            }
+            },
+            addrSelection: undefined
         })
     }
     cancelSearch = () => {
@@ -83,14 +90,37 @@ class TrackingPage extends Component {
         this.props.socket.emit("getAllData")
     }
     businessMarker = (business) => {
-        this.setState({markerPopupState: "true", businessDetails: business})
+        // console.log("Business",business)
+        // let location = {
+        //     latitude: business.lat,
+        //     longitude: business.long
+        // }
+        this.setState({markerPopupState: true, businessDetails: business,selectedBusiness:business.businessId})
     }
+    onSelected = (viewport,item) => {
+        if(this.state.businessList.length>0){
+            let SBusiness = this.state.businessList.find(business => (business.long == viewport.longitude && business.lat == viewport.latitude))
+            if(SBusiness!=undefined){
+                this.setState({viewport,selectedBusiness:SBusiness.businessId})
+            }
+            else this.setState({viewport, addrSelection:viewport,selectedBusiness:undefined})
+        }
+        else this.setState({viewport, addrSelection:viewport,selectedBusiness:undefined})
 
+    }
+    leftOver = (number) =>{
+        if(number<0) return 0;
+        return number
+    }
+    closePop = () => {
+        this.setState({markerPopupState:false})
+    }
     render() {
         const { viewport } = this.state;
         return (
             <div className="TrackingBody">
                 <div className="mapSide">
+
                     <ReactMapGL
                         mapboxApiAccessToken={mapboxApiKey}
                         mapStyle="mapbox://styles/mapbox/light-v10"
@@ -108,7 +138,7 @@ class TrackingPage extends Component {
                                                         latitude={business.lat}
                                                         onClick={()=>this.businessMarker(business)}
                                                     >
-                                                        <div className="cmarker temporary cmarker"><span ><div className="markerText">{business.limit-business.counter}</div></span></div>
+                                                        <div className="cmarker temporary cmarker"><span ><div className="markerText">{this.leftOver(business.limit-business.counter)}</div></span></div>
                                                     </Marker>
                                                     ):(
                                                         <Marker
@@ -116,7 +146,7 @@ class TrackingPage extends Component {
                                                         latitude={business.lat}
                                                         onClick={()=>this.businessMarker(business)}
                                                     >
-                                                        <div className="marker temporary marker"><span ><div className="markerText">{business.limit-business.counter}</div></span></div>
+                                                        <div className="marker temporary marker"><span ><div className="markerText">{this.leftOver(business.limit-business.counter)}</div></span></div>
                                                     </Marker>
                                                     )//, ()=>{
                                                     //     if(business.businessId == this.state.businessDetails.businessId){
@@ -124,11 +154,16 @@ class TrackingPage extends Component {
                                                     // }},
                                             )
                     ):("")}
-
+                    { this.state.addrSelection ? 
+                    (   <Marker 
+                        longitude={this.state.addrSelection.longitude}
+                        latitude={this.state.addrSelection.latitude}>
+                        <div className="cmarker temporary cmarker"><span ><div className="markerText">X</div></span></div>
+                        </Marker>):("")}
                     </ReactMapGL>
                 </div>
                 <div>
-                    {this.state.markerPopupState==="false" ? ("") : (<div className="markerPopup"><PopupComponent businessDetails={this.state.businessDetails}/></div>)}
+                    {!this.state.markerPopupState ? ("") : (<div className="markerPopup"><PopupComponent closePop={()=>this.closePop()}businessDetails={this.state.businessDetails}/></div>)}
                 </div>
                 <div className="leftSide-map">
                     <div className="topButtons trackTopButtons">
@@ -150,12 +185,6 @@ class TrackingPage extends Component {
                             <TableContainer className="trackTable">
                                 <Table className="searchTable">
                                     <TableHead>
-                                        {/* <TableRow>
-                                            <TableCell className="tableText large-text">BUSINESS NAME</TableCell>
-                                            <TableCell className="tableText large-text">ADDRESS</TableCell>
-                                            <TableCell className="tableText large-text">CURRENT CAPACITY</TableCell>
-                                            <TableCell className="tableText large-text">MAX CAPACITY</TableCell>
-                                        </TableRow> */}
                                     </TableHead>
                                     <TableBody className="bListTable">
                                         {this.state.filterBList.length!=0 ? (
@@ -167,7 +196,7 @@ class TrackingPage extends Component {
                                                             {business.businessaddr}
                                                         </div>
                                                         <div>
-                                                            Spaces Left: {business.limit-business.counter}
+                                                            Spaces Left: {this.leftOver(business.limit-business.counter)}
                                                         </div>
                                                     </TableCell>
                                                 </TableRow>
@@ -186,7 +215,9 @@ class TrackingPage extends Component {
                                 </Table>
                             </TableContainer>
                         </Paper>
+
                     </div>
+
                 </div>
                 <div className="addrSearchBar">
                     <div className="actualSearch" style={{ boxShadow:'3px 5px 5px 0px gray', borderRadius: '15px'}}>

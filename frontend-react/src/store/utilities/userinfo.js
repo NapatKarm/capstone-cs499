@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {Endpoint} from '../../components/Endpoint';
+import socket from '../../components/socket'; 
 
 // Action Types
 const USER_SIGNUP = "USER_SIGNUP";
@@ -95,6 +96,7 @@ export const userLoginThunk = (email,password) => async (dispatch) => {
         })
         .then(res => {
             console.log("Response from login",res);
+            socket.emit('userInit', { email:email })
             dispatch(userLogin(res.data));
         })
         .catch(err => {

@@ -71,135 +71,110 @@
 .marker {
     width:0;
     height:0;
-  }
+}
   
-  .marker  span {
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    box-sizing:border-box;
-    width: 30px;
-    height: 30px;
-    color:#fff;
-    background: #4D2D73;
-    border:solid 2px;
-    border-radius: 0 70% 70%;
-    box-shadow:0 0 2px #000;
-    cursor: pointer;
-    transform-origin:0 0;
-    transform: rotateZ(-135deg);
-  }
-  
-  .marker b {
-    transform: rotateZ(135deg)
-  }
-  .markerText {
-      transform: rotateZ(135deg) !important
-  }
-  .temporary-marker span {
-    background: #D3D3D3;
-  }
-  .cmarker {
-    width:0;
-    height:0;
-  }
-  
-  .cmarker  span {
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    box-sizing:border-box;
-    width: 30px;
-    height: 30px;
-    color:#fff;
-    background: #d31919;
-    border:solid 2px;
-    border-radius: 0 70% 70%;
-    box-shadow:0 0 2px #000;
-    cursor: pointer;
-    transform-origin:0 0;
-    transform: rotateZ(-135deg);
-  }
-  
-  .cmarker b {
-    transform: rotateZ(135deg)
-  }
-  .cmarkerText {
-      transform: rotateZ(135deg) !important
-  }
-  .temporary-cmarker span {
-    background: #D3D3D3;
-  }
-  .businessHeader {
-      font-weight: bold;
-      font-size: 20px;
-      padding-bottom: 2%;
-  }
-
-  .businessCell {
-    color: white !important;
-    transition: 0.2s;
-  }
-  .businessCell:hover {
-    background-color: #242424 !important;
-  }
-  .businessCell:active {
-    background-color: #313131 !important;
-  }
-
-  .markerPopup {
-    width: 25%;
-    align-self: center;
-    height: 50%;
-    bottom: 5%;
-    margin-left: 73%;
-    padding: 0 !important;
-    color: white;
-    text-align: center;
-    background-color: #191919 !important;
-    border-radius: 15px;
-    position: absolute;
-    z-index: 0!important; 
-  }
-
-  .circle-popup {
-    position: absolute;
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    top: 55%;
-    left: 55%;
-    margin-top: -50px;
-    margin-left: -50px;
-    width: 75px !important;
-    height: 75px !important;
-    z-index: 2!important;
+.marker  span {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  box-sizing:border-box;
+  width: 30px;
+  height: 30px;
+  color:#fff;
+  background: #4D2D73;
+  border:solid 2px;
+  border-radius: 0 70% 70%;
+  box-shadow:0 0 2px #000;
+  cursor: pointer;
+  transform-origin:0 0;
+  transform: rotateZ(-135deg);
 }
 
-  .circleUnder-popup {
-    position: absolute;
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    top: 55%;
-    left: 55%;
-    margin-top: -50px;
-    margin-left: -50px;
-    width: 75px!important;
-    height: 75px!important;
-    z-index: 1!important;
+.marker b {
+  transform: rotateZ(135deg)
+}
+.markerText {
+    transform: rotateZ(135deg) !important
+}
+.temporary-marker span {
+  background: #D3D3D3;
+}
+.cmarker {
+  width:0;
+  height:0;
 }
 
-.circleProgress-popup {
-    height: 75px!important;
-    width: 75px!important;
+.cmarker  span {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  box-sizing:border-box;
+  width: 30px;
+  height: 30px;
+  color:#fff;
+  background: #d31919;
+  border:solid 2px;
+  border-radius: 0 70% 70%;
+  box-shadow:0 0 2px #000;
+  cursor: pointer;
+  transform-origin:0 0;
+  transform: rotateZ(-135deg);
 }
 
-.circleFont-popup {
-    font-size: 15px!important;
-    opacity: 100%!important;
+.cmarker b {
+  transform: rotateZ(135deg)
+}
+.cmarkerText {
+    transform: rotateZ(135deg) !important
+}
+.temporary-cmarker span {
+  background: #D3D3D3;
+}
+.businessHeader {
+    font-weight: bold;
+    font-size: 20px;
+    padding-bottom: 2%;
 }
 
-.bottomDiv-popup {
-    bottom: 10px;
+.businessCell {
+  color: white !important;
+  transition: 0.2s;
+}
+.businessCell:hover {
+  background-color: #242424 !important;
+}
+.businessCell:active {
+  background-color: #313131 !important;
+}
+.markerPopup {
+  width: 30%;
+  height: 25%;
+  bottom: 5%;
+  margin-left: 67%;
+  padding: 1rem !important;
+  color: white;
+  background-color: #191919 !important;
+  border-radius: 15px;
+  position: absolute;
+  z-index: 0!important; 
+}
+.popupHeader{
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight:bold;
+  font-size: xx-large;
+  padding-bottom: 0.25rem;
+}
+.lineInfo{
+  display:flex;
+  justify-content: space-between;
+}
+.lineBar{
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+.bottomRow{
+  margin-top: 1rem;
+  font-weight: bold;
 }
