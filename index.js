@@ -1196,7 +1196,7 @@ io.on('connection', (socket) => {
       }
       let today = month + '/' + day + '/' + time.getFullYear();
   
-      let businessInfo = await busdb.where('businessId', '==', req.body.businessId).get();  
+      let businessInfo = await busdb.where('businessId', '==', businessId).get();  
       let businessLogRef = busdb.doc(businessInfo.docs[0].id).collection('logs');                            
       let todaysLog = await businessLogRef.where('date', '==', today).get();
       let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
@@ -1280,7 +1280,7 @@ io.on('connection', (socket) => {
       }
       let today = month + '/' + day + '/' + time.getFullYear();
   
-      let businessInfo = await busdb.where('businessId', '==', req.body.businessId).get();  
+      let businessInfo = await busdb.where('businessId', '==', businessId).get();  
       let businessLogRef = busdb.doc(businessInfo.docs[0].id).collection('logs');                            
       let todaysLog = await businessLogRef.where('date', '==', today).get();
       let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
@@ -1294,7 +1294,7 @@ io.on('connection', (socket) => {
       todaysLogRef.update({
         actions : admin.firestore.FieldValue.arrayUnion(actionData)
       });
-      
+
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
         limit: businessJson.limit,
