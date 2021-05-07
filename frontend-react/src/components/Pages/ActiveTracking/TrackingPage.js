@@ -179,12 +179,6 @@ class TrackingPage extends Component {
                             <TableContainer className="trackTable">
                                 <Table className="searchTable">
                                     <TableHead>
-                                        {/* <TableRow>
-                                            <TableCell className="tableText large-text">BUSINESS NAME</TableCell>
-                                            <TableCell className="tableText large-text">ADDRESS</TableCell>
-                                            <TableCell className="tableText large-text">CURRENT CAPACITY</TableCell>
-                                            <TableCell className="tableText large-text">MAX CAPACITY</TableCell>
-                                        </TableRow> */}
                                     </TableHead>
                                     <TableBody className="bListTable">
                                         {this.state.filterBList.length!=0 ? (
