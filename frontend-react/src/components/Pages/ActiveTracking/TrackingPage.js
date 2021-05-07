@@ -196,7 +196,7 @@ class TrackingPage extends Component {
                                                             {business.businessaddr}
                                                         </div>
                                                         <div>
-                                                            Spaces Left: {business.limit-business.counter}
+                                                            Spaces Left: {this.leftOver(business.limit-business.counter)}
                                                         </div>
                                                     </TableCell>
                                                 </TableRow>

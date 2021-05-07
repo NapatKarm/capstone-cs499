@@ -57,11 +57,14 @@ class PopupComponent extends Component {
         </div>
         <div className="lineInfo">
           <div>
-            Current Occupants: {this.props.businessDetails.counter}
+            Occupants: {this.props.businessDetails.counter}
           </div>
           <div>
-            Maximum Capacity: {this.props.businessDetails.limit}
+            Capacity: {this.props.businessDetails.limit}
           </div>
+        </div>
+        <div className="bottomRow">
+          Spaces Left: {this.props.businessDetails.limit-this.props.businessDetails.counter}
         </div>
         
       </div>
