@@ -30,8 +30,7 @@ class TrackingPage extends Component {
         this.state = {
             filterBList: [],
             businessList: [],
-            businessDetails: undefined,
-            markerPopupState: "false",
+            businessDetails: false,
             searched: "",
             searchedVal: "",
             selectedBusiness: "",
@@ -96,7 +95,7 @@ class TrackingPage extends Component {
         //     latitude: business.lat,
         //     longitude: business.long
         // }
-        this.setState({markerPopupState: "true", businessDetails: business,selectedBusiness:business.businessId})
+        this.setState({markerPopupState: true, businessDetails: business,selectedBusiness:business.businessId})
     }
     onSelected = (viewport,item) => {
         if(this.state.businessList.length>0){
@@ -108,6 +107,13 @@ class TrackingPage extends Component {
         }
         else this.setState({viewport, addrSelection:viewport,selectedBusiness:undefined})
 
+    }
+    leftOver = (number) =>{
+        if(number<0) return 0;
+        return number
+    }
+    closePop = () => {
+        this.setState({markerPopupState:false})
     }
     render() {
         const { viewport } = this.state;
@@ -132,7 +138,7 @@ class TrackingPage extends Component {
                                                         latitude={business.lat}
                                                         onClick={()=>this.businessMarker(business)}
                                                     >
-                                                        <div className="cmarker temporary cmarker"><span ><div className="markerText">{business.limit-business.counter}</div></span></div>
+                                                        <div className="cmarker temporary cmarker"><span ><div className="markerText">{this.leftOver(business.limit-business.counter)}</div></span></div>
                                                     </Marker>
                                                     ):(
                                                         <Marker
@@ -140,7 +146,7 @@ class TrackingPage extends Component {
                                                         latitude={business.lat}
                                                         onClick={()=>this.businessMarker(business)}
                                                     >
-                                                        <div className="marker temporary marker"><span ><div className="markerText">{business.limit-business.counter}</div></span></div>
+                                                        <div className="marker temporary marker"><span ><div className="markerText">{this.leftOver(business.limit-business.counter)}</div></span></div>
                                                     </Marker>
                                                     )//, ()=>{
                                                     //     if(business.businessId == this.state.businessDetails.businessId){
@@ -157,7 +163,7 @@ class TrackingPage extends Component {
                     </ReactMapGL>
                 </div>
                 <div>
-                    {this.state.markerPopupState==="false" ? ("") : (<div className="markerPopup"><PopupComponent businessDetails={this.state.businessDetails}/></div>)}
+                    {!this.state.markerPopupState ? ("") : (<div className="markerPopup"><PopupComponent closePop={()=>this.closePop()}businessDetails={this.state.businessDetails}/></div>)}
                 </div>
                 <div className="leftSide-map">
                     <div className="topButtons trackTopButtons">

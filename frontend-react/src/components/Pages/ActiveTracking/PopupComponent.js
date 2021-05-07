@@ -7,14 +7,14 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 const BorderLinearProgress = withStyles((theme) => ({
   root: {
     height: 10,
-    borderRadius: 5,
+    borderRadius: 0,
   },
   colorPrimary: {
     backgroundColor: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
   },
   bar: {
-    borderRadius: 5,
-    backgroundColor: '#1a90ff',
+    borderRadius: 0,
+    backgroundColor: 'rgb(171, 25, 30)',
   },
 }))(LinearProgress);
 
@@ -34,6 +34,8 @@ class PopupComponent extends Component {
     console.log("BLEH")
   }
   render() {
+    let percent = (this.props.businessDetails.counter/this.props.businessDetails.limit)*100
+    if(percent>100) percent = 100;
     return (
       <div className="display-popup">
         <div className="popupHeader">
@@ -41,7 +43,7 @@ class PopupComponent extends Component {
             {this.props.businessDetails.businessname}
           </div>
           <div>
-            <IconButton aria-label="refresh" onClick={() => this.closePop()} style={{ textAlign: "right" }}>
+            <IconButton aria-label="refresh" onClick={() => this.props.closePop()} style={{ textAlign: "right" }}>
               <CloseIcon style={{ color: "white" }} />
             </IconButton>
           </div>
@@ -50,7 +52,7 @@ class PopupComponent extends Component {
         <div className="lineBar">
           <BorderLinearProgress
           variant="determinate" 
-          value={(this.props.businessDetails.counter/this.props.businessDetails.limit)*100} 
+          value={percent} 
           />
         </div>
         <div className="lineInfo">
