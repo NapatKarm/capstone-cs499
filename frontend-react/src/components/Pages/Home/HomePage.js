@@ -199,20 +199,8 @@ class HomePage extends Component {
                             <DialogTitle id="form-dialog-title">Business Registration</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    Fill this out and bam you CREATE business hummie
+                                    Enter your business name, create a passocde, and find your business address to start logging a business with us.
                                 </DialogContentText>
-                                {/* <div className="form_group field">
-                                    <div>
-                                        <form>
-                                            <div className="omrs-input-group">
-                                                <label onChange={this.changeBName} className="omrs-input-underlined">
-                                                <input required/>
-                                                <span className="omrs-input-label">Normal</span>
-                                                </label>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div> */}
                                 <TextField
                                     autoFocus
                                     margin="dense"
@@ -221,19 +209,8 @@ class HomePage extends Component {
                                     type="string"
                                     fullWidth
                                     onChange={this.changeBName}
-                                    
                                 />
 
-                                {/* <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    id="BAddress"
-                                    id="geocoder"
-                                    label="Business Address"
-                                    type="string"
-                                    onChange={this.changeBAddress}
-                                    fullWidth
-                                /> */}
                                 <TextField
                                     autoFocus
                                     margin="dense"
@@ -278,7 +255,7 @@ class HomePage extends Component {
                             <DialogTitle id="form-dialog-title">Joining a Business</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    Fill this out and bam you JOIN business hummie
+                                    Enter the business ID and passcode provided by your employer to join their workspace.
                                 </DialogContentText>
                                 <TextField
                                     autoFocus

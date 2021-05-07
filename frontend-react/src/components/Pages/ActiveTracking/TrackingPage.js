@@ -188,6 +188,21 @@ class TrackingPage extends Component {
                         </Paper>
                     </div>
                 </div>
+                <div className="addrSearchBar">
+                    <div className="actualSearch" style={{ boxShadow:'3px 5px 5px 0px gray', borderRadius: '15px'}}>
+                        <div className="searchBarAround">
+                        <Geocoder
+                            id="BAddress"
+                            {...mapAccess} hideOnSelect={false}
+                            onSelected={this.onSelected}
+                            value=""
+                            queryParams={queryParams}
+                            viewport={viewport}
+                            updateInputOnSelect
+                        />
+                        </div>
+                    </div>
+                </div>
             </div>
         )
     }

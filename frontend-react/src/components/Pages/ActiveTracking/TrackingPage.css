@@ -6,7 +6,23 @@
     display: flex;
     flex-direction: row;
 }
-
+.searchBarAround{
+  width: 90%;
+  margin-left: 1.25rem;
+}
+.addrSearchBar{
+  width: 100%;
+  display:flex;
+  justify-content: flex-end;
+  font-size: medium !important;
+  position: absolute;
+}
+.actualSearch{
+  margin-top: 3%;
+  margin-right: 5%;
+  width: 30%;
+  background-color: white;
+}
 .trackTopButtons {
     padding-top: 30px;
     padding-bottom: 15px;
