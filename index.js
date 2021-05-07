@@ -1053,6 +1053,63 @@ io.on('connection', (socket) => {
 
   //socket.leave(socket.id);
 
+  setInterval(async () => {
+    let bus_list = await busdb.where('isopened', '==', true).get();
+    let coordinatesMap = {}
+    bus_list.forEach(async (business) => {
+      var businessData = business.data();
+      var bId = businessData.businessId;
+      coordinatesMap[bId] = {lat: businessData.lat, long: businessData.long};
+    });
+
+    const rooms = await io.of('/').adapter.allRooms();
+    var allData = []
+    for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
+      if(/^\d+$/.test(business_id)){
+        let singleBusiness = await ioredis.get(business_id);
+        let counter = await ioredis.get(business_id.toString()+"counter");
+
+        let singleBusinessJson = JSON.parse(singleBusiness);
+        singleBusinessJson.counter = counter;
+        singleBusinessJson.businessId = business_id;
+        singleBusinessJson.lat = coordinatesMap[business_id].lat;
+        singleBusinessJson.long = coordinatesMap[business_id].long;
+
+        if(singleBusinessJson.hasOwnProperty('timeCount') == false){
+          singleBusinessJson.timeCount = [];
+        }
+  
+        let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
+        let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
+        hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
+        hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
+
+        timeCountJson = await ioredis.get("timeCount");
+        
+        timeCountList = timeCountJson.timeCount
+        if(timeCountList != null){
+          if(timeCountList.length >= 10){
+            timeCountList.shift();
+            timeCountList.push({time:hourFormat, counter: await ioredis.get(business_id.toString()+"counter")});
+          }
+          else{
+            timeCountList.push({time:hourFormat, counter: await ioredis.get(business_id.toString()+"counter")});
+          }
+          timeArrayJson = JSON.stringify({
+            timeCount: timeCountList
+          })
+          await ioredis.set("timeCount", timeCountList);
+        }
+
+        singleBusinessJson.timeCount = timeCountList;
+
+        allData.push(singleBusinessJson);
+      }
+    }
+
+    socket.emit('updateMap', {allData: allData});
+  },5000);
+
   socket.on('userInit', async ({email}) => {
     // const json = JSON.stringify({
     //   email: email,
@@ -1071,6 +1128,10 @@ io.on('connection', (socket) => {
     });
     await ioredis.set(businessId, json);
     await ioredis.set(businessId.toString()+"counter", 0);
+    timeArrJson = JSON.stringify({
+      timeCount: []
+    })
+    await ioredis.set("timeCount", timeArrJson);
 
     await axios.patch(`https://${process.env.EXPRESS_HOST}/businessOpen`, {businessId: businessId, email: email, token: token})
     .then(res => {
@@ -1080,18 +1141,19 @@ io.on('connection', (socket) => {
       socket.emit('openResponse', {error: "Error"});
     })
 
+    let month, day = ""; 
     let time = new Date(); 
     if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
-        let month = '0' + time.getMonth();
+        month = '0' + time.getMonth();
     }
     else {
-        let month = time.getMonth();
+        month = time.getMonth();
     }
     if (time.getDate() < 10) {
-        let day = '0' + time.getDate();
+        day = '0' + time.getDate();
     }
     else {
-        let day = time.getDate();
+        day = time.getDate();
     }
     let today = month + '/' + day + '/' + time.getYear();
 
@@ -1113,6 +1175,7 @@ io.on('connection', (socket) => {
     io.in(businessId).emit('businessClose', {error: "The business has been closed."});
     await ioredis.del(businessId);
     await ioredis.del(businessId.toString()+"counter");
+    await ioredis.del("timeCount");
     await axios.patch(`https://${process.env.EXPRESS_HOST}/businessClose`, {businessId: businessId, email: email, token: token})
     .then(res => {
       socket.emit('closeResponse', {success: "Success"});
@@ -1170,16 +1233,14 @@ io.on('connection', (socket) => {
 
       await ioredis.incr(businessId.toString()+"counter");
 
-      let time = Date();
-
       // let user = await ioredis.get(socket.id);
       // let userJson = JSON.parse(user);
 
+      let month, day = "";
       let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
       let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
       hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
       hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
-      let month, day = "";
       let time = new Date();
 
       if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
@@ -1199,6 +1260,7 @@ io.on('connection', (socket) => {
       let businessInfo = await busdb.where('businessId', '==', businessId).get();  
       let businessLogRef = busdb.doc(businessInfo.docs[0].id).collection('logs');                            
       let todaysLog = await businessLogRef.where('date', '==', today).get();
+      console.log(todaysLog.empty)
       let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
 
       let actionData = {
@@ -1254,16 +1316,14 @@ io.on('connection', (socket) => {
         await ioredis.decr(businessId.toString()+"counter");
       }
 
-      let time = Date();
-
       // let user = await ioredis.get(socket.id);
       // let userJson = JSON.parse(user);
 
+      let month, day = "";
       let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
       let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
       hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
       hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
-      let month, day = "";
       let time = new Date();
 
       if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
@@ -1314,15 +1374,17 @@ io.on('connection', (socket) => {
       const rooms = await io.of('/').adapter.allRooms();
       var allData = []
       for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
-        let singleBusiness = await ioredis.get(business_id);
-        let counter = await ioredis.get(business_id.toString()+"counter");
-
-        let singleBusinessJson = JSON.parse(singleBusiness);
-        singleBusinessJson.counter = counter;
-        singleBusinessJson.businessId = business_id;
-        singleBusinessJson.lat = coordinatesMap[business_id].lat;
-        singleBusinessJson.long = coordinatesMap[business_id].long;
-        allData.push(singleBusinessJson);
+        if(/^\d+$/.test(business_id)){
+          let singleBusiness = await ioredis.get(business_id);
+          let counter = await ioredis.get(business_id.toString()+"counter");
+  
+          let singleBusinessJson = JSON.parse(singleBusiness);
+          singleBusinessJson.counter = counter;
+          singleBusinessJson.businessId = business_id;
+          singleBusinessJson.lat = coordinatesMap[business_id].lat;
+          singleBusinessJson.long = coordinatesMap[business_id].long;
+          allData.push(singleBusinessJson);
+        }
       }
       io.emit('updateMap', {allData: allData});
     }
@@ -1361,15 +1423,17 @@ io.on('connection', (socket) => {
       const rooms = await io.of('/').adapter.allRooms();
       var allData = []
       for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
-        let singleBusiness = await ioredis.get(business_id);
-        let counter = await ioredis.get(business_id.toString()+"counter");
-
-        let singleBusinessJson = JSON.parse(singleBusiness);
-        singleBusinessJson.counter = counter;
-        singleBusinessJson.businessId = business_id;
-        singleBusinessJson.lat = coordinatesMap[business_id].lat;
-        singleBusinessJson.long = coordinatesMap[business_id].long;
-        allData.push(singleBusinessJson);
+        if(/^\d+$/.test(business_id)){
+          let singleBusiness = await ioredis.get(business_id);
+          let counter = await ioredis.get(business_id.toString()+"counter");
+  
+          let singleBusinessJson = JSON.parse(singleBusiness);
+          singleBusinessJson.counter = counter;
+          singleBusinessJson.businessId = business_id;
+          singleBusinessJson.lat = coordinatesMap[business_id].lat;
+          singleBusinessJson.long = coordinatesMap[business_id].long;
+          allData.push(singleBusinessJson);
+        }
       }
       io.emit('updateMap', {allData: allData});
     }
@@ -1391,15 +1455,17 @@ io.on('connection', (socket) => {
     const rooms = await io.of('/').adapter.allRooms();
     var allData = []
     for(let it = rooms.values(), business_id = null; business_id = it.next().value;){
-      let singleBusiness = await ioredis.get(business_id);
-      let counter = await ioredis.get(business_id.toString()+"counter");
+      if(/^\d+$/.test(business_id)){
+        let singleBusiness = await ioredis.get(business_id);
+        let counter = await ioredis.get(business_id.toString()+"counter");
 
-      let singleBusinessJson = JSON.parse(singleBusiness);
-      singleBusinessJson.counter = counter;
-      singleBusinessJson.businessId = business_id;
-      singleBusinessJson.lat = coordinatesMap[business_id].lat;
-      singleBusinessJson.long = coordinatesMap[business_id].long;
-      allData.push(singleBusinessJson);
+        let singleBusinessJson = JSON.parse(singleBusiness);
+        singleBusinessJson.counter = counter;
+        singleBusinessJson.businessId = business_id;
+        singleBusinessJson.lat = coordinatesMap[business_id].lat;
+        singleBusinessJson.long = coordinatesMap[business_id].long;
+        allData.push(singleBusinessJson);
+      }
     }
     socket.emit('updateMap', {allData: allData});
   });
