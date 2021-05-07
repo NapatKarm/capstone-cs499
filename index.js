@@ -590,7 +590,6 @@ app.get('/businessGraph', async (req, res) => {
   member_list.forEach( member => {
     if (member.email == req.body.email) {
       has_permissions = true;
-      break;
     }
   });
   if (!has_permissions)  {
