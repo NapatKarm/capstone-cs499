@@ -31,28 +31,41 @@ app.get('/', async function (req, res) {
 //   let test_ref = await test.collection('logs').add(data);
 //   console.log(test_ref);
 
-    let currentTimeUTC = Date.now();                        // currentTime in UTC
-    let hourFormat = new Date(0);                          // Sets the date to start
+    let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
+    let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
     hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
-    hourFormat = hourFormat.toLocaleTimeString('en-GB');   // HH:MM:SS format (24 hour), en-GB = English Great Britain
-
-    let today = 
-
+    hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
+    console.log(hourFormat);
+    let month, day = "";
+    let time = new Date();
+    if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
+        month = '0' + ( time.getMonth() + 1 );
+    }
+    else {
+        month = time.getMonth();
+    }
+    if (time.getDate() < 10) {
+        day = '0' + time.getDate();
+    }
+    else {
+        day = time.getDate();
+    }
+    let today = month + '/' + day + '/' + time.getFullYear();
+    console.log(today);
 
     let businessInfo = await busdb.where('businessId', '==', req.body.businessId).get();  
     let businessLogRef = busdb
         .doc(businessInfo.docs[0].id)
         .collection('logs');                            
     let todaysLog = await businessLogRef.where('date', '==', today).get();
-
-    time = Date();
+    let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
     let actionData = {
         'email' : "email",
         'type' : 1,
         'time' : hourFormat,
         'utc' : currentTimeUTC  
     };
-    todaysLog.update({
+    todaysLogRef.update({
         actions : admin.firestore.FieldValue.arrayUnion(actionData)
     });
     res.send("Good");
