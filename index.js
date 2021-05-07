@@ -1143,19 +1143,20 @@ io.on('connection', (socket) => {
 
     let month, day = ""; 
     let time = new Date(); 
+    let month, day = "";
     if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
-        month = '0' + time.getMonth();
+      month = '0' + ( time.getMonth() + 1 );
     }
     else {
-        month = time.getMonth();
+      month = time.getMonth();
     }
     if (time.getDate() < 10) {
-        day = '0' + time.getDate();
+      day = '0' + time.getDate();
     }
     else {
-        day = time.getDate();
+      day = time.getDate();
     }
-    let today = month + '/' + day + '/' + time.getYear();
+    let today = month + '/' + day + '/' + time.getFullYear();
 
 
     busInfo = await busdb.where('businessId', '==', businessId).get();
@@ -1316,6 +1317,8 @@ io.on('connection', (socket) => {
         await ioredis.decr(businessId.toString()+"counter");
       }
 
+      
+
       // let user = await ioredis.get(socket.id);
       // let userJson = JSON.parse(user);
 
@@ -1355,6 +1358,7 @@ io.on('connection', (socket) => {
         actions : admin.firestore.FieldValue.arrayUnion(actionData)
       });
 
+      time = Date();
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
         limit: businessJson.limit,
