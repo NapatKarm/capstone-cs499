@@ -9,8 +9,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Connect to FireBase
-var admin = require('firebase-admin');
-var serviceAccount = require('./service-account.json');
+let admin = require('firebase-admin');
+let serviceAccount = require('./service-account.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://c-vivid-default-rtdb.firebaseio.com'
@@ -31,44 +31,44 @@ app.get('/', async function (req, res) {
 //   let test_ref = await test.collection('logs').add(data);
 //   console.log(test_ref);
 
-    let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
-    let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
-    hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
-    hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
-    console.log(hourFormat);
-    let month, day = "";
-    let time = new Date();
-    if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
-        month = '0' + ( time.getMonth() + 1 );
-    }
-    else {
-        month = time.getMonth();
-    }
-    if (time.getDate() < 10) {
-        day = '0' + time.getDate();
-    }
-    else {
-        day = time.getDate();
-    }
-    let today = month + '/' + day + '/' + time.getFullYear();
-    console.log(today);
+    // let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
+    // let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
+    // hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
+    // hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
+    // console.log(hourFormat);
+    // let month, day = "";
+    // let time = new Date();
+    // if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
+    //     month = '0' + ( time.getMonth() + 1 );
+    // }
+    // else {
+    //     month = time.getMonth();
+    // }
+    // if (time.getDate() < 10) {
+    //     day = '0' + time.getDate();
+    // }
+    // else {
+    //     day = time.getDate();
+    // }
+    // let today = month + '/' + day + '/' + time.getFullYear();
+    // console.log(today);
 
-    let businessInfo = await busdb.where('businessId', '==', req.body.businessId).get();  
-    let businessLogRef = busdb
-        .doc(businessInfo.docs[0].id)
-        .collection('logs');                            
-    let todaysLog = await businessLogRef.where('date', '==', today).get();
-    let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
-    let actionData = {
-        'email' : "email",
-        'type' : 1,
-        'time' : hourFormat,
-        'utc' : currentTimeUTC  
-    };
-    todaysLogRef.update({
-        actions : admin.firestore.FieldValue.arrayUnion(actionData)
-    });
-    res.send("Good");
+    // let businessInfo = await busdb.where('businessId', '==', req.body.businessId).get();  
+    // let businessLogRef = busdb
+    //     .doc(businessInfo.docs[0].id)
+    //     .collection('logs');                            
+    // let todaysLog = await businessLogRef.where('date', '==', today).get();
+    // let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
+    // let actionData = {
+    //     'email' : "email",
+    //     'type' : 1,
+    //     'time' : hourFormat,
+    //     'utc' : currentTimeUTC  
+    // };
+    // todaysLogRef.update({
+    //     actions : admin.firestore.FieldValue.arrayUnion(actionData)
+    // });
+    // res.send("Good");
   // user_info = await usersdb.where('email', '==', req.body.email).get();
   // user_bus = await busdb.where('bussinessid', 'in', user_info.docs[0].get(businessList)).get();
   // user_bus.forEach(doc => {
@@ -101,7 +101,7 @@ app.get('/', async function (req, res) {
 
 // Sign-up end point
 app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastname, email, password}
-  var existing_user = await usersdb.where('email', '==', req.body.email.toLowerCase()).get();
+  let existing_user = await usersdb.where('email', '==', req.body.email.toLowerCase()).get();
   if(!existing_user.empty) {               //Email is taken
     res.status(422).send('Email already in use');
   }
@@ -422,6 +422,33 @@ app.patch('/kickMember', async (req, res) => {                      //Expected: 
 });
 
 app.patch('/businessOpen', async (req, res) => {                     //Expected Request {business_id, email, token}
+  let time = new Date(); 
+  let month, day = "";
+  if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
+    month = '0' + time.getMonth();
+  }
+  else {
+    month = time.getMonth();
+  }
+  if (time.getDate() < 10) {
+    day = '0' + time.getDate();
+  }
+  else {
+    day = time.getDate();
+  }
+  let today = month + '/' + day + '/' + time.getYear();
+
+  busInfo = await busdb.where('businessId', '==', businessId).get();
+  busRef = busdb.doc(busInfo.docs[0].id);
+  busLogs = await busRef.collection('logs').where('date', '==', today).get();
+  let logs = {
+    'date' : today,
+    'actions' : []
+  };
+  if (busLogs.empty) {
+    await busRef.collection('logs').add(logs);
+  }
+
   let changer_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
   if (changer_info.docs[0].get('token') != req.body.token || changer_info.empty) {
     res.status(400).send("Incorrect Token");
@@ -548,25 +575,70 @@ app.delete('/businessDelete', async (req, res) => { // expected request: busines
 });
 
 app.get('/businessGraph', async (req, res) => {
-    try {
-        some_bus_id = await busdb.where('businessId', '==', req.body.businessId).get();
-            
-        the_id = some_bus_id.docs[0].id;
-        bus_logs = await busdb.doc(the_id)
-            .collection('logs')
-            .where('date', '==', req.body.date)
-            .get();
-
-        bus_data = bus_logs.docs[0].data();
-        // bus_logs.forEach( (doc) => {
-        //     console.log(doc.data())
-        // });
-        console.log(bus_logs.size);
-        console.log(bus_data);
-        res.send(bus_data);
-    } catch(error) {
-        console.log(error);
+  let bus_doc = await busdb.where('businessId', '==', req.body.businessId).get();
+  let mem_doc = await usersdb.where('email', '==', req.body.email).where('token', '==', req.body.token).get();
+  if (bus_doc.empty) {
+    res.status(401).send("Business does not exist");
+    return;
+  }
+  if (mem_doc.empty) {
+    res.status(401).send("Incorrect token or email");
+    return;
+  }
+  let member_list = bus_doc.docs[0].get('memberList');
+  let has_permissions =  false;
+  member_list.forEach( member => {
+    if (member.email == req.body.email) {
+      has_permissions = true;
+      break;
     }
+  });
+  if (!has_permissions)  {
+    res.status(401).send("Not enough permissions");
+  }
+  try {
+    let bus_log_ref = busdb.doc(bus_doc.docs[0].id).collection('logs');
+    let today = new Date();
+    let dd = String(today.getDate()).padStart(2, '0');
+    let mm = String(today.getMonth() + 1).padStart(2, '0');
+    let yyyy = today.getFullYear();
+    today = mm + '/' + dd + '/' + yyyy;
+    let todays_log = bus_log_ref.where('date', '==', today).get();
+    let actions = todays_log.docs[0].get('actions');
+
+    //begin calculating averages
+    let i = 0;
+    let j = 0;
+    let running_total = 0;
+    while (i < actions.length) {
+      if (i < 10) {
+        j = String(i).padStart(2, '0');
+      }
+      else {
+        j = i;
+      }
+      let end_of_hour = actions.findIndex( (element) => {
+        element.time[0] + element.time[1] == j  // First 2 elements of time are the hours
+      });
+      let count = 0;
+      let sum = 0;
+      let averageList = [];
+      for (let i = 0; i < end_of_hour; i++) {
+        running_total += actions[i].type; // update the total everytime
+        sum += running_total;
+        count += actions[i].type;         // add everytime an entry is found
+        if (count == 0) {
+          averageList.unshift(averageList.length - 1);
+        } else {
+          let average = sum/count;
+          averageList.unshift(average);
+        }
+      }
+      i++;
+    }
+  } catch(error) {
+      console.log(error);
+  }
 });
 
 const port = process.env.PORT || 5000;
