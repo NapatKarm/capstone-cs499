@@ -157,7 +157,7 @@ class BusinessDetailsPage extends Component {
                 email: this.props.userData.email,
                 token: this.props.userData.token
              })
-            this.props.socket.on("openResponse", ({ success, error }) => {
+            this.props.socket.once("openResponse", ({ success, error }) => {
                 console.log("Open Response",success,error)
                 if(error!==undefined) this.setState({openERR:"An Error has occurred, please try again"});
                 else if(success!==undefined) {
@@ -245,7 +245,7 @@ class BusinessDetailsPage extends Component {
     }
     joinTracker = (bID, information) => {
         this.props.socket.emit('joinTracker', {businessId:bID,email:this.props.userData.email})
-        this.props.socket.on("joinCheck", ({ counter, limit, error }) => {
+        this.props.socket.once("joinCheck", ({ counter, limit, error }) => {
             console.log("JOIN Response",counter,limit,error)
             if(error!==undefined) this.setState({joinERR:error});
             else if(counter!==undefined&&limit!==undefined) {
@@ -322,7 +322,7 @@ class BusinessDetailsPage extends Component {
                 email: this.props.userData.email,
                 token: this.props.userData.token
              })
-            this.props.socket.on("closeResponse", ({ success, error }) => {
+            this.props.socket.once("closeResponse", ({ success, error }) => {
                 console.log("Close Response",success,error)
                 if(error!==undefined) this.setState({returnERR:"An Error has occurred, please try again"});
                 else if(success!==undefined) {
