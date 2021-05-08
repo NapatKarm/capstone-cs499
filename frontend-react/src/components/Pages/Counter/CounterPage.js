@@ -118,6 +118,7 @@ class CounterPage extends Component {
         this.props.socket.on("kicked",({success}) => {
             console.log("KICKED SOCKETS",success)
             if(success!==undefined){
+                alert("You have been removed from the business")
                 this.props.socket.emit('leaveBusiness', {businessId: this.props.bDetails.businessId})
                 this.props.history.push("/home")
             }
