@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 // Connect to FireBase
 let admin = require('firebase-admin');
 let serviceAccount = require('./service-account.json');
+const e = require('express');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://c-vivid-default-rtdb.firebaseio.com'
@@ -631,6 +632,7 @@ app.get('/businessGraph', async (req, res) => {
   if (!has_permissions)  {
     res.status(401).send("Not enough permissions");
   }
+
   try {
     let bus_log_ref = busdb.doc(bus_doc.docs[0].id).collection('logs');
     let today = new Date();
@@ -638,39 +640,59 @@ app.get('/businessGraph', async (req, res) => {
     let mm = String(today.getMonth() + 1).padStart(2, '0');
     let yyyy = today.getFullYear();
     today = mm + '/' + dd + '/' + yyyy;
-    let todays_log = bus_log_ref.where('date', '==', today).get();
+    let todays_log = await bus_log_ref.where('date', '==', req.body.date).get();
+    if (todays_log.empty) {  // "Catch" block to see if its ever empty
+      let logs = {
+        'date' : today,
+        'actions' : []
+      };
+      await bus_log_ref.add(logs);
+    }
     let actions = todays_log.docs[0].get('actions');
-
+    
     //begin calculating averages
     let i = 0;
-    let j = 0;
-    let running_total = 0;
-    while (i < actions.length) {
-      if (i < 10) {
-        j = String(i).padStart(2, '0');
-      }
-      else {
-        j = i;
-      }
-      let end_of_hour = actions.findIndex( (element) => {
-        element.time[0] + element.time[1] == j  // First 2 elements of time are the hours
+    let curr_capacity = 0;
+    let start_of_hour = 0; 
+    let end_of_hour = 0;
+    let average_list = [];
+
+    while (i < 24) {
+      start_of_hour =  actions.findIndex( (element) => {  // hh:mm:ss    
+        return element.time[0] + element.time[1] == i  
       });
-      let count = 0;
-      let sum = 0;
-      let averageList = [];
-      for (let i = 0; i < end_of_hour; i++) {
-        running_total += actions[i].type; // update the total everytime
-        sum += running_total;
-        count += actions[i].type;         // add everytime an entry is found
-        if (count == 0) {
-          averageList.unshift(averageList.length - 1);
-        } else {
-          let average = sum/count;
-          averageList.unshift(average);
+      if (i == 23) {
+        end_of_hour = actions.length - 1
+      } else {
+        end_of_hour = actions.findIndex( (element) => {  
+          return element.time[0] + element.time[1] > i  
+        });
+      }
+      
+      console.log("i ", i, " start ", start_of_hour, "end ", end_of_hour);
+      
+      if (start_of_hour == -1) {
+        let last_index = average_list.length - 1 < 0 ? 0 : average_list[average_list.length - 1];
+        average_list.push(last_index);
+      } else if (end_of_hour == -1) {
+          end_of_hour = actions.length - 1;
+      } else {
+        let count = 0;
+        let sum = 0;
+        for (let i = start_of_hour; i < end_of_hour; i++) {
+          curr_capacity += actions[i].type; 
+          sum += curr_capacity;           // Numerator, current capacity per increment/decrement
+          count += actions[i].type;       // Denominator, amount of changes
         }
+        console.log("num", sum);
+        console.log("denom", count);
+        let average = Math.round(sum/count);
+        console.log(average);       
+        average_list.push(average);
       }
       i++;
-    }
+    } // end while
+    res.status(200).send(average_list);
   } catch(error) {
       console.log(error);
   }
