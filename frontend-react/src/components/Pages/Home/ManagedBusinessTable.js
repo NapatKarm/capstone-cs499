@@ -33,7 +33,7 @@ class ManagedBusinessTable extends Component {
     }
     joinTracker = (bID, information) => {
         this.props.socket.emit('joinTracker', {businessId:bID,email:this.props.userData.email})
-        this.props.socket.on("joinCheck", ({ counter, limit, error }) => {
+        this.props.socket.once("joinCheck", ({ counter, limit, error }) => {
             console.log("JOIN Response",counter,limit,error)
             if(error!==undefined) this.setState({joinERR:error});
             else if(counter!==undefined&&limit!==undefined) {

@@ -52,11 +52,15 @@ class BusinessDetailsPage extends Component {
                 this.updateDetails();
             }
         })
-        this.props.socket.on("kicked",({success}) => {
-            console.log("KICKED SOCKETS",success)
-            if(success!==undefined){
-                alert("You have been removed from the business")
-                this.props.history.push("/home");
+        this.props.socket.on("kicked",({businessId}) => {
+            console.log("KICKED SOCKETS",businessId)
+            if(this.state.businessDetails != undefined)
+            {
+                if(businessId==this.state.businessDetails.businessId){
+                    this.props.socket.removeAllListeners();
+                    alert("You have been removed from the business")
+                    this.props.history.push("/home")
+                }
             }
         })
         this.setState({
@@ -89,6 +93,7 @@ class BusinessDetailsPage extends Component {
     // }
 
     logout = () => {
+        this.props.socket.removeAllListeners();
         this.props.bUserLogout()
         this.props.userLogout()
         this.props.history.push("/")
@@ -157,7 +162,7 @@ class BusinessDetailsPage extends Component {
                 email: this.props.userData.email,
                 token: this.props.userData.token
              })
-            this.props.socket.on("openResponse", ({ success, error }) => {
+            this.props.socket.once("openResponse", ({ success, error }) => {
                 console.log("Open Response",success,error)
                 if(error!==undefined) this.setState({openERR:"An Error has occurred, please try again"});
                 else if(success!==undefined) {
@@ -245,7 +250,7 @@ class BusinessDetailsPage extends Component {
     }
     joinTracker = (bID, information) => {
         this.props.socket.emit('joinTracker', {businessId:bID,email:this.props.userData.email})
-        this.props.socket.on("joinCheck", ({ counter, limit, error }) => {
+        this.props.socket.once("joinCheck", ({ counter, limit, error }) => {
             console.log("JOIN Response",counter,limit,error)
             if(error!==undefined) this.setState({joinERR:error});
             else if(counter!==undefined&&limit!==undefined) {
@@ -258,6 +263,7 @@ class BusinessDetailsPage extends Component {
                     if (this.props.cInfo){
                         this.props.bView(information)
                         if (this.props.bDetails) {
+                            this.props.socket.removeAllListeners();
                             this.props.history.push("/counter")
                         }
                     }
@@ -322,7 +328,7 @@ class BusinessDetailsPage extends Component {
                 email: this.props.userData.email,
                 token: this.props.userData.token
              })
-            this.props.socket.on("closeResponse", ({ success, error }) => {
+            this.props.socket.once("closeResponse", ({ success, error }) => {
                 console.log("Close Response",success,error)
                 if(error!==undefined) this.setState({returnERR:"An Error has occurred, please try again"});
                 else if(success!==undefined) {
