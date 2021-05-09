@@ -52,11 +52,15 @@ class BusinessDetailsPage extends Component {
                 this.updateDetails();
             }
         })
-        this.props.socket.on("kicked",({success}) => {
-            console.log("KICKED SOCKETS",success)
-            if(success!==undefined){
-                alert("You have been removed from the business")
-                this.props.history.push("/home");
+        this.props.socket.on("kicked",({businessId}) => {
+            console.log("KICKED SOCKETS",businessId)
+            if(this.state.businessDetails != undefined)
+            {
+                if(businessId==this.state.businessDetails.businessId){
+                    this.props.socket.removeAllListeners();
+                    alert("You have been removed from the business")
+                    this.props.history.push("/home")
+                }
             }
         })
         this.setState({
@@ -89,6 +93,7 @@ class BusinessDetailsPage extends Component {
     // }
 
     logout = () => {
+        this.props.socket.removeAllListeners();
         this.props.bUserLogout()
         this.props.userLogout()
         this.props.history.push("/")
@@ -258,6 +263,7 @@ class BusinessDetailsPage extends Component {
                     if (this.props.cInfo){
                         this.props.bView(information)
                         if (this.props.bDetails) {
+                            this.props.socket.removeAllListeners();
                             this.props.history.push("/counter")
                         }
                     }

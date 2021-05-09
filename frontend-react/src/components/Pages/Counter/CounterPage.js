@@ -115,13 +115,17 @@ class CounterPage extends Component {
                 maxCap: this.props.cInfo.limit
             })
         }
-        this.props.socket.on("kicked",({success}) => {
-            console.log("KICKED SOCKETS",success)
-            if(success!==undefined){
-                alert("You have been removed from the business")
-                this.props.socket.emit('leaveBusiness', {businessId: this.props.bDetails.businessId})
-                this.props.history.push("/home")
+        this.props.socket.on("kicked",({businessId}) => {
+            console.log("KICKED SOCKETS",businessId)
+            if(this.props.bDetails&&businessId!==undefined){
+                if(this.props.bDetails.businessId==businessId){
+                    this.props.socket.removeAllListeners();
+                    this.props.socket.emit('leaveBusiness', {businessId: this.props.bDetails.businessId})
+                    alert("You have been removed from the business")
+                    this.props.history.push("/home")
+                }
             }
+
         })
         this.props.socket.on("updateCounter",({ error, limit, counter, changerEmail, changerType,time }) => {
             if(error!==undefined){
@@ -148,6 +152,7 @@ class CounterPage extends Component {
 
     }
     logout = () => {
+        this.props.socket.removeAllListeners();
         this.props.bUserLogout()
         this.props.userLogout()
         this.props.history.push("/")
@@ -166,6 +171,7 @@ class CounterPage extends Component {
     }
     goBackHome = () => {
         this.props.socket.emit('leaveBusiness', {businessId: this.props.bDetails.businessId})
+        this.props.socket.removeAllListeners();
         this.props.history.push("/home")
     }
 

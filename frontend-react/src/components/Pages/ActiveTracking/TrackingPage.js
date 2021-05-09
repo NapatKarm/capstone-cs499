@@ -46,7 +46,7 @@ class TrackingPage extends Component {
     componentDidMount = () => {
         this.props.socket.emit("getAllData")
         this.props.socket.on("updateMap", ({ allData }) => {
-            //console.log("from UPDATE MAP", allData)
+            console.log("from UPDATE MAP", allData)
             this.setState({ businessList: allData }, () => { 
                 const filteredRows = this.state.businessList.filter((row) => {
                     return row.businessname.toLowerCase().includes(this.state.searchedVal.toLowerCase());
@@ -61,6 +61,7 @@ class TrackingPage extends Component {
     }
     goBackHome = () => {
         // this.props.bClear()
+        this.props.socket.removeAllListeners();
         this.props.history.push("/")
     }
     requestSearch = (searchedVal) => {
