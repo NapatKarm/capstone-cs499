@@ -1304,6 +1304,7 @@ io.on('connection', (socket) => {
     let kickeeId = await ioredis.get(kickeeEmail)
     console.log("Email to be kicked", kickeeEmail)
     console.log("ID to be kicked", kickeeId)
+
     socket.to(kickeeId).emit('kicked', {businessId: businessId})
 
     await axios.patch(`https://${process.env.EXPRESS_HOST}/kickMember`, {businessId: businessId, kickerEmail: kickerEmail, kickeeEmail: kickeeEmail, token: token})
@@ -1361,6 +1362,9 @@ io.on('connection', (socket) => {
       todaysLogRef.update({
         actions : admin.firestore.FieldValue.arrayUnion(actionData)
       });
+
+      // let user = await ioredis.get(socket.id);
+      // let userJson = JSON.parse(user);
 
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
@@ -1425,6 +1429,7 @@ io.on('connection', (socket) => {
       });
 
       time = Date();
+
       io.in(businessId).emit('updateCounter', {
         counter: await ioredis.get(businessId.toString()+"counter"),
         limit: businessJson.limit,
