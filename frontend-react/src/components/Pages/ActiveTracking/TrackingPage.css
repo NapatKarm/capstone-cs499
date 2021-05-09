@@ -147,10 +147,10 @@
   background-color: #313131 !important;
 }
 .markerPopup {
-  width: 30%;
-  height: 25%;
+  width: 35%;
+  height: 30%;
   bottom: 5%;
-  margin-left: 67%;
+  margin-left: 60%;
   padding: 1rem !important;
   color: white;
   background-color: #191919 !important;
@@ -177,4 +177,7 @@
 .bottomRow{
   margin-top: 1rem;
   font-weight: bold;
+}
+.lineGraph{
+  height: 30%;
 }
