@@ -1288,7 +1288,7 @@ io.on('connection', (socket) => {
 
       let actionData = {
         'email' : "email",
-        'type' : 0,
+        'type' : -1,
         'time' : hourFormat,
         'utc' : currentTimeUTC  
       };
