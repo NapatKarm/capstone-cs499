@@ -101,7 +101,7 @@ class PopupComponent extends Component {
           </div>
         </div>
         <div className="bottomRow">
-          <Line height={90}className="lineGraph"redraw={false} data={this.graphPointers(this.props.businessDetails.timeCount)} options={options} />
+          <Line height={70}className="lineGraph"redraw={false} data={this.graphPointers(this.props.businessDetails.timeCount)} options={options} />
         </div>
         
       </div>
