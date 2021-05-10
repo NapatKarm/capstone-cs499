@@ -683,7 +683,7 @@ app.get('/businessGraph', async (req, res) => {
         let last_index = average_list.length - 1 < 0 ? 0 : average_list[average_list.length - 1];
         average_list.push(last_index);
       } else if (end_of_hour == -1) {
-          end_of_hour = actions.length - 1;
+        end_of_hour = actions.length - 1;
       } else {
         let count = 0;
         let sum = 0;
