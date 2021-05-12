@@ -1359,7 +1359,7 @@ io.on('connection', (socket) => {
         'time' : hourFormat,
         'utc' : currentTimeUTC  
       };
-      todaysLogRef.update({
+      await todaysLogRef.update({
         actions : admin.firestore.FieldValue.arrayUnion(actionData)
       });
 
@@ -1424,7 +1424,7 @@ io.on('connection', (socket) => {
         'time' : hourFormat,
         'utc' : currentTimeUTC  
       };
-      todaysLogRef.update({
+      await todaysLogRef.update({
         actions : admin.firestore.FieldValue.arrayUnion(actionData)
       });
 
