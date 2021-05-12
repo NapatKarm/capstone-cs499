@@ -71,7 +71,9 @@ class PopupComponent extends Component {
     return data;
   }
   render() {
-    let percent = (this.props.businessDetails.counter/this.props.businessDetails.limit)*100
+    if(this.props.businessDetails){
+      let percent = (this.props.businessDetails.counter/this.props.businessDetails.limit)*100
+    }
     if(percent>100) percent = 100;
     return (
       <div className="displayPopup">
