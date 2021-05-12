@@ -72,7 +72,7 @@ class TrackingPage extends Component {
             this.setState({ filterBList: filteredRows })
         })
     };
-    viewChange = (lat,long,id) => {
+    viewChange = (lat,long,id,infoBusiness) => {
         this.setState({
             selectedBusiness:id,
             viewport: {
@@ -82,6 +82,11 @@ class TrackingPage extends Component {
             },
             addrSelection: undefined
         })
+        console.log("testing 1")
+        if (this.state.markerPopupState===true) {
+            console.log("testing")
+            this.setState({businessDetails: infoBusiness})
+        }
     }
     cancelSearch = () => {
         this.setState({ searched: "" });
@@ -107,7 +112,6 @@ class TrackingPage extends Component {
             else this.setState({viewport, addrSelection:viewport,selectedBusiness:undefined})
         }
         else this.setState({viewport, addrSelection:viewport,selectedBusiness:undefined})
-        
     }
     leftOver = (number) =>{
         if(number<0) return 0;
@@ -121,7 +125,6 @@ class TrackingPage extends Component {
         return (
             <div className="TrackingBody">
                 <div className="mapSide">
-
                     <ReactMapGL
                         mapboxApiAccessToken={mapboxApiKey}
                         mapStyle="mapbox://styles/mapbox/light-v10"
@@ -191,7 +194,7 @@ class TrackingPage extends Component {
                                         {this.state.filterBList.length!=0 ? (
                                             this.state.filterBList.map((business) => (
                                                 <TableRow>
-                                                    <TableCell className="businessCell" onClick={()=>this.viewChange(business.lat,business.long,business.businessId)}>
+                                                    <TableCell className="businessCell" onClick={()=>this.viewChange(business.lat,business.long,business.businessId,business)}>
                                                         <div>
                                                             <div className="businessHeader">{business.businessname}</div>
                                                             {business.businessaddr}
