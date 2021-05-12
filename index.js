@@ -1122,7 +1122,7 @@ io.on('connection', (socket) => {
         let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
         let d = new Date(0);                          // Sets the date to start (milliseconds)
         d.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
-        let hourFormat = d.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
+        let hourFormat = d.toLocaleTimeString('en-GB', {hour12 : false, timeZone : "EST"});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
         let h = parseInt(('0' + d.getHours()).slice(-2));
         let m = parseInt(('0' + d.getMinutes()).slice(-2));
         let s = parseInt(('0' + d.getSeconds()).slice(-2));
@@ -1330,7 +1330,7 @@ io.on('connection', (socket) => {
       let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
       let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
       hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
-      hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
+      hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false, timeZone : "EST"});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
       let time = new Date();
 
       if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
@@ -1396,7 +1396,7 @@ io.on('connection', (socket) => {
       let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
       let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
       hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
-      hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
+      hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false, timeZone : "EST"});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
       let time = new Date();
 
       if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
