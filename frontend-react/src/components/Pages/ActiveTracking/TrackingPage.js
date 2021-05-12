@@ -106,7 +106,7 @@ class TrackingPage extends Component {
             else this.setState({viewport, addrSelection:viewport,selectedBusiness:undefined})
         }
         else this.setState({viewport, addrSelection:viewport,selectedBusiness:undefined})
-
+        
     }
     leftOver = (number) =>{
         if(number<0) return 0;
