@@ -664,7 +664,7 @@ app.get('/businessGraph', async (req, res) => {
     let start_of_hour = 0; 
     let end_of_hour = 0;
     let average_list = [];
-
+    
     while (i < 24) {
       start_of_hour =  actions.findIndex( (element) => {  // hh:mm:ss    
         return element.time[0] + element.time[1] == i  
@@ -677,11 +677,24 @@ app.get('/businessGraph', async (req, res) => {
         });
       }
       
-      console.log("i ", i, " start ", start_of_hour, "end ", end_of_hour);
+    //   console.log("i ", i, " start ", start_of_hour, "end ", end_of_hour);
       
+      let am_pm = i < 12 || i == 0 ? 'AM' : 'PM';
+      let hour_of_day = i == 0 || i == 12 ? "12"
+                        : i < 12 && i != 0 && i != 12 ? i
+                        : i - 12;
+      hour_of_day = hour_of_day.toString();
+      hour_of_day = hour_of_day + ":00 " + am_pm;
+
       if (start_of_hour == -1) {
-        let last_index = average_list.length - 1 < 0 ? 0 : average_list[average_list.length - 1];
-        average_list.push(last_index);
+        let last_index = average_list.length - 1 <= 0 // If first index
+                        ? {'time' : "12:00 AM", 'average' : 0}
+                        : average_list[average_list.length - 1];
+        let time_and_average = {
+            time : hour_of_day,
+            average : last_index.average
+        }; 
+        average_list.push(time_and_average);
       } else if (end_of_hour == -1) {
         end_of_hour = actions.length - 1;
       } else {
@@ -690,13 +703,14 @@ app.get('/businessGraph', async (req, res) => {
         for (let i = start_of_hour; i < end_of_hour; i++) {
           curr_capacity += actions[i].type; 
           sum += curr_capacity;           // Numerator, current capacity per increment/decrement
-          count += actions[i].type;       // Denominator, amount of changes
+          count++;      // Denominator, amount of changes
         }
-        console.log("num", sum);
-        console.log("denom", count);
         let average = Math.round(sum/count);
-        console.log(average);       
-        average_list.push(average);
+        let time_and_average = {
+            time : hour_of_day,
+            average : average
+        }; 
+        average_list.push(time_and_average);
       }
       i++;
     } // end while
