@@ -123,7 +123,7 @@ export const userLogoutThunk = () => async (dispatch) => {
 }
 
 // Reducer Function
-export default (state = {},action) => {
+const userinfo = (state = {},action) => {
     switch(action.type){
         case USER_SIGNUP:
             return action.payload;
@@ -137,3 +137,5 @@ export default (state = {},action) => {
             return state;
     }
 }
+
+export default userinfo;

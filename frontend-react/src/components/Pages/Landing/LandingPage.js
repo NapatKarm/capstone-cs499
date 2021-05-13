@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
-import TextField from '@material-ui/core/TextField';
+import { withRouter } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 
 import './LandingPage.css';

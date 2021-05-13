@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -21,11 +21,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-
-const mapStyle = {
-    width: '80%',
-    height: '100%'
-}
 
 const mapboxApiKey = 'pk.eyJ1IjoibmFwYXRrYXJtIiwiYSI6ImNrbWRzejdmZTJwOGIyb29qem5kaGdnYWQifQ.0qB-jB0GW4iI1V3ban2fXQ';
 
@@ -61,8 +56,8 @@ class TrackingPage extends Component {
                     return row.businessname.toLowerCase().includes(this.state.searchedVal.toLowerCase());
                 });
                 this.setState({ filterBList: filteredRows })
-                if(this.state.businessDetails!=undefined){
-                    let tempBusiness = this.state.businessList.find(business => business.businessId == this.state.businessDetails.businessId)
+                if(this.state.businessDetails!==undefined){
+                    let tempBusiness = this.state.businessList.find(business => business.businessId === this.state.businessDetails.businessId)
                     this.setState({businessDetails:tempBusiness})
                 }
             }
@@ -115,8 +110,8 @@ class TrackingPage extends Component {
     }
     onSelected = (viewport,item) => {
         if(this.state.businessList.length>0){
-            let SBusiness = this.state.businessList.find(business => (business.long == viewport.longitude && business.lat == viewport.latitude))
-            if(SBusiness!=undefined){
+            let SBusiness = this.state.businessList.find(business => (business.long === viewport.longitude && business.lat === viewport.latitude))
+            if(SBusiness!==undefined){
                 this.setState({viewport,selectedBusiness:SBusiness.businessId})
             }
             else this.setState({viewport, addrSelection:viewport,selectedBusiness:undefined})
@@ -175,9 +170,9 @@ class TrackingPage extends Component {
                         {...viewport}
                         onViewportChange={(viewport) => this.setState({ viewport })}
                     >
-                    { (this.state.businessList!= undefined) ? (
+                    { (this.state.businessList!== undefined) ? (
                                                 this.state.businessList.map((business) => 
-                                                business.businessId == this.state.selectedBusiness ?
+                                                business.businessId === this.state.selectedBusiness ?
                                                     (
                                                         <Marker
                                                         longitude={business.long}
@@ -237,7 +232,7 @@ class TrackingPage extends Component {
                                     <TableHead>
                                     </TableHead>
                                     <TableBody className="bListTable">
-                                        {this.state.filterBList.length!=0 ? (
+                                        {this.state.filterBList.length!==0 ? (
                                             this.state.filterBList.map((business) => (
                                                 <TableRow>
                                                     <TableCell className="businessCell" onClick={()=>this.viewChange(business.lat,business.long,business.businessId,business)}>

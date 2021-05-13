@@ -11,9 +11,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
-import CancelIcon from '@material-ui/icons/Cancel';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import { green, red, cyan } from '@material-ui/core/colors';
 
 class ManagedBusinessTable extends Component {
     state = {

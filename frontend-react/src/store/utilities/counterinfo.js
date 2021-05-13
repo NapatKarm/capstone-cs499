@@ -28,7 +28,7 @@ export const cWipeThunk = () => (dispatch) => {
 }
 
 // Reducer Function
-export default (state = {},action) => {
+const counterinfo = (state = {},action) => {
     switch(action.type){
         case C_UPDATE:
             return action.payload;
@@ -38,3 +38,4 @@ export default (state = {},action) => {
             return state;
     }
 }
+export default counterinfo;

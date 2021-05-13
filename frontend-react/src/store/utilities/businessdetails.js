@@ -1,3 +1,4 @@
+
 // Action Types
 const B_VIEW = "B_VIEW";
 const B_CLEAR = "B_CLEAR";
@@ -28,7 +29,7 @@ export const bClearThunk = () => async (dispatch) => {
     dispatch(bClear())
 }
 // Reducer Function
-export default (state = {},action) => {
+const businessdetails = (state = {},action) => {
     switch(action.type){
         case B_VIEW:
             return action.payload;
@@ -38,3 +39,5 @@ export default (state = {},action) => {
             return state;
     }
 }
+
+export default businessdetails;

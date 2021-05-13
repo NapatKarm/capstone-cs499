@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import { makeStyles } from '@material-ui/core/styles';
 import CVIVIDNav from '../SharedComponent/Navbar'
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -27,23 +26,6 @@ const theme = createMuiTheme({
         }
     },
 })
-
-const useStyles = makeStyles((theme) => ({
-    palette: {
-        primary: {
-            main: '#8a0602',
-        }
-    },
-    root: {
-      flexGrow: 1,
-    },
-    menuButton: {
-      marginRight: theme.spacing(2),
-    },
-    title: {
-      flexGrow: 1,
-    },
-}));
 
 function CircularProgressWithLabel(props) {
     let numberColor = "black"
@@ -118,7 +100,7 @@ class CounterPage extends Component {
         this.props.socket.on("kicked",({businessId}) => {
             console.log("KICKED SOCKETS",businessId)
             if(this.props.bDetails&&businessId!==undefined){
-                if(this.props.bDetails.businessId==businessId){
+                if(this.props.bDetails.businessId===businessId){
                     this.props.socket.removeAllListeners();
                     this.props.socket.emit('leaveBusiness', {businessId: this.props.bDetails.businessId})
                     alert("You have been removed from the business")

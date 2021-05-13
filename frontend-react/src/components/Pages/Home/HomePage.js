@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -7,11 +7,9 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Slide from '@material-ui/core/Slide';
 import BusinessIcon from '@material-ui/icons/Business';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import CVIVIDNav from '../SharedComponent/Navbar'
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import './HomePage.css';
 import Geocoder from 'react-mapbox-gl-geocoder'
@@ -107,9 +105,9 @@ class HomePage extends Component {
         this.setState({ bPass: event.target.value })
     }
     regBusiness = async () => {
-        if(this.state.bName=="") this.setState({registerError: "Please enter a business name"})
-        else if(this.state.bPass=="") this.setState({registerError: "Please enter a business pass"})
-        else if(this.state.addrSelected==false) this.setState({registerError: "Please select a valid address"})
+        if(this.state.bName==="") this.setState({registerError: "Please enter a business name"})
+        else if(this.state.bPass==="") this.setState({registerError: "Please enter a business pass"})
+        else if(this.state.addrSelected===false) this.setState({registerError: "Please select a valid address"})
         else
         {
             await this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass,this.state.blong, this.state.blat)
@@ -126,8 +124,8 @@ class HomePage extends Component {
 
     }
     joinBusiness = async () => {
-        if(this.state.bID=="") this.setState({ joinError:"Please enter a business ID"})
-        else if(this.state.bPass=="") this.setState({ joinError:"Please enter a business pass"})
+        if(this.state.bID==="") this.setState({ joinError:"Please enter a business ID"})
+        else if(this.state.bPass==="") this.setState({ joinError:"Please enter a business pass"})
         else{
             await this.props.bJoin(this.state.userData.email, this.state.bID, this.state.bPass)
             if (this.props.bJoinError) {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -54,9 +54,9 @@ class BusinessDetailsPage extends Component {
         })
         this.props.socket.on("kicked",({businessId}) => {
             console.log("KICKED SOCKETS",businessId)
-            if(this.state.businessDetails != undefined)
+            if(this.state.businessDetails !== undefined)
             {
-                if(businessId==this.state.businessDetails.businessId){
+                if(businessId===this.state.businessDetails.businessId){
                     this.props.socket.removeAllListeners();
                     alert("You have been removed from the business")
                     this.props.history.push("/home")
@@ -67,7 +67,7 @@ class BusinessDetailsPage extends Component {
             businessDetails: this.props.bDetails
         }, () => {
             console.log("Updated Business Details", this.state.businessDetails)
-            let roleGrab = this.state.businessDetails.memberList.find(element => element.email == this.props.userData.email)
+            let roleGrab = this.state.businessDetails.memberList.find(element => element.email === this.props.userData.email)
             if (roleGrab !== undefined) {
                 this.setState({
                     role: roleGrab.role,
@@ -110,7 +110,7 @@ class BusinessDetailsPage extends Component {
                     businessDetails: res.data,
                     action: false
                 })
-                let roleGrab = this.state.businessDetails.memberList.find(element => element.email == this.props.userData.email)
+                let roleGrab = this.state.businessDetails.memberList.find(element => element.email === this.props.userData.email)
                 if (roleGrab !== undefined) {
                     this.setState({
                         role: roleGrab.role,
@@ -374,7 +374,7 @@ class BusinessDetailsPage extends Component {
                         </div>
                         <div>
                             {this.state.businessDetails ? (
-                                ((this.state.role == "Admin") | (this.state.role == "Owner")) ? (
+                                ((this.state.role === "Admin") | (this.state.role === "Owner")) ? (
                                     this.state.isopened ? (
                                         <div>
                                             <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Change Passcode</Button>

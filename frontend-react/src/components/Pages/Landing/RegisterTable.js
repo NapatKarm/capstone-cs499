@@ -24,7 +24,7 @@ class RegisterTable extends Component {
         } else {
           pass.type = "password";
         }
-        var pass = document.getElementById("confirmPassword");
+        pass = document.getElementById("confirmPassword");
         if (pass.type === "password") {
           pass.type = "text";
         } else {
