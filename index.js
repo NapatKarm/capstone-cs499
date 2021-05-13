@@ -619,7 +619,7 @@ Expected Request Body :
   token
   date (formatted <mm/dd/yyyy>)
 */
-app.get('/businessGraph', async (req, res) => {
+app.post('/businessGraph', async (req, res) => {
   let bus_doc = await busdb.where('businessId', '==', req.body.businessId).get();
   let mem_doc = await usersdb.where('email', '==', req.body.email).where('token', '==', req.body.token).get();
   if (bus_doc.empty) {
