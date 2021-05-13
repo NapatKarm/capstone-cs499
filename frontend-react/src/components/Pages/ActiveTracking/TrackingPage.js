@@ -13,7 +13,7 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
 import './TrackingPage.css';
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import ReactMapGL, {Marker} from '!react-map-gl';
+import ReactMapGL, {Marker, NavigationControl,LinearInterpolator} from '!react-map-gl';
 import PopupComponent from './PopupComponent';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import Geocoder from '!react-mapbox-gl-geocoder'
@@ -25,6 +25,11 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 const mapboxApiKey = 'pk.eyJ1IjoibmFwYXRrYXJtIiwiYSI6ImNrbWRzejdmZTJwOGIyb29qem5kaGdnYWQifQ.0qB-jB0GW4iI1V3ban2fXQ';
+
+const navControlStyle= {
+    right: 20,
+    top:180
+  };
 
 class TrackingPage extends Component {
     constructor(props) {
@@ -167,8 +172,11 @@ class TrackingPage extends Component {
                         height="100%"
                         visible={true}
                         {...viewport}
+                        transitionDuration={500} 
+                        transitionInterpolator={new LinearInterpolator()}
                         onViewportChange={(viewport) => this.setState({ viewport })}
                     >
+                        <NavigationControl style={navControlStyle} />
                     { (this.state.businessList!== undefined) ? (
                                                 this.state.businessList.map((business) => 
                                                 business.businessId === this.state.selectedBusiness ?
