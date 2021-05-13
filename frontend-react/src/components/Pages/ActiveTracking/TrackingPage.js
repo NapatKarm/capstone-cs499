@@ -165,6 +165,7 @@ class TrackingPage extends Component {
                         mapStyle="mapbox://styles/mapbox/light-v10"
                         width="100%"
                         height="100%"
+                        visible={true}
                         {...viewport}
                         onViewportChange={(viewport) => this.setState({ viewport })}
                     >
