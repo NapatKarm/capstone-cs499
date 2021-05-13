@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import { Line, defaults } from 'react-chartjs-2';
 
 defaults.animation = false;
