@@ -148,7 +148,6 @@
 }
 .markerPopup {
   width: 35%;
-  height: 30%;
   bottom: 5%;
   margin-left: 60%;
   padding: 1rem !important;
@@ -179,7 +178,7 @@
   font-weight: bold;
 }
 .lineGraph{
-  height: 30%;
+  height: 40%;
 }
 .pathgo{
   height: 75px;
