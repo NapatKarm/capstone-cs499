@@ -134,7 +134,7 @@ const userinfo = (state = {},action) => {
         case ERROR:
             return action.payload;
         default:
-            return state;
+            return state; 
     }
 }
 
