@@ -655,9 +655,8 @@ app.get('/businessGraph', async (req, res) => {
         'actions' : []
       };
       await bus_log_ref.add(logs);
-      res.status(200).send(logs);
-      return;
     }
+    todays_log = await bus_log_ref.where('date', '==', req.body.date).get();
     let actions = todays_log.docs[0].get('actions');
     
     //begin calculating averages
