@@ -36,6 +36,7 @@ class RoutesView extends Component {
                     <Route exact path="/test" render={TestLandingComponent} />
                     <Route exact path="/" render={LandingPageComponent} />
                     <Route exact path="/counter" render={CounterPageComponent} />
+                    <Route exact path="/pathgo" render={() => (window.location = "https://PathGo.app")} />
                     {   loggedIn && (
                             <Switch>
                                 <Route exact path="/home" render={HomePageComponent} />
