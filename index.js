@@ -655,6 +655,8 @@ app.get('/businessGraph', async (req, res) => {
         'actions' : []
       };
       await bus_log_ref.add(logs);
+      res.status(200).send(logs);
+      return;
     }
     let actions = todays_log.docs[0].get('actions');
     
