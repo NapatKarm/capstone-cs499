@@ -12,9 +12,11 @@ import SearchBar from "material-ui-search-bar";
 import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
 import './TrackingPage.css';
-import ReactMapGL, {Marker} from 'react-map-gl';
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import ReactMapGL, {Marker} from '!react-map-gl';
 import PopupComponent from './PopupComponent';
-import Geocoder from 'react-mapbox-gl-geocoder'
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import Geocoder from '!react-mapbox-gl-geocoder'
 import {mapAccess,queryParams} from '../SharedComponent/Shared';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -85,13 +87,9 @@ class TrackingPage extends Component {
                 latitude: lat,
                 longitude: long
             },
-            addrSelection: undefined
+            addrSelection: undefined,
+            businessDetails: infoBusiness
         })
-        console.log("testing 1")
-        if (this.state.markerPopupState===true) {
-            console.log("testing")
-            this.setState({businessDetails: infoBusiness})
-        }
     }
     cancelSearch = () => {
         this.setState({ searched: "" });
