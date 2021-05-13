@@ -16,6 +16,11 @@ import ReactMapGL, {Marker} from 'react-map-gl';
 import PopupComponent from './PopupComponent';
 import Geocoder from 'react-mapbox-gl-geocoder'
 import {mapAccess,queryParams} from '../SharedComponent/Shared';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 const mapStyle = {
     width: '80%',
@@ -28,6 +33,8 @@ class TrackingPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            openMod: false,
+            alreadyClosed: false,
             filterBList: [],
             businessList: [],
             businessDetails: false,
@@ -47,7 +54,9 @@ class TrackingPage extends Component {
         this.props.socket.emit("getAllData")
         this.props.socket.on("updateMap", ({ allData }) => {
             console.log("from UPDATE MAP", allData)
+            
             this.setState({ businessList: allData }, () => { 
+                if(this.state.businessList){
                 const filteredRows = this.state.businessList.filter((row) => {
                     return row.businessname.toLowerCase().includes(this.state.searchedVal.toLowerCase());
                 });
@@ -56,6 +65,7 @@ class TrackingPage extends Component {
                     let tempBusiness = this.state.businessList.find(business => business.businessId == this.state.businessDetails.businessId)
                     this.setState({businessDetails:tempBusiness})
                 }
+            }
             })
         })
     }
@@ -120,10 +130,42 @@ class TrackingPage extends Component {
     closePop = () => {
         this.setState({markerPopupState:false})
     }
+    modClose = () => {
+        this.setState({openMod:false})
+    }
+    toPath = () => {
+        this.props.socket.removeAllListeners();
+        this.props.history.push("/pathgo")
+    }
+    modOpen = () => {
+        this.setState({openMod:true})
+    }
     render() {
         const { viewport } = this.state;
         return (
             <div className="TrackingBody">
+            <Dialog
+                open={this.state.openMod}
+                onClose={this.modClose}
+            >
+                <DialogTitle id="alert-dialog-title">{"Are you getting lost in stores?"}</DialogTitle>
+                <DialogContent>
+                <img alt="pathgo" className="pathgo"src="https://cdn.discordapp.com/attachments/836652969675849788/841805903534489610/PathGoLogoLight.png"/>
+                <DialogContentText id="alert-dialog-description">
+                    If you're having trouble with navigation because buildings are truly complicated. Have no fear, PathGo can help you with your problems!
+                    If you would like to be redirected to PathGo please click yes.
+                </DialogContentText>
+                
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={this.modClose} color="primary">
+                    No
+                </Button>
+                <Button onClick={this.toPath} color="primary" autoFocus>
+                    Yes
+                </Button>
+                </DialogActions>
+            </Dialog>
                 <div className="mapSide">
                     <ReactMapGL
                         mapboxApiAccessToken={mapboxApiKey}
@@ -133,7 +175,7 @@ class TrackingPage extends Component {
                         {...viewport}
                         onViewportChange={(viewport) => this.setState({ viewport })}
                     >
-                    { this.state.businessList!=undefined ? (
+                    { (this.state.businessList!= undefined) ? (
                                                 this.state.businessList.map((business) => 
                                                 business.businessId == this.state.selectedBusiness ?
                                                     (
@@ -171,7 +213,11 @@ class TrackingPage extends Component {
                 </div>
                 <div className="leftSide-map">
                     <div className="topButtons trackTopButtons">
-                        <Button onClick={this.goBackHome} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Register/Sign In</Button>
+                        <div>
+                            <Button onClick={this.goBackHome} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Register/Sign In</Button>
+                            <Button onClick={this.modOpen} style={{ marginLeft: '10px',padding: '5px 20px 5px 20px', backgroundColor: '#3d5a80', color: 'white' }}>Help I'm Lost!</Button>
+                        </div>
+
                         <IconButton aria-label="refresh" onClick={() => this.refreshTB()} style={{ textAlign: "right" }}>
                             <RefreshIcon style={{ color: "white" }} />
                         </IconButton>
