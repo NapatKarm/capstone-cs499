@@ -1111,7 +1111,7 @@ app.post('/businessGraph', async (req, res) => {
     let todays_log = await bus_log_ref.where('date', '==', req.body.date).get();
     if (todays_log.empty) {  // "Catch" block to see if its ever empty
       let logs = {
-        'date' : today,
+        'date' : req.body.date,
         'actions' : []
       };
       await bus_log_ref.add(logs);
