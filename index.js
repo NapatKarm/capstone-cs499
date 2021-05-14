@@ -1111,8 +1111,8 @@ app.post('/businessGraph', async (req, res) => {
                         ? {'time' : "12:00 AM", 'average' : 0}
                         : average_list[average_list.length - 1];
         let time_and_average = {
-            time : hour_of_day,
-            average : last_index.average
+            'time' : hour_of_day,
+            'average' : last_index.average
         }; 
         average_list.push(time_and_average);
       } else if (end_of_hour == -1) {
