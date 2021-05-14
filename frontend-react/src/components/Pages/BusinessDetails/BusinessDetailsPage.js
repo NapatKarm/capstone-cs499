@@ -21,6 +21,21 @@ import TextField from '@material-ui/core/TextField';
 import CVIVIDNav from '../SharedComponent/Navbar'
 import { Endpoint } from '../../Endpoint';
 import './BusinessDetailsPage.css';
+import { Line, defaults } from 'react-chartjs-2';
+
+const options = {
+    scales: {
+      yAxes: [
+        {
+          ticks: {
+            beginAtZero: false,
+            min: 0,
+            max: 100
+          },
+        },
+      ],
+    },
+  };
 
 class BusinessDetailsPage extends Component {
     constructor(props) {
@@ -39,7 +54,9 @@ class BusinessDetailsPage extends Component {
             openERR: "",
             returnERR: "",
             chosenDate: "",
-            returnedDateData: []
+            returnedDateData: [],
+            counter: 0,
+            limit: 0,
         }
     }
     componentDidMount() {
@@ -49,12 +66,10 @@ class BusinessDetailsPage extends Component {
                 alert("Something went wrong check the console")
             }
             if (success !== undefined) {
-                console.log("Successfully kicked user")
                 this.updateDetails();
             }
         })
         this.props.socket.on("kicked", ({ businessId }) => {
-            console.log("KICKED SOCKETS", businessId)
             if (this.state.businessDetails !== undefined) {
                 if (businessId === this.state.businessDetails.businessId) {
                     this.props.socket.removeAllListeners();
@@ -66,7 +81,6 @@ class BusinessDetailsPage extends Component {
         this.setState({
             businessDetails: this.props.bDetails
         }, () => {
-            console.log("Updated Business Details", this.state.businessDetails)
             let roleGrab = this.state.businessDetails.memberList.find(element => element.email === this.props.userData.email)
             if (roleGrab !== undefined) {
                 this.setState({
@@ -78,6 +92,27 @@ class BusinessDetailsPage extends Component {
             else alert("Something is wrong, you are not in this business but you can still see it.")
         })
     }
+    graphPointers = (timeCount) => {
+        let labelList = [];
+        let dataList = [];
+        timeCount.forEach(element=> {
+          labelList.push(element.time)
+          dataList.push(parseInt(element.average))
+        })
+        let data = {
+          labels: labelList,
+          datasets: [
+            {
+              label: 'Occupants',
+              data: dataList,
+              fill: false,
+              backgroundColor: 'rgb(171, 25, 30)',
+              borderColor: 'rgba(171, 25, 30,0.2)',
+            },
+          ],
+        };
+        return data;
+    }
 
     logout = () => {
         this.props.socket.removeAllListeners();
@@ -86,7 +121,6 @@ class BusinessDetailsPage extends Component {
         this.props.history.push("/")
     }
     updateDetails = async () => {
-        console.log("UPDATING")
         axios.post(`${Endpoint}/getSingleBusinessData`, {
             businessId: this.state.businessDetails.businessId,
             email: this.props.userData.email,
@@ -134,7 +168,6 @@ class BusinessDetailsPage extends Component {
         this.setState({ bPass: event.target.value })
     }
     BOpen = () => {
-        console.log("Should be running Business Open", this.state)
         if (this.state.limitNum === "") {
             this.setState({ openERR: "Please enter a limit" });
         }
@@ -186,7 +219,6 @@ class BusinessDetailsPage extends Component {
         })
     }
     deleteB = () => {
-        console.log("DELETING")
         this.setState({
             actionName: "delete",
             actionVictim: "this business",
@@ -205,13 +237,13 @@ class BusinessDetailsPage extends Component {
             .then(res => {
                 console.log("Response from Business Graph", res);
                 this.setState({returnedDateData:res.data})
+                console.log(this.state.returnedDateData)
             })
             .catch(err => {
                 console.log("Error from Business Graph", err)
             })
     }
     runPromote = (changeeEmail) => {
-        console.log("Promoting")
         this.setState({
             actionName: "promote",
             actionVictim: changeeEmail,
@@ -219,7 +251,6 @@ class BusinessDetailsPage extends Component {
         })
     }
     runDemote = (changeeEmail) => {
-        console.log("Demoting")
         this.setState({
             actionName: "demote",
             actionVictim: changeeEmail,
@@ -227,7 +258,6 @@ class BusinessDetailsPage extends Component {
         })
     }
     runKick = (kickeeEmail) => {
-        console.log("Kicking")
         this.setState({
             actionName: "kick",
             actionVictim: kickeeEmail,
@@ -235,7 +265,6 @@ class BusinessDetailsPage extends Component {
         })
     }
     runClose = () => {
-        console.log("Closing")
         this.setState({
             actionName: "close",
             actionVictim: this.state.businessDetails.businessname,
@@ -243,7 +272,6 @@ class BusinessDetailsPage extends Component {
         })
     }
     runOpen = () => {
-        console.log("Opening")
         this.setState({
             openingBusiness: true,
             openERR: "",
@@ -256,7 +284,6 @@ class BusinessDetailsPage extends Component {
             console.log("JOIN Response", counter, limit, error)
             if (error !== undefined) this.setState({ joinERR: error });
             else if (counter !== undefined && limit !== undefined) {
-                console.log("Time to reroute")
                 var cInfo = {
                     limit: limit,
                     counter: counter
@@ -324,7 +351,6 @@ class BusinessDetailsPage extends Component {
             })
         }
         else if (this.state.actionName === "close") {
-            console.log("Should be running Business CLOSE", this.state)
             this.props.socket.emit('closeBusiness', {
                 businessId: this.state.businessDetails.businessId,
                 email: this.props.userData.email,
@@ -422,7 +448,23 @@ class BusinessDetailsPage extends Component {
                                 </div>
                             </div>
                             <div className="workdayData">
+                                <form noValidate>
+                                    <TextField
+                                        id="date"
+                                        label="Choose a Date"
+                                        type="date"
+                                        defaultValue="2020-01-01"
+                                        className="datePicker"
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        onChange={this.changeDate}
+                                    />
+                                </form>
                                 <Button className="testClick clickableButton" onClick={() => this.runGraph(this.state.businessDetails.businessId, this.props.userData.email, this.props.userData.token, this.state.chosenDate)}>Click Me</Button>
+                            </div>
+                            <div className="workdayGraph">
+                                <Line height={60} className="lineGraph" redraw={false} data={this.graphPointers(this.state.returnedDateData)} options={options} />
                             </div>
                             <div className="workersTableDiv">
                                 <TableContainer component={Paper}>
@@ -505,19 +547,7 @@ class BusinessDetailsPage extends Component {
                             or you know... you did something you weren't supposed to
                         </div>
                     )}
-                    <form noValidate>
-                        <TextField
-                            id="date"
-                            label="Choose a Date"
-                            type="date"
-                            defaultValue="2020-01-01"
-                            className="datePicker"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            onChange={this.changeDate}
-                        />
-                    </form>
+                    
                 </div>
                 <div>
                     <Dialog open={this.state.action} onClose={this.cancelAction} aria-labelledby="form-dialog-title">

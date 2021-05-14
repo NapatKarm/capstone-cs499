@@ -41,6 +41,10 @@
     font-weight:bold;
 }
 
+.workdayData {
+    display: flex;
+}
+
 .workersTableDiv {
     margin-top: 15px;
 }
