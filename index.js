@@ -172,7 +172,6 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
   let existing_user = await usersdb.where('email', '==', req.body.email.toLowerCase()).get(); // QuerySnapshot
   //For security reasons, you do not disclose whether email or password is invalid
   try {
-    console.log("SIGNIN", existing_user.empty)
     if(existing_user.empty) { 
       res.status(422).send('Invalid email or password');
     }
@@ -181,7 +180,6 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
     }
     else {
       let new_token = uuidv4();
-      console.log("TOKEN GENERATION:", new_token)
       let user_ref =  usersdb.doc(existing_user.docs[0].id);
       await user_ref.update({
         token : new_token
@@ -543,8 +541,6 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
 // Get Single Business Data Endpoint
 app.post('/getSingleBusinessData', async (req, res) => {            //Expected: {business_id, email, token}
   let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
-  console.log("TOKEN:", req.body.token)
-  console.log("user_info.empty", user_info.empty)
   if (user_info.empty) {
     res.status(400).send("Incorrect Token");
     return;
@@ -556,7 +552,7 @@ app.post('/getSingleBusinessData', async (req, res) => {            //Expected: 
       is_member = true;
     }
   });
-  console.log("is_member", is_member)
+
   if (is_member == false) {
     res.status(400).send("Not a member of this business");
     return;
@@ -1232,7 +1228,6 @@ async function getAllOpenData(){
     
   }
   allData = Array.from(allDataSet);
-  console.log("SIZE", allData.length);
   return allData;
 }
 
@@ -1372,16 +1367,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('kickMember', async ({businessId, kickerEmail, kickeeEmail, token}) => {
-    // let user = await ioredis.get(socket.id);
-    // console.log("KICK MEMBER:", user)
-    // if(user != null){
-    //   let userJson = JSON.parse(user);
-    //   console.log("ID to be kicked", userJson.socketId)
-    //   io.to(userJson.socketId).emit('kicked', { success: "Success"})
-    // }
     let kickeeId = await ioredis.get(kickeeEmail)
-    console.log("Email to be kicked", kickeeEmail)
-    console.log("ID to be kicked", kickeeId)
 
     socket.to(kickeeId).emit('kicked', {businessId: businessId})
 
@@ -1428,7 +1414,6 @@ io.on('connection', (socket) => {
       let businessInfo = await busdb.where('businessId', '==', businessId).get();  
       let businessLogRef = busdb.doc(businessInfo.docs[0].id).collection('logs');                            
       let todaysLog = await businessLogRef.where('date', '==', today).get();
-      console.log(todaysLog.empty)
       let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
 
       let actionData = {
@@ -1626,12 +1611,10 @@ setInterval(async () => {
       let seconds = ('0' + s).slice(-2);
 
       let displayTime = hours+":"+minutes+":"+seconds+" "+ampm;
-      console.log(displayTime);
       let timeCountJsonStr = await ioredis.get(businessId.toString()+"timeCount");
       let timeCountList = JSON.parse(timeCountJsonStr).timeCount
       if(timeCountList != null && timeCountList.length > 0){
         let prevTime = timeCountList[timeCountList.length - 1].time;
-        console.log(prevTime)
         if(prevTime[1] == ":"){
           oldH = parseInt(prevTime.slice(0, 1));
           oldM = parseInt(prevTime.slice(2, 4));
@@ -1643,18 +1626,12 @@ setInterval(async () => {
           oldS = parseInt(prevTime.slice(6, 8));
         }
 
-        console.log("OLD SECONDS", oldS)
-        console.log("NEW SECONDS", s);
-        console.log(s >= oldS+10)
         if(s >= oldS+10 || (oldS >= 50 && s >= 0)){
-          console.log(timeCountList.length)
           if(timeCountList.length >= 10){
             timeCountList.shift();
-            console.log("FIRST", displayTime)
             timeCountList.push({time:displayTime, counter: await ioredis.get(businessId.toString()+"counter")});
           }
           else{
-            console.log("SECOND", displayTime)
             timeCountList.push({time:displayTime, counter: await ioredis.get(businessId.toString()+"counter")});
           }
           timeArrayJson = JSON.stringify({
@@ -1664,14 +1641,12 @@ setInterval(async () => {
         }
       }
       else{
-        console.log("THIRD", displayTime)
         timeCountList.push({time:displayTime, counter: await ioredis.get(businessId.toString()+"counter")});
         timeArrayJson = JSON.stringify({
           timeCount: timeCountList
         })
         await ioredis.set(businessId.toString()+"timeCount", timeArrayJson);
       }
-      console.log(timeCountList);
       singleBusinessJson.timeCount = timeCountList;
       allDataSet.add(singleBusinessJson);
     }
