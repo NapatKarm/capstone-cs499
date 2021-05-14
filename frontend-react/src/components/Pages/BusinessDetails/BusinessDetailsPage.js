@@ -78,19 +78,6 @@ class BusinessDetailsPage extends Component {
             else alert("Something is wrong, you are not in this business but you can still see it.")
         })
     }
-    // componentDidUpdate() {
-    //     // this.props.socket.on("closeResponse", ({ success, error }) => {
-    //     //     console.log("REEEEE Close Response",success,error)
-    //     //     if(error!==undefined) this.setState({returnERR:"An Error has occurred, please try again"});
-    //     //     else if(success!==undefined) {
-    //     //         this.setState({
-    //     //             action: false
-    //     //         })
-    //     //         this.updateDetails();
-    //     //         }
-    //     //     }
-    //     // )
-    // }
 
     logout = () => {
         this.props.socket.removeAllListeners();
@@ -206,6 +193,15 @@ class BusinessDetailsPage extends Component {
             actionName: "delete",
             actionVictim: "this business",
             action: true
+        })
+    }
+    runGraph = (bId, bEmail, bToken, bDate) => {
+        console.log(bId,bEmail,bToken,bDate)
+        axios.post(`${Endpoint}/businessGraph`, {
+            businessId: bId,
+            email: bEmail,
+            token: bToken,
+            date: bDate
         })
     }
     runPromote = (changeeEmail) => {
@@ -412,6 +408,9 @@ class BusinessDetailsPage extends Component {
                                     <div>Passcode: {this.state.businessDetails.businesspass}</div>
                                 </div>
                             </div>
+                            <div className="workdayData">
+                                <Button className="testClick clickableButton" onClick={() => this.runGraph(this.state.businessDetails.businessId,this.props.userData.email,this.props.userData.token,"05/12/2021")}>Click Me</Button>
+                            </div>
                             <div className="workersTableDiv">
                                 <TableContainer component={Paper}>
                                     <Table className="workersTable" size="small" aria-label="a dense table">
@@ -426,7 +425,7 @@ class BusinessDetailsPage extends Component {
                                         </TableHead>
                                         <TableBody className="workersTable">
                                             {this.state.businessDetails.memberList.map((member) => (
-                                                <TableRow className="workersRow" key={member.email}>
+                                                <TableRow className="workersRow clickableButton" onClick={() => this.runPromote(member.email)} key={member.email}>
                                                     <TableCell className="tableText" component="th" scope="row">
                                                         {member.firstname}
                                                     </TableCell>
