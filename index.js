@@ -1614,7 +1614,7 @@ setInterval(async () => {
           oldS = parseInt(prevTime.slice(6, 8));
         }
 
-        if(s >= oldS+10 || (oldS >= 50 && s >= 0)){
+        if(s >= (oldS+10)%60){
           if(timeCountList.length >= 10){
             timeCountList.shift();
             timeCountList.push({time:displayTime, counter: await ioredis.get(businessId.toString()+"counter")});
