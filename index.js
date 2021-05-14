@@ -1038,6 +1038,51 @@ app.delete('/businessDelete', async (req, res) => { // expected request: busines
   }
 });
 
+/**
+ * @swagger
+ * /businessGraph:
+ *   post:
+ *     summary: Gets time data for business graph
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               businessId:
+ *                 type: integer
+ *                 description: The business id.
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *               token:
+ *                 type: string
+ *                 description: The user's token.
+ *               date:
+ *                 type: string
+ *                 description: Query date.
+ *     responses:
+ *       '200':
+ *         description: Success. Returns list of average occupants for every hour.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 average_list:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       time:
+ *                         type: string
+ *                         description: Time (12-hour time format).
+ *                       average:
+ *                         type: integer
+ *                         description: Average amount of people at this hour.
+ *       '401':
+ *         description: Not Enough Permissions.
+*/
 app.post('/businessGraph', async (req, res) => {
   let bus_doc = await busdb.where('businessId', '==', req.body.businessId).get();
   let mem_doc = await usersdb.where('email', '==', req.body.email).where('token', '==', req.body.token).get();
