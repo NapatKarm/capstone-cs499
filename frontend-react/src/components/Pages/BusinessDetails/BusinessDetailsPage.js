@@ -19,8 +19,7 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import CVIVIDNav from '../SharedComponent/Navbar'
-import {Endpoint} from '../../Endpoint';
-
+import { Endpoint } from '../../Endpoint';
 import './BusinessDetailsPage.css';
 
 class BusinessDetailsPage extends Component {
@@ -38,25 +37,26 @@ class BusinessDetailsPage extends Component {
             openingBusiness: false,
             limitNum: "",
             openERR: "",
-            returnERR: ""
+            returnERR: "",
+            chosenDate: "",
+            returnedDateData: []
         }
     }
     componentDidMount() {
-        this.props.socket.on("kickResponse",({ success, error }) => {
-            if(error!==undefined){
-                console.log("Kick error: ",error);
+        this.props.socket.on("kickResponse", ({ success, error }) => {
+            if (error !== undefined) {
+                console.log("Kick error: ", error);
                 alert("Something went wrong check the console")
             }
-            if(success!==undefined){
+            if (success !== undefined) {
                 console.log("Successfully kicked user")
                 this.updateDetails();
             }
         })
-        this.props.socket.on("kicked",({businessId}) => {
-            console.log("KICKED SOCKETS",businessId)
-            if(this.state.businessDetails !== undefined)
-            {
-                if(businessId===this.state.businessDetails.businessId){
+        this.props.socket.on("kicked", ({ businessId }) => {
+            console.log("KICKED SOCKETS", businessId)
+            if (this.state.businessDetails !== undefined) {
+                if (businessId === this.state.businessDetails.businessId) {
                     this.props.socket.removeAllListeners();
                     alert("You have been removed from the business")
                     this.props.history.push("/home")
@@ -134,31 +134,29 @@ class BusinessDetailsPage extends Component {
         this.setState({ bPass: event.target.value })
     }
     BOpen = () => {
-        console.log("Should be running Business Open",this.state)
-        if(this.state.limitNum==="")
-        {
-            this.setState({openERR:"Please enter a limit"});
+        console.log("Should be running Business Open", this.state)
+        if (this.state.limitNum === "") {
+            this.setState({ openERR: "Please enter a limit" });
         }
-        else 
-        {
-            this.props.socket.emit('openBusiness', { 
+        else {
+            this.props.socket.emit('openBusiness', {
                 businessId: this.state.businessDetails.businessId,
                 businessname: this.state.businessDetails.businessname,
                 businessaddr: this.state.businessDetails.businessaddr,
                 limit: this.state.limitNum,
                 email: this.props.userData.email,
                 token: this.props.userData.token
-             })
+            })
             this.props.socket.once("openResponse", ({ success, error }) => {
-                console.log("Open Response",success,error)
-                if(error!==undefined) this.setState({openERR:"An Error has occurred, please try again"});
-                else if(success!==undefined) {
+                console.log("Open Response", success, error)
+                if (error !== undefined) this.setState({ openERR: "An Error has occurred, please try again" });
+                else if (success !== undefined) {
                     this.setState({
                         openingBusiness: false
                     })
-                    }
-                    this.updateDetails();
                 }
+                this.updateDetails();
+            }
             )
         }
 
@@ -195,14 +193,22 @@ class BusinessDetailsPage extends Component {
             action: true
         })
     }
-    runGraph = (bId, bEmail, bToken, bDate) => {
-        console.log(bId,bEmail,bToken,bDate)
-        axios.post(`${Endpoint}/businessGraph`, {
+    runGraph = async (bId, bEmail, bToken, bDate) => {
+        console.log(bId, bEmail, bToken, bDate)
+        await axios.post(`${Endpoint}/businessGraph`, {
+            date: this.state.chosenDate,
             businessId: bId,
             email: bEmail,
-            token: bToken,
-            date: bDate
+            token: bToken
+
         })
+            .then(res => {
+                console.log("Response from Business Graph", res);
+                this.setState({returnedDateData:res.data})
+            })
+            .catch(err => {
+                console.log("Error from Business Graph", err)
+            })
     }
     runPromote = (changeeEmail) => {
         console.log("Promoting")
@@ -245,26 +251,26 @@ class BusinessDetailsPage extends Component {
         })
     }
     joinTracker = (bID, information) => {
-        this.props.socket.emit('joinTracker', {businessId:bID,email:this.props.userData.email})
+        this.props.socket.emit('joinTracker', { businessId: bID, email: this.props.userData.email })
         this.props.socket.once("joinCheck", ({ counter, limit, error }) => {
-            console.log("JOIN Response",counter,limit,error)
-            if(error!==undefined) this.setState({joinERR:error});
-            else if(counter!==undefined&&limit!==undefined) {
+            console.log("JOIN Response", counter, limit, error)
+            if (error !== undefined) this.setState({ joinERR: error });
+            else if (counter !== undefined && limit !== undefined) {
                 console.log("Time to reroute")
-                    var cInfo = {
-                        limit: limit,
-                        counter: counter
-                    }
-                    this.props.cUpdate(cInfo)
-                    if (this.props.cInfo){
-                        this.props.bView(information)
-                        if (this.props.bDetails) {
-                            this.props.socket.removeAllListeners();
-                            this.props.history.push("/counter")
-                        }
+                var cInfo = {
+                    limit: limit,
+                    counter: counter
+                }
+                this.props.cUpdate(cInfo)
+                if (this.props.cInfo) {
+                    this.props.bView(information)
+                    if (this.props.bDetails) {
+                        this.props.socket.removeAllListeners();
+                        this.props.history.push("/counter")
                     }
                 }
             }
+        }
         )
     }
     changeLimit = (event) => {
@@ -318,30 +324,32 @@ class BusinessDetailsPage extends Component {
             })
         }
         else if (this.state.actionName === "close") {
-            console.log("Should be running Business CLOSE",this.state)
-            this.props.socket.emit('closeBusiness', { 
+            console.log("Should be running Business CLOSE", this.state)
+            this.props.socket.emit('closeBusiness', {
                 businessId: this.state.businessDetails.businessId,
                 email: this.props.userData.email,
                 token: this.props.userData.token
-             })
+            })
             this.props.socket.once("closeResponse", ({ success, error }) => {
-                console.log("Close Response",success,error)
-                if(error!==undefined) this.setState({returnERR:"An Error has occurred, please try again"});
-                else if(success!==undefined) {
+                console.log("Close Response", success, error)
+                if (error !== undefined) this.setState({ returnERR: "An Error has occurred, please try again" });
+                else if (success !== undefined) {
                     this.setState({
                         action: false
                     })
                     this.updateDetails();
-                    }
                 }
+            }
             )
         }
         else if (this.state.actionName === "delete") {
-            await axios.delete(`${Endpoint}/businessDelete`, {data: {
-                businessId: this.state.businessDetails.businessId,
-                email: this.props.userData.email,
-                token: this.props.userData.token
-            }})
+            await axios.delete(`${Endpoint}/businessDelete`, {
+                data: {
+                    businessId: this.state.businessDetails.businessId,
+                    email: this.props.userData.email,
+                    token: this.props.userData.token
+                }
+            })
                 .then(res => {
                     console.log("Response from DELETE", res);
                     this.props.history.push("/home");
@@ -353,6 +361,11 @@ class BusinessDetailsPage extends Component {
                 })
         }
         else console.log("No Action Set")
+    }
+    changeDate = (e) => {
+        let date = new Date(e.target.value)
+        let converted = (((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 8) ? date.getDate()+1 : ('0' + date.getDate()+1)) + '/' + date.getFullYear());
+        this.setState({chosenDate:converted})
     }
     render() {
         return (
@@ -374,14 +387,14 @@ class BusinessDetailsPage extends Component {
                                     this.state.isopened ? (
                                         <div>
                                             <Button style={{ padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Change Passcode</Button>
-                                            <Button onClick={()=>this.joinTracker(this.state.businessDetails.businessId,this.state.businessDetails)} style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: 'white', color: 'black'}}>Track</Button>
-                                            <Button className="forcedWhiteColor"style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e' }} onClick={this.runClose}>Close</Button>
+                                            <Button onClick={() => this.joinTracker(this.state.businessDetails.businessId, this.state.businessDetails)} style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: 'white', color: 'black' }}>Track</Button>
+                                            <Button className="forcedWhiteColor" style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e' }} onClick={this.runClose}>Close</Button>
                                         </div>
                                     ) : (
                                         <div>
                                             <Button onClick={this.changingBPass} style={{ padding: '5px 20px 5px 20px', backgroundColor: '#ebebeb', color: 'black' }}>Change Passcode</Button>
                                             <Button style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#64646420', color: 'rgb(255 255 255 / 26%)' }} disabled>Track</Button>
-                                            <Button onClick={this.runOpen} style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white'}}>Open</Button>
+                                            <Button onClick={this.runOpen} style={{ marginLeft: "10px", padding: '5px 20px 5px 20px', backgroundColor: '#ab191e', color: 'white' }}>Open</Button>
                                         </div>
                                     )
                                 ) : ("")
@@ -394,7 +407,7 @@ class BusinessDetailsPage extends Component {
                                 <div className="businessNameTitle">{this.state.businessDetails.businessname}</div>
                                 {this.state.role === "Owner" ? (
                                     <div className="deleteBusiness" onClick={this.deleteB}>Delete Business</div>
-                                ):(
+                                ) : (
                                     ""
                                 )}
                             </div>
@@ -409,7 +422,7 @@ class BusinessDetailsPage extends Component {
                                 </div>
                             </div>
                             <div className="workdayData">
-                                <Button className="testClick clickableButton" onClick={() => this.runGraph(this.state.businessDetails.businessId,this.props.userData.email,this.props.userData.token,"05/12/2021")}>Click Me</Button>
+                                <Button className="testClick clickableButton" onClick={() => this.runGraph(this.state.businessDetails.businessId, this.props.userData.email, this.props.userData.token, this.state.chosenDate)}>Click Me</Button>
                             </div>
                             <div className="workersTableDiv">
                                 <TableContainer component={Paper}>
@@ -431,7 +444,7 @@ class BusinessDetailsPage extends Component {
                                                     </TableCell>
                                                     <TableCell className="tableText">{member.lastname}</TableCell>
                                                     <TableCell className="tableText">{member.email}</TableCell>
-                                                    <TableCell className="tableText" style={{width:'100px'}}>{member.role}</TableCell>
+                                                    <TableCell className="tableText" style={{ width: '100px' }}>{member.role}</TableCell>
                                                     {(((this.state.role === "Owner") | (this.state.role === "Admin")) && (this.props.userData.email !== member.email)) ?
                                                         (
                                                             this.state.role === "Owner" ?
@@ -492,6 +505,19 @@ class BusinessDetailsPage extends Component {
                             or you know... you did something you weren't supposed to
                         </div>
                     )}
+                    <form noValidate>
+                        <TextField
+                            id="date"
+                            label="Choose a Date"
+                            type="date"
+                            defaultValue="2020-01-01"
+                            className="datePicker"
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            onChange={this.changeDate}
+                        />
+                    </form>
                 </div>
                 <div>
                     <Dialog open={this.state.action} onClose={this.cancelAction} aria-labelledby="form-dialog-title">
@@ -499,16 +525,16 @@ class BusinessDetailsPage extends Component {
                         <DialogContent>
                             <DialogContentText>
                                 Are you sure you want to {this.state.actionName} {this.state.actionVictim}?
-                                 </DialogContentText>
-                                 {this.state.returnERR}
+                            </DialogContentText>
+                            {this.state.returnERR}
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={this.cancelAction} color="primary">
                                 Cancel
-                                </Button>
+                            </Button>
                             <Button onClick={this.confirmAction} color="primary">
                                 Confirm
-                                </Button>
+                            </Button>
                         </DialogActions>
                     </Dialog>
                     <Dialog open={this.state.changingBPass} onClose={this.cancelBPassChange} aria-labelledby="form-dialog-title">
@@ -516,7 +542,7 @@ class BusinessDetailsPage extends Component {
                         <DialogContent>
                             <DialogContentText>
                                 What would you like to change passcode to?
-                                 </DialogContentText>
+                            </DialogContentText>
                             <TextField
                                 autoFocus
                                 margin="dense"
@@ -531,10 +557,10 @@ class BusinessDetailsPage extends Component {
                         <DialogActions>
                             <Button onClick={this.cancelBPassChange} color="primary">
                                 Cancel
-                                </Button>
+                            </Button>
                             <Button onClick={this.BPassChange} color="primary">
                                 Change
-                                </Button>
+                            </Button>
                         </DialogActions>
                     </Dialog>
                     <Dialog open={this.state.openingBusiness} onClose={this.cancelOpening} aria-labelledby="form-dialog-title">
@@ -558,7 +584,7 @@ class BusinessDetailsPage extends Component {
                             <Button onClick={this.cancelOpening} color="primary">
                                 Cancel
                             </Button>
-                            <Button  onClick={this.BOpen}color="primary">
+                            <Button onClick={this.BOpen} color="primary">
                                 Open
                             </Button>
                         </DialogActions>
