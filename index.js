@@ -1192,14 +1192,6 @@ async function isPartofBusiness(businessId, socket_id){
 }
 
 async function getAllOpenData(){
-  let bus_list = await busdb.where('isopened', '==', true).get();
-  let coordinatesMap = {}
-  bus_list.forEach(async (business) => {
-    var businessData = business.data();
-    var bId = businessData.businessId;
-    coordinatesMap[bId] = {lat: businessData.lat, long: businessData.long};
-  });
-
   openedJsonStr = await ioredis.get("openedBusinesses");
   if(openedJsonStr != null)
   {
@@ -1212,8 +1204,6 @@ async function getAllOpenData(){
 
       singleBusinessJson.counter = await ioredis.get(businessId.toString()+"counter");
       singleBusinessJson.businessId = businessId;
-      singleBusinessJson.lat = coordinatesMap[businessId].lat;
-      singleBusinessJson.long = coordinatesMap[businessId].long;
       
       let timeCountJsonStr = await ioredis.get(businessId.toString()+"timeCount");
       if(timeCountJsonStr != null){
@@ -1249,35 +1239,6 @@ io.on('connection', (socket) => {
   socket.on('openBusiness', async ({businessId, businessname, businessaddr, limit, email, token}) => {
     console.log("open");
 
-    const json = JSON.stringify({
-      businessname: businessname,
-      businessaddr: businessaddr,
-      limit: limit
-    });
-    await ioredis.set(businessId, json);
-    await ioredis.set(businessId.toString()+"counter", 0);
-    timeArrJson = JSON.stringify({
-      timeCount: []
-    })
-    await ioredis.set(businessId.toString()+"timeCount", timeArrJson);
-    
-    let openedJsonStr = "";
-    if(await ioredis.exists("openedBusinesses") == false){
-      let openedArr = [businessId]
-      openedJsonStr = JSON.stringify({
-        opened: openedArr
-      })
-    }
-    else{
-      openedJsonStr = await ioredis.get("openedBusinesses")
-      let openedArr = JSON.parse(openedJsonStr).opened
-      openedArr.push(businessId)
-      openedJsonStr = JSON.stringify({
-        opened: openedArr
-      })
-    }
-    await ioredis.set("openedBusinesses", openedJsonStr)
-
     await axios.patch(`https://${process.env.EXPRESS_HOST}/businessOpen`, {businessId: businessId, email: email, token: token})
     .then(res => {
       socket.emit('openResponse', {success: "Success"});
@@ -1286,32 +1247,69 @@ io.on('connection', (socket) => {
       socket.emit('openResponse', {error: "Error"});
     })
 
-    let month, day = ""; 
-    let time = new Date(); 
-    if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
-      month = '0' + ( time.getMonth() + 1 );
-    }
-    else {
-      month = time.getMonth();
-    }
-    if (time.getDate() < 10) {
-      day = '0' + time.getDate();
-    }
-    else {
-      day = time.getDate();
-    }
-    let today = month + '/' + day + '/' + time.getFullYear();
+    let bus_data = await busdb.where('isopened','==',true).where('businessId','==',businessId).get();
+    if(!bus_data.empty){
+      console.log(bus_data.docs[0].get('lat'))
+      console.log(bus_data.docs[0].get('long'))
+
+      const json = JSON.stringify({
+        businessname: businessname,
+        businessaddr: businessaddr,
+        limit: limit,
+        lat: bus_data.docs[0].get('lat'),
+        long: bus_data.docs[0].get('long')
+      });
+      await ioredis.set(businessId, json);
+      await ioredis.set(businessId.toString()+"counter", 0);
+      timeArrJson = JSON.stringify({
+        timeCount: []
+      })
+      await ioredis.set(businessId.toString()+"timeCount", timeArrJson);
+      
+      let openedJsonStr = "";
+      if(await ioredis.exists("openedBusinesses") == false){
+        let openedArr = [businessId]
+        openedJsonStr = JSON.stringify({
+          opened: openedArr
+        })
+      }
+      else{
+        openedJsonStr = await ioredis.get("openedBusinesses")
+        let openedArr = JSON.parse(openedJsonStr).opened
+        openedArr.push(businessId)
+        openedJsonStr = JSON.stringify({
+          opened: openedArr
+        })
+      }
+      await ioredis.set("openedBusinesses", openedJsonStr)
+
+      let month, day = ""; 
+      let time = new Date(); 
+      if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
+        month = '0' + ( time.getMonth() + 1 );
+      }
+      else {
+        month = time.getMonth();
+      }
+      if (time.getDate() < 10) {
+        day = '0' + time.getDate();
+      }
+      else {
+        day = time.getDate();
+      }
+      let today = month + '/' + day + '/' + time.getFullYear();
 
 
-    busInfo = await busdb.where('businessId', '==', businessId).get();
-    busRef = busdb.doc(busInfo.docs[0].id);
-    busLogs = await busRef.collection('logs').where('date', '==', today).get();
-    if (busLogs.empty) {
-      let logs = {
-        'date' : today,
-        'actions' : []
-      };
-      await busRef.collection('logs').add(logs);
+      busInfo = await busdb.where('businessId', '==', businessId).get();
+      busRef = busdb.doc(busInfo.docs[0].id);
+      busLogs = await busRef.collection('logs').where('date', '==', today).get();
+      if (busLogs.empty) {
+        let logs = {
+          'date' : today,
+          'actions' : []
+        };
+        await busRef.collection('logs').add(logs);
+      }
     }
   });
 
@@ -1553,14 +1551,6 @@ io.on('connection', (socket) => {
 });
 
 setInterval(async () => {
-  let bus_list = await busdb.where('isopened', '==', true).get();
-  let coordinatesMap = {}
-  bus_list.forEach(async (business) => {
-    var businessData = business.data();
-    var bId = businessData.businessId;
-    coordinatesMap[bId] = {lat: businessData.lat, long: businessData.long};
-  });
-
   openedJsonStr = await ioredis.get("openedBusinesses");
   
   if(openedJsonStr != null)
@@ -1574,8 +1564,6 @@ setInterval(async () => {
 
       singleBusinessJson.counter = await ioredis.get(businessId.toString()+"counter");
       singleBusinessJson.businessId = businessId;
-      singleBusinessJson.lat = coordinatesMap[businessId].lat;
-      singleBusinessJson.long = coordinatesMap[businessId].long;
 
       if(singleBusinessJson.hasOwnProperty('timeCount') == false){
         singleBusinessJson.timeCount = [];
