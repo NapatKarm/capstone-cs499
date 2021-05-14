@@ -1163,7 +1163,7 @@ async function getAllOpenData(){
   if(openedJsonStr != null)
   {
     openedArr = JSON.parse(openedJsonStr).opened;
-    allData = [];
+    allDataSet = new Set();
     for(var i = 0; i < openedArr.length; i++){
       let businessId = openedArr[i];
       let singleBusiness = await ioredis.get(businessId);
@@ -1182,9 +1182,12 @@ async function getAllOpenData(){
       else{
         singleBusinessJson.timeCount = [];
       }
-      allData.push(singleBusinessJson);
+      allDataSet.add(singleBusinessJson);
     }
+    
   }
+  allData = Array.from(allDataSet);
+  console.log("SIZE", allData.length);
   return allData;
 }
 
@@ -1192,78 +1195,6 @@ io.on('connection', (socket) => {
   console.log(`user ${socket.id} has connected`);
 
   //socket.leave(socket.id);
-
-  setInterval(async () => {
-    let bus_list = await busdb.where('isopened', '==', true).get();
-    let coordinatesMap = {}
-    bus_list.forEach(async (business) => {
-      var businessData = business.data();
-      var bId = businessData.businessId;
-      coordinatesMap[bId] = {lat: businessData.lat, long: businessData.long};
-    });
-
-    openedJsonStr = await ioredis.get("openedBusinesses");
-    if(openedJsonStr != null)
-    {
-      openedArr = JSON.parse(openedJsonStr).opened;
-      allData = [];
-      for(var i = 0; i < openedArr.length; i++){
-        let businessId = openedArr[i];
-        let singleBusiness = await ioredis.get(businessId);
-        let singleBusinessJson = JSON.parse(singleBusiness);
-
-        singleBusinessJson.counter = await ioredis.get(businessId.toString()+"counter");
-        singleBusinessJson.businessId = businessId;
-        singleBusinessJson.lat = coordinatesMap[businessId].lat;
-        singleBusinessJson.long = coordinatesMap[businessId].long;
-
-        if(singleBusinessJson.hasOwnProperty('timeCount') == false){
-          singleBusinessJson.timeCount = [];
-        }
-
-        let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
-        let d = new Date(0);                          // Sets the date to start (milliseconds)
-        d.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
-        let hourFormat = d.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
-        let h = parseInt(('0' + d.getHours()).slice(-2));
-        let m = parseInt(('0' + d.getMinutes()).slice(-2));
-        let s = parseInt(('0' + d.getSeconds()).slice(-2));
-
-        let timeCountJsonStr = await ioredis.get(businessId.toString()+"timeCount");
-        let timeCountList = JSON.parse(timeCountJsonStr).timeCount
-        if(timeCountList != null && timeCountList.length > 0){
-          let prevTime = timeCountList[timeCountList.length - 1].time;
-          oldH = parseInt(prevTime.slice(0, 2));
-          oldM = parseInt(prevTime.slice(3, 5));
-          oldS = parseInt(prevTime.slice(6, 8));
-
-          if(s >= oldS+10 || (oldS >= 50 && s >= 0)){
-            if(timeCountList.length >= 10){
-              timeCountList.shift();
-              timeCountList.push({time:hourFormat, counter: await ioredis.get(businessId.toString()+"counter")});
-            }
-            else{
-              timeCountList.push({time:hourFormat, counter: await ioredis.get(businessId.toString()+"counter")});
-            }
-            timeArrayJson = JSON.stringify({
-              timeCount: timeCountList
-            })
-            await ioredis.set(businessId.toString()+"timeCount", timeArrayJson);
-          }
-        }
-        else{
-          timeCountList.push({time:hourFormat, counter: await ioredis.get(businessId.toString()+"counter")});
-          timeArrayJson = JSON.stringify({
-            timeCount: timeCountList
-          })
-          await ioredis.set(businessId.toString()+"timeCount", timeArrayJson);
-        }
-        singleBusinessJson.timeCount = timeCountList;
-        allData.push(singleBusinessJson);
-      }
-    }
-    socket.emit('updateMap', {allData: allData});
-  },5000);
 
   socket.on('userInit', async ({email}) => {
     // const json = JSON.stringify({
@@ -1432,7 +1363,7 @@ io.on('connection', (socket) => {
       let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
       let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
       hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
-      hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
+      hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false, timeZone : "EST"});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
       let time = new Date();
 
       if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
@@ -1461,7 +1392,7 @@ io.on('connection', (socket) => {
         'time' : hourFormat,
         'utc' : currentTimeUTC  
       };
-      todaysLogRef.update({
+      await todaysLogRef.update({
         actions : admin.firestore.FieldValue.arrayUnion(actionData)
       });
 
@@ -1498,7 +1429,7 @@ io.on('connection', (socket) => {
       let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
       let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
       hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
-      hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
+      hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false, timeZone : "EST"});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
       let time = new Date();
 
       if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
@@ -1522,11 +1453,11 @@ io.on('connection', (socket) => {
 
       let actionData = {
         'email' : "email",
-        'type' : 0,
+        'type' : -1,
         'time' : hourFormat,
         'utc' : currentTimeUTC  
       };
-      todaysLogRef.update({
+      await todaysLogRef.update({
         actions : admin.firestore.FieldValue.arrayUnion(actionData)
       });
 
@@ -1591,6 +1522,118 @@ io.on('connection', (socket) => {
   });
 });
 
+setInterval(async () => {
+  let bus_list = await busdb.where('isopened', '==', true).get();
+  let coordinatesMap = {}
+  bus_list.forEach(async (business) => {
+    var businessData = business.data();
+    var bId = businessData.businessId;
+    coordinatesMap[bId] = {lat: businessData.lat, long: businessData.long};
+  });
+
+  openedJsonStr = await ioredis.get("openedBusinesses");
+  
+  if(openedJsonStr != null)
+  {
+    openedArr = JSON.parse(openedJsonStr).opened;
+    allDataSet = new Set();
+    for(var i = 0; i < openedArr.length; i++){
+      let businessId = openedArr[i];
+      let singleBusiness = await ioredis.get(businessId);
+      let singleBusinessJson = JSON.parse(singleBusiness);
+
+      singleBusinessJson.counter = await ioredis.get(businessId.toString()+"counter");
+      singleBusinessJson.businessId = businessId;
+      singleBusinessJson.lat = coordinatesMap[businessId].lat;
+      singleBusinessJson.long = coordinatesMap[businessId].long;
+
+      if(singleBusinessJson.hasOwnProperty('timeCount') == false){
+        singleBusinessJson.timeCount = [];
+      }
+
+      let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
+      let d = new Date(0);                          // Sets the date to start (milliseconds)
+      d.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
+      let hourFormat = d.toLocaleTimeString('en-GB', {hour12 : false, timeZone : "EST"});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
+      let h = parseInt(hourFormat.slice(0, 2));
+      let m = parseInt(hourFormat.slice(3, 5));
+      let s = parseInt(hourFormat.slice(6, 8));
+
+      //EST Offset
+      h = h + 1;
+      if(h == 25){
+        h = 1
+      }
+      ////////////
+
+      let ampm = h >= 12 ? 'PM' : 'AM';
+      let hours = 0;
+      if(h == 0){
+        hours = 12;
+      }
+      else if(h > 12){
+        hours = h-12;
+      }
+      else{
+        hours = h
+      }
+      let minutes = ('0' + m).slice(-2);
+      let seconds = ('0' + s).slice(-2);
+
+      let displayTime = hours+":"+minutes+":"+seconds+" "+ampm;
+      console.log(displayTime);
+      let timeCountJsonStr = await ioredis.get(businessId.toString()+"timeCount");
+      let timeCountList = JSON.parse(timeCountJsonStr).timeCount
+      if(timeCountList != null && timeCountList.length > 0){
+        let prevTime = timeCountList[timeCountList.length - 1].time;
+        console.log(prevTime)
+        if(prevTime[1] == ":"){
+          oldH = parseInt(prevTime.slice(0, 1));
+          oldM = parseInt(prevTime.slice(2, 4));
+          oldS = parseInt(prevTime.slice(5, 7));
+        }
+        else{
+          oldH = parseInt(prevTime.slice(0, 2));
+          oldM = parseInt(prevTime.slice(3, 5));
+          oldS = parseInt(prevTime.slice(6, 8));
+        }
+
+        console.log("OLD SECONDS", oldS)
+        console.log("NEW SECONDS", s);
+        console.log(s >= oldS+10)
+        if(s >= oldS+10 || (oldS >= 50 && s >= 0)){
+          console.log(timeCountList.length)
+          if(timeCountList.length >= 10){
+            timeCountList.shift();
+            console.log("FIRST", displayTime)
+            timeCountList.push({time:displayTime, counter: await ioredis.get(businessId.toString()+"counter")});
+          }
+          else{
+            console.log("SECOND", displayTime)
+            timeCountList.push({time:displayTime, counter: await ioredis.get(businessId.toString()+"counter")});
+          }
+          timeArrayJson = JSON.stringify({
+            timeCount: timeCountList
+          })
+          await ioredis.set(businessId.toString()+"timeCount", timeArrayJson);
+        }
+      }
+      else{
+        console.log("THIRD", displayTime)
+        timeCountList.push({time:displayTime, counter: await ioredis.get(businessId.toString()+"counter")});
+        timeArrayJson = JSON.stringify({
+          timeCount: timeCountList
+        })
+        await ioredis.set(businessId.toString()+"timeCount", timeArrayJson);
+      }
+      console.log(timeCountList);
+      singleBusinessJson.timeCount = timeCountList;
+      allDataSet.add(singleBusinessJson);
+    }
+  }
+  let allData = Array.from(allDataSet);
+  io.emit('updateMap', {allData: allData});
+},5000);
+
 const port = process.env.PORT || 4000;
->>>>>>> 071c44ddf964da49867253166d1c2e7880841bbb
 server.listen(port, () => console.log(`App is listening on Port ${port}`));
