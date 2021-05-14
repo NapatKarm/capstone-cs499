@@ -43,6 +43,11 @@
 
 .workdayData {
     display: flex;
+    color: white!important;
+}
+
+.datePicker {
+    color: white!important;
 }
 
 .workersTableDiv {

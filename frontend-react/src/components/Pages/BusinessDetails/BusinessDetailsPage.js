@@ -22,6 +22,11 @@ import CVIVIDNav from '../SharedComponent/Navbar'
 import { Endpoint } from '../../Endpoint';
 import './BusinessDetailsPage.css';
 import { Line, defaults } from 'react-chartjs-2';
+import { makeStyles } from "@material-ui/core/styles";
+import {
+    createMuiTheme, 
+    ThemeProvider
+  } from '@material-ui/core/styles';
 
 const options = {
     scales: {
@@ -36,6 +41,14 @@ const options = {
       ],
     },
   };
+
+const theme = createMuiTheme({
+    palette: {
+        primary: {
+            main: '#000000'
+        }
+    }
+})
 
 class BusinessDetailsPage extends Component {
     constructor(props) {
@@ -447,25 +460,6 @@ class BusinessDetailsPage extends Component {
                                     <div>Passcode: {this.state.businessDetails.businesspass}</div>
                                 </div>
                             </div>
-                            <div className="workdayData">
-                                <form noValidate>
-                                    <TextField
-                                        id="date"
-                                        label="Choose a Date"
-                                        type="date"
-                                        defaultValue="2020-01-01"
-                                        className="datePicker"
-                                        InputLabelProps={{
-                                            shrink: true,
-                                        }}
-                                        onChange={this.changeDate}
-                                    />
-                                </form>
-                                <Button className="testClick clickableButton" onClick={() => this.runGraph(this.state.businessDetails.businessId, this.props.userData.email, this.props.userData.token, this.state.chosenDate)}>Click Me</Button>
-                            </div>
-                            <div className="workdayGraph">
-                                <Line height={60} className="lineGraph" redraw={false} data={this.graphPointers(this.state.returnedDateData)} options={options} />
-                            </div>
                             <div className="workersTableDiv">
                                 <TableContainer component={Paper}>
                                     <Table className="workersTable" size="small" aria-label="a dense table">
@@ -539,6 +533,28 @@ class BusinessDetailsPage extends Component {
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
+                            </div>
+                            <div className="workdayGraph">
+                                <Line height={50} className="lineGraph" redraw={false} data={this.graphPointers(this.state.returnedDateData)} options={options} />
+                            </div>
+                            <div className="workdayData">
+                                <ThemeProvider theme={theme}>
+                                <form noValidate>
+                                    <TextField
+                                        id="date"
+                                        label="Choose a Date"
+                                        type="date"
+                                        defaultValue="2020-01-01"
+                                        className="datePicker"
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        // style={{ paddingLeft: '10px', color: 'white', backgroundColor: 'white' }}
+                                        onChange={this.changeDate}
+                                    />
+                                </form>
+                                </ThemeProvider>
+                                <Button className="searchGraphData clickableButton" onClick={() => this.runGraph(this.state.businessDetails.businessId, this.props.userData.email, this.props.userData.token, this.state.chosenDate)}>Search</Button>
                             </div>
                         </div>
                     ) : (
