@@ -172,7 +172,6 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
   let existing_user = await usersdb.where('email', '==', req.body.email.toLowerCase()).get(); // QuerySnapshot
   //For security reasons, you do not disclose whether email or password is invalid
   try {
-    console.log("SIGNIN", existing_user.empty)
     if(existing_user.empty) { 
       res.status(422).send('Invalid email or password');
     }
@@ -181,7 +180,6 @@ app.post('/signin', async (req, res) => {         //Expected request: {email, pa
     }
     else {
       let new_token = uuidv4();
-      console.log("TOKEN GENERATION:", new_token)
       let user_ref =  usersdb.doc(existing_user.docs[0].id);
       await user_ref.update({
         token : new_token
@@ -543,8 +541,6 @@ app.post('/getBusinessData', async (req, res) => {                   //Expected 
 // Get Single Business Data Endpoint
 app.post('/getSingleBusinessData', async (req, res) => {            //Expected: {business_id, email, token}
   let user_info = await usersdb.where('token', '==', req.body.token).where('email', '==', req.body.email.toLowerCase()).get();
-  console.log("TOKEN:", req.body.token)
-  console.log("user_info.empty", user_info.empty)
   if (user_info.empty) {
     res.status(400).send("Incorrect Token");
     return;
@@ -556,7 +552,7 @@ app.post('/getSingleBusinessData', async (req, res) => {            //Expected: 
       is_member = true;
     }
   });
-  console.log("is_member", is_member)
+
   if (is_member == false) {
     res.status(400).send("Not a member of this business");
     return;
@@ -1038,6 +1034,153 @@ app.delete('/businessDelete', async (req, res) => { // expected request: busines
   }
 });
 
+/**
+ * @swagger
+ * /businessGraph:
+ *   post:
+ *     summary: Gets time data for business graph
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               businessId:
+ *                 type: integer
+ *                 description: The business id.
+ *               email:
+ *                 type: string
+ *                 description: The user's email.
+ *               token:
+ *                 type: string
+ *                 description: The user's token.
+ *               date:
+ *                 type: string
+ *                 description: Query date.
+ *     responses:
+ *       '200':
+ *         description: Success. Returns list of average occupants for every hour.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 average_list:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       time:
+ *                         type: string
+ *                         description: Time (12-hour time format).
+ *                       average:
+ *                         type: integer
+ *                         description: Average amount of people at this hour.
+ *       '401':
+ *         description: Not Enough Permissions.
+*/
+app.post('/businessGraph', async (req, res) => {
+  let bus_doc = await busdb.where('businessId', '==', req.body.businessId).get();
+  let mem_doc = await usersdb.where('email', '==', req.body.email).where('token', '==', req.body.token).get();
+  if (bus_doc.empty) {
+    res.status(401).send("Business does not exist");
+    return;
+  }
+  if (mem_doc.empty) {
+    res.status(401).send("Incorrect token or email");
+    return;
+  }
+  let member_list = bus_doc.docs[0].get('memberList');
+  let has_permissions =  false;
+  member_list.forEach( member => {
+    if (member.email == req.body.email) {
+      has_permissions = true;
+    }
+  });
+  if (!has_permissions)  {
+    res.status(401).send("Not enough permissions");
+  }
+
+  try {
+    let bus_log_ref = busdb.doc(bus_doc.docs[0].id).collection('logs');
+    let today = new Date();
+    let dd = String(today.getDate()).padStart(2, '0');
+    let mm = String(today.getMonth() + 1).padStart(2, '0');
+    let yyyy = today.getFullYear();
+    today = mm + '/' + dd + '/' + yyyy;
+    let todays_log = await bus_log_ref.where('date', '==', req.body.date).get();
+    if (todays_log.empty) {  // "Catch" block to see if its ever empty
+      let logs = {
+        'date' : today,
+        'actions' : []
+      };
+      await bus_log_ref.add(logs);
+    }
+    todays_log = await bus_log_ref.where('date', '==', req.body.date).get();
+    let actions = todays_log.docs[0].get('actions');
+    
+    //begin calculating averages
+    let i = 0;
+    let curr_capacity = 0;
+    let start_of_hour = 0; 
+    let end_of_hour = 0;
+    let average_list = [];
+    
+    while (i < 24) {
+      start_of_hour =  actions.findIndex( (element) => {  // hh:mm:ss    
+        return element.time[0] + element.time[1] == i  
+      });
+      if (i == 23) {
+        end_of_hour = actions.length - 1
+      } else {
+        end_of_hour = actions.findIndex( (element) => {  
+          return element.time[0] + element.time[1] > i  
+        });
+      }
+      
+    //   console.log("i ", i, " start ", start_of_hour, "end ", end_of_hour);
+      
+      let am_pm = i < 12 || i == 0 ? 'AM' : 'PM';
+      let hour_of_day = i == 0 || i == 12 ? "12"
+                        : i < 12 && i != 0 && i != 12 ? i
+                        : i - 12;
+      hour_of_day = hour_of_day.toString();
+      hour_of_day = hour_of_day + ":00 " + am_pm;
+
+      if (start_of_hour == -1) {
+        let last_index = average_list.length - 1 <= 0 // If first index
+                        ? {'time' : "12:00 AM", 'average' : 0}
+                        : average_list[average_list.length - 1];
+        let time_and_average = {
+            'time' : hour_of_day,
+            'average' : last_index.average
+        }; 
+        average_list.push(time_and_average);
+      } else if (end_of_hour == -1) {
+        end_of_hour = actions.length - 1;
+      } else {
+        let count = 0;
+        let sum = 0;
+        for (let i = start_of_hour; i < end_of_hour; i++) {
+          curr_capacity += actions[i].type; 
+          sum += curr_capacity;           // Numerator, current capacity per increment/decrement
+          count++;      // Denominator, amount of changes
+        }
+        let average = Math.round(sum/count);
+        let time_and_average = {
+            time : hour_of_day,
+            average : average
+        }; 
+        average_list.push(time_and_average);
+      }
+      i++;
+    } // end while
+    res.status(200).send(average_list);
+  } catch(error) {
+      console.log(error);
+  }
+});
+
 async function isPartofBusiness(businessId, socket_id){
   const memberList = await io.of('/').adapter.sockets(new Set([businessId]));
   for (let it = memberList.values(), socketID = null; socketID = it.next().value;) { // iterate through a SET
@@ -1085,7 +1228,6 @@ async function getAllOpenData(){
     
   }
   allData = Array.from(allDataSet);
-  console.log("SIZE", allData.length);
   return allData;
 }
 
@@ -1225,16 +1367,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('kickMember', async ({businessId, kickerEmail, kickeeEmail, token}) => {
-    // let user = await ioredis.get(socket.id);
-    // console.log("KICK MEMBER:", user)
-    // if(user != null){
-    //   let userJson = JSON.parse(user);
-    //   console.log("ID to be kicked", userJson.socketId)
-    //   io.to(userJson.socketId).emit('kicked', { success: "Success"})
-    // }
     let kickeeId = await ioredis.get(kickeeEmail)
-    console.log("Email to be kicked", kickeeEmail)
-    console.log("ID to be kicked", kickeeId)
 
     socket.to(kickeeId).emit('kicked', {businessId: businessId})
 
@@ -1281,7 +1414,6 @@ io.on('connection', (socket) => {
       let businessInfo = await busdb.where('businessId', '==', businessId).get();  
       let businessLogRef = busdb.doc(businessInfo.docs[0].id).collection('logs');                            
       let todaysLog = await businessLogRef.where('date', '==', today).get();
-      console.log(todaysLog.empty)
       let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
 
       let actionData = {
@@ -1453,31 +1585,54 @@ setInterval(async () => {
       let d = new Date(0);                          // Sets the date to start (milliseconds)
       d.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
       let hourFormat = d.toLocaleTimeString('en-GB', {hour12 : false, timeZone : "EST"});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
-      let h = ('0' + d.getHours()).slice(-2);
-      let m = ('0' + d.getMinutes()).slice(-2);
-      let s = ('0' + d.getSeconds()).slice(-2);
+      let h = parseInt(hourFormat.slice(0, 2));
+      let m = parseInt(hourFormat.slice(3, 5));
+      let s = parseInt(hourFormat.slice(6, 8));
+
+      //EST Offset
+      h = h + 1;
+      if(h == 25){
+        h = 1
+      }
+      ////////////
 
       let ampm = h >= 12 ? 'PM' : 'AM';
       let hours = 0;
-      if(h > 12){
+      if(h == 0){
+        hours = 12;
+      }
+      else if(h > 12){
         hours = h-12;
       }
+      else{
+        hours = h
+      }
+      let minutes = ('0' + m).slice(-2);
+      let seconds = ('0' + s).slice(-2);
 
+      let displayTime = hours+":"+minutes+":"+seconds+" "+ampm;
       let timeCountJsonStr = await ioredis.get(businessId.toString()+"timeCount");
       let timeCountList = JSON.parse(timeCountJsonStr).timeCount
       if(timeCountList != null && timeCountList.length > 0){
         let prevTime = timeCountList[timeCountList.length - 1].time;
-        oldH = parseInt(prevTime.slice(0, 2));
-        oldM = parseInt(prevTime.slice(3, 5));
-        oldS = parseInt(prevTime.slice(6, 8));
+        if(prevTime[1] == ":"){
+          oldH = parseInt(prevTime.slice(0, 1));
+          oldM = parseInt(prevTime.slice(2, 4));
+          oldS = parseInt(prevTime.slice(5, 7));
+        }
+        else{
+          oldH = parseInt(prevTime.slice(0, 2));
+          oldM = parseInt(prevTime.slice(3, 5));
+          oldS = parseInt(prevTime.slice(6, 8));
+        }
 
         if(s >= oldS+10 || (oldS >= 50 && s >= 0)){
           if(timeCountList.length >= 10){
             timeCountList.shift();
-            timeCountList.push({time:hours+":"+m+":"+s+" "+ampm, counter: await ioredis.get(businessId.toString()+"counter")});
+            timeCountList.push({time:displayTime, counter: await ioredis.get(businessId.toString()+"counter")});
           }
           else{
-            timeCountList.push({time:hours+":"+m+":"+s+" "+ampm, counter: await ioredis.get(businessId.toString()+"counter")});
+            timeCountList.push({time:displayTime, counter: await ioredis.get(businessId.toString()+"counter")});
           }
           timeArrayJson = JSON.stringify({
             timeCount: timeCountList
@@ -1486,7 +1641,7 @@ setInterval(async () => {
         }
       }
       else{
-        timeCountList.push({time:hours+":"+m+":"+s+ampm, counter: await ioredis.get(businessId.toString()+"counter")});
+        timeCountList.push({time:displayTime, counter: await ioredis.get(businessId.toString()+"counter")});
         timeArrayJson = JSON.stringify({
           timeCount: timeCountList
         })
