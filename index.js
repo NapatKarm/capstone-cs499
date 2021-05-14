@@ -22,120 +22,6 @@ const db = admin.firestore();
 const usersdb = db.collection('users'); 
 const busdb = db.collection('business');
 
-// Default testing endpoint
-app.get('/', async function (req, res) {
-  let businessId = 10;
-  let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
-  let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
-  hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
-  hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
-  let month, day = "";
-  let time = new Date();
-
-  if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
-    month = '0' + ( time.getMonth() + 1 );
-  }
-  else {
-    month = time.getMonth();
-  }
-  if (time.getDate() < 10) {
-    day = '0' + time.getDate();
-  }
-  else {
-    day = time.getDate();
-  }
-  let today = month + '/' + day + '/' + time.getFullYear();
-
-  let businessInfo = await busdb.where('businessId', '==', businessId).get();  
-  let businessLogRef = busdb.doc(businessInfo.docs[0].id).collection('logs');                            
-  let todaysLog = await businessLogRef.where('date', '==', today).get();
-  let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
-
-  let actionData = {
-    'email' : "email",
-    'type' : 0,
-    'time' : hourFormat,
-    'utc' : currentTimeUTC  
-  };
-  todaysLogRef.update({
-    actions : admin.firestore.FieldValue.arrayUnion(actionData)
-  });
-//   let data = {
-//     'test' : 1,
-//     'param2' : 2
-//   };
-//   let test = await busdb.add(data);
-//   let test_ref = await test.collection('logs').add(data);
-//   console.log(test_ref);
-
-    // let currentTimeUTC = Date.now();                       // currentTime in UTC milliseconds
-    // let hourFormat = new Date(0);                          // Sets the date to start (milliseconds)
-    // hourFormat.setUTCMilliseconds(currentTimeUTC);         // and add offset to make it current time
-    // hourFormat = hourFormat.toLocaleTimeString('en-GB', {hour12 : false});   // HH:MM:SS format (24 hour), en-GB = English Great Britain
-    // console.log(hourFormat);
-    // let month, day = "";
-    // let time = new Date();
-    // if (time.getMonth() < 10) {           //Append 0 to single-digit months and single digit days
-    //     month = '0' + ( time.getMonth() + 1 );
-    // }
-    // else {
-    //     month = time.getMonth();
-    // }
-    // if (time.getDate() < 10) {
-    //     day = '0' + time.getDate();
-    // }
-    // else {
-    //     day = time.getDate();
-    // }
-    // let today = month + '/' + day + '/' + time.getFullYear();
-    // console.log(today);
-
-    // let businessInfo = await busdb.where('businessId', '==', req.body.businessId).get();  
-    // let businessLogRef = busdb
-    //     .doc(businessInfo.docs[0].id)
-    //     .collection('logs');                            
-    // let todaysLog = await businessLogRef.where('date', '==', today).get();
-    // let todaysLogRef = businessLogRef.doc(todaysLog.docs[0].id);
-    // let actionData = {
-    //     'email' : "email",
-    //     'type' : 1,
-    //     'time' : hourFormat,
-    //     'utc' : currentTimeUTC  
-    // };
-    // todaysLogRef.update({
-    //     actions : admin.firestore.FieldValue.arrayUnion(actionData)
-    // });
-    // res.send("Good");
-  // user_info = await usersdb.where('email', '==', req.body.email).get();
-  // user_bus = await busdb.where('bussinessid', 'in', user_info.docs[0].get(businessList)).get();
-  // user_bus.forEach(doc => {
-  //   console.log(doc.data())
-//   });
-  // some_bus = await busdb.where('businessId', 'in', [0, 1]).get();
-  // some_bus.docs.forEach(doc => {
-  //   console.log(doc.data())
-  // });
-  // some_bus_ref = busdb.doc(some_bus.docs[0].id);
-  // new_member = {                             
-  //   'firstname': "testing",
-  //   'lastname': "123 test",
-  //   'email': "some test email",
-  //   'role': 'Employee'
-  // };
-  // try {
-  //   some_bus_ref.update({                                            // Add business info to user's business[]
-  //     memberList: admin.firestore.FieldValue.arrayUnion(new_member)
-  //   });
-  //   console.log("sucessfully updated array");
-  //   some_bus = await busdb.where('businessId','==', 0).get();
-  //   res.send(some_bus.docs[0].get('memberList'));
-  // } catch (error) {
-  //   console.log(error);
-  // }
-
-  // res.send('hello world');
-});
-
 // Sign-up end point
 app.post('/signup', async (req, res) => {  //Expected request: {firstname, lastname, email, password}
   let existing_user = await usersdb.where('email', '==', req.body.email.toLowerCase()).get();
@@ -711,16 +597,12 @@ app.post('/businessGraph', async (req, res) => {
           sum += curr_capacity;           // Numerator, current capacity per increment/decrement
           count++;      // Denominator, amount of changes
         }
-        console.log("num", sum);
-        console.log("denom", count);
-        let average = Math.round(sum/count);
-        console.log("avg", average);
+        let average = Math.round(sum/count);     
         let time_and_average = {
             "time" : hour_of_day,
             "average" : average
         }; 
-        average_list.push(time_and_average);
-        console.log(average_list);
+        average_list.push(time_and_average);       
       }
       i++;
     } // end while
