@@ -44,7 +44,6 @@ class TestLanding extends Component {
         this.props.userLogout()
     }
     onSelected = (viewport, item) => {
-        console.log("TESTING",viewport,item)
         this.setState({viewport})
     }
     render() {

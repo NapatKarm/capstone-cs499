@@ -21,12 +21,8 @@ import TextField from '@material-ui/core/TextField';
 import CVIVIDNav from '../SharedComponent/Navbar'
 import { Endpoint } from '../../Endpoint';
 import './BusinessDetailsPage.css';
-import { Line, defaults } from 'react-chartjs-2';
-import { makeStyles } from "@material-ui/core/styles";
-import {
-    createMuiTheme, 
-    ThemeProvider
-  } from '@material-ui/core/styles';
+import { Line } from 'react-chartjs-2';
+import { withStyles, createMuiTheme,ThemeProvider} from "@material-ui/core/styles";
 
 const options = {
     scales: {
@@ -42,10 +38,37 @@ const options = {
     },
   };
 
+  const CssTextField = withStyles({
+    root: {
+    '& label': {
+        color: 'white',
+    },
+    '& input': {
+        color: 'white'
+    },
+      '& label.Mui-focused': {
+        color: 'white',
+      },
+      '& .MuiInput-underline:after': {
+        borderBottomColor: 'white',
+      },
+      '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+          borderColor: 'white',
+        },
+        '&:hover fieldset': {
+          borderColor: 'white',
+        },
+        '&.Mui-focused fieldset': {
+          borderColor: 'white',
+        },
+      },
+    },
+  })(TextField);
 const theme = createMuiTheme({
     palette: {
         primary: {
-            main: '#000000'
+            main: 'rgb(171, 25, 30)'
         }
     }
 })
@@ -153,7 +176,7 @@ class BusinessDetailsPage extends Component {
                 }
             })
             .catch(err => {
-                console.log("Error from UPDATE", err)
+                //console.log("Error from UPDATE", err)
                 alert("You are no longer in this business")
                 this.props.history.push("/home");
 
@@ -194,7 +217,7 @@ class BusinessDetailsPage extends Component {
                 token: this.props.userData.token
             })
             this.props.socket.once("openResponse", ({ success, error }) => {
-                console.log("Open Response", success, error)
+                //console.log("Open Response", success, error)
                 if (error !== undefined) this.setState({ openERR: "An Error has occurred, please try again" });
                 else if (success !== undefined) {
                     this.setState({
@@ -215,14 +238,14 @@ class BusinessDetailsPage extends Component {
             businesspass: this.state.bPass
         })
             .then(res => {
-                console.log("Response from PASS CHANGE", res);
+                //console.log("Response from PASS CHANGE", res);
                 this.updateDetails();
                 this.setState({
                     changingBPass: false
                 })
             })
             .catch(err => {
-                console.log("Error from PASS CHANGE", err)
+                console.log("Error:", err)
                 alert("Something went wrong, check console")
             })
     }
@@ -239,7 +262,7 @@ class BusinessDetailsPage extends Component {
         })
     }
     runGraph = async (bId, bEmail, bToken, bDate) => {
-        console.log(bId, bEmail, bToken, bDate)
+        //console.log(bId, bEmail, bToken, bDate)
         await axios.post(`${Endpoint}/businessGraph`, {
             date: this.state.chosenDate,
             businessId: bId,
@@ -248,9 +271,9 @@ class BusinessDetailsPage extends Component {
 
         })
             .then(res => {
-                console.log("Response from Business Graph", res);
+                //console.log("Response from Business Graph", res);
                 this.setState({returnedDateData:res.data})
-                console.log(this.state.returnedDateData)
+               // console.log(this.state.returnedDateData)
             })
             .catch(err => {
                 console.log("Error from Business Graph", err)
@@ -294,7 +317,7 @@ class BusinessDetailsPage extends Component {
     joinTracker = (bID, information) => {
         this.props.socket.emit('joinTracker', { businessId: bID, email: this.props.userData.email })
         this.props.socket.once("joinCheck", ({ counter, limit, error }) => {
-            console.log("JOIN Response", counter, limit, error)
+            //console.log("JOIN Response", counter, limit, error)
             if (error !== undefined) this.setState({ joinERR: error });
             else if (counter !== undefined && limit !== undefined) {
                 var cInfo = {
@@ -330,7 +353,7 @@ class BusinessDetailsPage extends Component {
                 token: this.props.userData.token
             })
                 .then(res => {
-                    console.log("Response from PROMOTE", res);
+                    //("Response from PROMOTE", res);
                     this.updateDetails();
                 })
                 .catch(err => {
@@ -347,7 +370,7 @@ class BusinessDetailsPage extends Component {
                 token: this.props.userData.token
             })
                 .then(res => {
-                    console.log("Response from DEMOTE", res);
+                    //console.log("Response from DEMOTE", res);
                     this.updateDetails();
                 })
                 .catch(err => {
@@ -370,7 +393,7 @@ class BusinessDetailsPage extends Component {
                 token: this.props.userData.token
             })
             this.props.socket.once("closeResponse", ({ success, error }) => {
-                console.log("Close Response", success, error)
+                //console.log("Close Response", success, error)
                 if (error !== undefined) this.setState({ returnERR: "An Error has occurred, please try again" });
                 else if (success !== undefined) {
                     this.setState({
@@ -390,7 +413,7 @@ class BusinessDetailsPage extends Component {
                 }
             })
                 .then(res => {
-                    console.log("Response from DELETE", res);
+                    //console.log("Response from DELETE", res);
                     this.props.history.push("/home");
                 })
                 .catch(err => {
@@ -459,6 +482,29 @@ class BusinessDetailsPage extends Component {
                                     <div>ID: {this.state.businessDetails.businessId} </div>
                                     <div>Passcode: {this.state.businessDetails.businesspass}</div>
                                 </div>
+                            </div>
+                            <div className="workdayData">
+                                <ThemeProvider theme={theme}>
+                                <form noValidate>
+                                    <CssTextField
+                                        id="date"
+                                        variant="outlined"
+                                        label="Choose a Date"
+                                        type="date"
+                                        defaultValue="2021-01-01"
+                                        className="datePicker"
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        color={"white"}
+                                        onChange={this.changeDate}
+                                    />
+                                </form>
+                                </ThemeProvider>
+                                <Button style={{marginLeft:'1%'}}className="searchGraphData clickableButton" onClick={() => this.runGraph(this.state.businessDetails.businessId, this.props.userData.email, this.props.userData.token, this.state.chosenDate)}>Search</Button>
+                            </div>
+                            <div className="workdayGraph">
+                                <Line height={50} className="lineGraph" redraw={false} data={this.graphPointers(this.state.returnedDateData)} options={options} />
                             </div>
                             <div className="workersTableDiv">
                                 <TableContainer component={Paper}>
@@ -533,28 +579,6 @@ class BusinessDetailsPage extends Component {
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                            </div>
-                            <div className="workdayGraph">
-                                <Line height={50} className="lineGraph" redraw={false} data={this.graphPointers(this.state.returnedDateData)} options={options} />
-                            </div>
-                            <div className="workdayData">
-                                <ThemeProvider theme={theme}>
-                                <form noValidate>
-                                    <TextField
-                                        id="date"
-                                        label="Choose a Date"
-                                        type="date"
-                                        defaultValue="2020-01-01"
-                                        className="datePicker"
-                                        InputLabelProps={{
-                                            shrink: true,
-                                        }}
-                                        // style={{ paddingLeft: '10px', color: 'white', backgroundColor: 'white' }}
-                                        onChange={this.changeDate}
-                                    />
-                                </form>
-                                </ThemeProvider>
-                                <Button className="searchGraphData clickableButton" onClick={() => this.runGraph(this.state.businessDetails.businessId, this.props.userData.email, this.props.userData.token, this.state.chosenDate)}>Search</Button>
                             </div>
                         </div>
                     ) : (

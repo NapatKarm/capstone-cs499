@@ -72,7 +72,7 @@ export const userSignupThunk = (firstName, lastName, email, password) => async (
             password: password
         })
         .then(res => {
-            console.log("Response from signup",res);
+            //console.log("Response from signup",res);
             dispatch(userSignup(res));
         })
         .catch(err => {
@@ -95,7 +95,7 @@ export const userLoginThunk = (email,password) => async (dispatch) => {
             password: password
         })
         .then(res => {
-            console.log("Response from login",res);
+            //console.log("Response from login",res);
             socket.emit('userInit', { email:email })
             dispatch(userLogin(res.data));
         })

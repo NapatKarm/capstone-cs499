@@ -21,7 +21,6 @@ const bClear = () => {
 
 // Thunks
 export const bViewThunk = (business) => async (dispatch) => {
-    console.log("Passed in business details",business)
     dispatch(bView(business))
 }
 

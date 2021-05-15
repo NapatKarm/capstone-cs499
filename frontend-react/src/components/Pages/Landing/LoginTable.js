@@ -31,9 +31,9 @@ class LoginTable extends Component {
 
     handleSubmit = async (submit) => {
         // submit.preventDefault()
-        console.log(this.state.email, validator.isEmail(this.state.email), this.state.password)
+        //console.log(this.state.email, validator.isEmail(this.state.email), this.state.password)
         if(validator.isEmail(this.state.email)) {
-            console.log("Email validated!")
+            //console.log("Email validated!")
             if(this.state.password === "") {
                 this.setState({errorMessage: "Please enter a password"})
             } else {

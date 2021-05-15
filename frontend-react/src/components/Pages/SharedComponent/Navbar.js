@@ -18,7 +18,7 @@ class CVIVIDNav extends Component {
             this.setState({
                 uFirst: this.props.userData.firstname,
                 uLast: this.props.userData.lastname
-            },()=>{console.log("Nav Check",this.state.uFirst,this.state.uLast)})
+            })
         }
     }
     render() {

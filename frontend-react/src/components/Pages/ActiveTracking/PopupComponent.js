@@ -43,11 +43,11 @@ class PopupComponent extends Component {
     }
   }
   componentDidMount(){
-    console.log(this.props.businessDetails,"WEEEE")
+    //console.log(this.props.businessDetails,"WEEEE")
     this.setState({limit:this.props.businessDetails.limit,counter:this.props.businessDetails.counter})
   }
   closePop = () => {
-    console.log("BLEH")
+    //console.log("BLEH")
   }
   graphPointers = (timeCount) => {
     let labelList = [];
