@@ -1,0 +1,148 @@
+.bodyT {
+    height: 100vh;
+    color: white;
+    background-color: #191919;
+    background-size: 100%;
+}
+
+.bgImage {
+    background: url("../../Imgs/pin-bg.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.landingLogo {
+    width: 50vh;
+}
+
+.titleHeader {
+    padding-top: 10px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.actionButton {
+    display: flex;
+    justify-content: center;
+}
+
+.registerButton {
+    margin-right: 0.2rem!important;
+}
+
+.loginButton {
+    margin-left: 0.2rem!important;
+}
+
+.leftSide {
+    /* flex-grow: 1; */
+    flex-direction: column;
+    text-align: center;
+    font-size: 12px;
+    width: 50vh;
+    padding-left: 50px;
+    padding-top: 50px;
+}
+
+.rightSide {
+    flex-grow: 1;
+    width: 40vh;
+    padding: 50px;
+    /* padding-top: 50px; */
+}
+
+.footerLanding {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.footerText {
+    font-size: 8px;
+    padding-left: 50px;
+    padding-bottom: 10px;
+}
+
+#gitLink {
+    color: lightgray;
+    text-decoration: none;
+}
+
+/*** LOGINTABLE CSS ****/
+.loginTable {
+    margin-top: 15px;
+    margin-right: 50px;
+    border-radius: 5px;
+    position: absolute;
+    width: 30%;
+    right: 50px;
+    background-color: #f7f6f6;
+    padding-bottom: 50px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.loginTitle {
+    color: gray;
+}
+.circleAvatarLogo{
+    width: auto;
+}
+.showPassword {
+    color: gray;
+    left: 0px!important;
+    align-self: left!important;
+    text-align: left !important;
+    padding-bottom: 25px;
+}
+
+.errorText {
+    color: lightcoral;
+    padding-bottom: 25px;
+}
+
+.loginButton {
+    text-align: center;
+}
+
+/*** REGISTERTABLE CSS ***/
+.registerTable {
+    margin-top: 15px;
+    margin-right: 50px;
+    border-radius: 5px;
+    position: absolute;
+    width: 30%;
+    right: 50px;
+    background-color: #f7f6f6;
+    padding-bottom: 50px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.registerSuccess {
+    color: black;
+}
+
+.registerTitle {
+    color: gray;
+}
+
+.registerName {
+    display: flex;
+}
+
+.registerButton {
+    text-align: center;
+}

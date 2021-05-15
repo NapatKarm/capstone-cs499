@@ -1,0 +1,103 @@
+.businessDetailsPage{
+    color: white;
+    background-color: #191919;
+    height: 100vh;
+}
+.forcedWhiteColor{
+    color: white !important;
+}
+.topButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.fullContainerBDP {
+    padding: 20px;
+}
+.topInfo {
+    display: flex;
+    justify-content: space-between;
+}
+.topRight {
+    text-align: right;
+}
+::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+.NameDeleteDiv {
+    display: flex;
+    align-items: flex-end;
+}
+
+.deleteBusiness {
+    padding-left: 10px;
+    color: gray;
+}
+
+.deleteBusiness:hover {
+    color: #b9b9b9;
+}
+
+.businessNameTitle{
+    font-size:40px;
+    font-weight:bold;
+}
+
+.workdayData {
+    margin-top: 1%;
+    display: flex;
+    color: white!important;
+    justify-content: flex-end;
+}
+
+.datePicker {
+    color: white!important;
+
+}
+
+.workersTableDiv {
+    margin-top: 15px;
+}
+
+.workersTable {
+    background-color: #191919 !important;
+}
+
+.tableText {
+    background-color: #1c1c1c;
+    color: white!important;
+    padding: 20px!important;
+    border-bottom-color: #ffffff25!important;
+}
+
+.buttonCell {
+    background-color: #1c1c1c;
+    color: white!important;
+    padding-right: 0px!important;
+    border-bottom-color: #ffffff25!important;
+}
+
+.buttonText {
+    background-color: #1c1c1c;
+    color: white!important;
+}
+
+.large-text {
+    font-weight: bold!important;
+    font-size:large!important;
+    /* padding-left: 5px!important; */
+    padding-bottom: 10px!important;
+    border-bottom-color: white!important;
+}
+
+.clickableButton {
+    font-weight: normal!important;
+    color: black!important;
+    background-color: #ebebeb!important;
+}
+
+.disabledButton {
+    font-weight: normal!important;
+    color: gray!important;
+    background-color: #b9b9b9!important;
+}

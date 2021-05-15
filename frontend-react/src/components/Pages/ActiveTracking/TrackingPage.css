@@ -1,0 +1,185 @@
+.TrackingBody {
+    background-color: #191919;
+    height: 100vh;
+    width: 100vw;
+    /* padding: 0 50px 0 50px; */
+    display: flex;
+    flex-direction: row;
+}
+.searchBarAround{
+  width: 90%;
+  margin-left: 1.25rem;
+}
+.addrSearchBar{
+  width: 100%;
+  display:flex;
+  justify-content: flex-end;
+  font-size: medium !important;
+  position: absolute;
+}
+.actualSearch{
+  margin-top: 3%;
+  margin-right: 8%;
+  width: 30%;
+  background-color: white;
+}
+.trackTopButtons {
+    padding-top: 30px;
+    padding-bottom: 15px;
+    margin-left: 15px;
+    margin-right: 10px;
+}
+
+.trackTable {
+    max-height: 75vh!important;
+}
+
+.searchTable {
+    padding-top: 20px!important;
+}
+
+.bListTable {
+    background-color: #191919 !important;
+}
+
+.whiteText {
+    color: white !important;
+    border-bottom-color: #ffffff25!important;
+}
+.mapSide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 0 !important;
+}
+.leftSide-map {
+    width: 30%;
+    align-self: center;
+    height: 90%;
+    margin-left: 2%;
+    padding: 0 !important;
+    background-color: #191919 !important;
+    border-radius: 15px;
+    position: absolute;
+}
+.tableText {
+    background-color: #1c1c1c;
+    color: white!important;
+    padding: 20px!important;
+}
+
+.marker {
+    width:0;
+    height:0;
+}
+  
+.marker  span {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  box-sizing:border-box;
+  width: 30px;
+  height: 30px;
+  color:#fff;
+  background: #4D2D73;
+  border:solid 2px;
+  border-radius: 0 70% 70%;
+  box-shadow:0 0 2px #000;
+  cursor: pointer;
+  transform-origin:0 0;
+  transform: rotateZ(-135deg);
+}
+
+.marker b {
+  transform: rotateZ(135deg)
+}
+.markerText {
+    transform: rotateZ(135deg) !important
+}
+.temporary-marker span {
+  background: #D3D3D3;
+}
+.cmarker {
+  width:0;
+  height:0;
+}
+
+.cmarker  span {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  box-sizing:border-box;
+  width: 30px;
+  height: 30px;
+  color:#fff;
+  background: #d31919;
+  border:solid 2px;
+  border-radius: 0 70% 70%;
+  box-shadow:0 0 2px #000;
+  cursor: pointer;
+  transform-origin:0 0;
+  transform: rotateZ(-135deg);
+}
+
+.cmarker b {
+  transform: rotateZ(135deg)
+}
+.cmarkerText {
+    transform: rotateZ(135deg) !important
+}
+.temporary-cmarker span {
+  background: #D3D3D3;
+}
+.businessHeader {
+    font-weight: bold;
+    font-size: 20px;
+    padding-bottom: 2%;
+}
+
+.businessCell {
+  color: white !important;
+  transition: 0.2s;
+}
+.businessCell:hover {
+  background-color: #242424 !important;
+}
+.businessCell:active {
+  background-color: #313131 !important;
+}
+.markerPopup {
+  width: 35%;
+  bottom: 5%;
+  margin-left: 60%;
+  padding: 1rem !important;
+  color: white;
+  background-color: #191919 !important;
+  border-radius: 15px;
+  position: absolute;
+  z-index: 0!important; 
+}
+.popupHeader{
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight:bold;
+  font-size: xx-large;
+  padding-bottom: 0.25rem;
+}
+.lineInfo{
+  display:flex;
+  justify-content: space-between;
+}
+.lineBar{
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+.bottomRow{
+  margin-top: 1rem;
+  font-weight: bold;
+}
+.lineGraph{
+  height: 40%;
+}
+.pathgo{
+  height: 75px;
+}

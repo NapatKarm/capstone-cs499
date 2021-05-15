@@ -1,0 +1,136 @@
+.homePage {
+    color: white;
+    background-color: #191919;
+    height: 100vh;
+}
+.topButtonGroup{
+    display:flex;
+    justify-content: space-evenly;
+    margin-top: 20px;
+}
+.topButtonBox{
+    display:flex;
+    justify-content: space-between;
+    color: white;
+    background-color: #ab191e;
+    height: auto;
+    width: 20%;
+    padding: 20px;
+    align-items: center;
+    transition: 0.2s;
+}
+.topButtonBox:active{
+    background-color: #7a1216;
+}
+.topText{
+    font-size: 21px;
+    font-family: Helvetica;
+}
+.bottonText{
+    font-size: 18px;
+    font-family: Helvetica;
+}
+.BusinessTable{
+    padding: 25px;
+}
+.MBusinessTable{
+    background-color: #1c1c1c !important;
+    color: white !important;
+    max-height: 64vh;
+}
+.MTableBody{
+    color: white !important;
+}
+.topRowT{
+    font-size: 20px !important;
+    color: white !important;
+    width: 20%;
+}
+.regDialog{
+	width: 2500px;
+}
+.addrSearchBox{
+	margin-top: 3%;
+
+}
+.react-geocoder {
+	border: none;
+	/* border-bottom: 0.125rem solid var(--omrs-color-ink-medium-contrast);
+	width: 100%;
+	height: 2rem;
+	font-size: 1.0625rem;
+	padding-left: 0.875rem;
+	line-height: 147.6%;
+	padding-top: 0.825rem;
+	padding-bottom: 0.5rem;	 */
+}
+.react-geocoder > input{
+	border:none;
+	border-bottom: 0.125rem solid rgb(196, 196, 196);
+	width: 100%;
+	height: 2rem;
+	font-size: 1rem;
+	line-height: 147.6%;
+	padding-bottom: 0.25rem;
+	transition: 0.02s;
+}
+.react-geocoder > input:focus {
+	outline: none;
+	transition: 0.02s;
+	border-color: var(--omrs-color-ink-high-contrast);
+	border-bottom: 0.125rem solid;
+	border-bottom-color:  #1e4bd1 !important;
+}
+.react-geocoder > input:hover {
+	outline: none;
+	transition: 0.02s;
+	border-color: var(--omrs-color-ink-high-contrast);
+	border-bottom: 0.125rem solid;
+	border-bottom-color: -internal-light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
+}
+.react-geocoder-item{
+	padding: 0.5rem;
+	color:#1c1c1c;
+	transition: 0.02s;
+	border-bottom: 0.125rem solid;
+	border-color:#cecece;
+	
+}
+.react-geocoder-results {
+	position: fixed;
+	background-color: white;
+}
+.react-geocoder-item:hover {
+	background-color: rgb(240, 240, 240);
+}
+
+/** BEGIN: Non Openmrs CSS **/
+@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
+* {
+	font-family: "Roboto";
+}
+div.container {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-around;
+	margin-top: 30px;
+	border: 1px solid whitesmoke;
+	padding: 21px;
+	border-radius: 4px;
+}
+h4.title {
+	text-align: center;
+	margin-bottom: 45px;
+}
+:root {
+	--omrs-color-ink-lowest-contrast: rgba(47, 60, 85, 0.18);
+	--omrs-color-ink-low-contrast: rgba(60, 60, 67, 0.3);
+	--omrs-color-ink-medium-contrast: rgba(19, 19, 21, 0.6);
+	--omrs-color-interaction: #1e4bd1;
+	--omrs-color-interaction-minus-two: rgba(73, 133, 224, 0.12);
+	--omrs-color-danger: #b50706;
+	--omrs-color-bg-low-contrast: #eff1f2;
+	--omrs-color-ink-high-contrast: #121212;
+	--omrs-color-bg-high-contrast: #ffffff;
+	
+}

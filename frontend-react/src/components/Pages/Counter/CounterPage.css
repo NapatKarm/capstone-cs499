@@ -1,0 +1,145 @@
+.bodyCunter {
+    background: white;
+    display: flex;
+    position: relative;
+    z-index:0;
+}
+
+.navBar {
+    display: flex;
+    position: absolute;
+    width: 100%;
+}
+
+.displayMax {
+    position: absolute;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    top: 25%;
+    left: 50%;
+    margin-top: -50px;
+    margin-left: -50px;
+    width: 100px;
+    height: 100px;
+}
+
+.displayRemCap {
+    position: absolute;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-self: center!important;
+    align-items: center!important;
+    justify-content: center!important;
+    text-align: center;
+    top: 76%;
+    margin-top: 5px;
+    /* margin-left: -85px; */
+    /* width: 150x; */
+    width: 100%;
+    height: 100px;
+}
+
+.circle {
+    position: absolute;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    top: 50%;
+    left: 50%;
+    margin-top: -50px;
+    margin-left: -50px;
+    width: 100px;
+    height: 100px;
+    z-index: 3;
+}
+
+.circleFont {
+    font-size: 80px!important;
+    opacity: 100%!important;
+}
+
+.circleUnder {
+    position: absolute;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    top: 50%;
+    left: 50%;
+    margin-top: -50px;
+    margin-left: -50px;
+    width: 100px;
+    height: 100px;
+    z-index: 2;
+}
+.backgroundButtons {
+    display:flex;
+    height: 100vh
+}
+.whiteCircle {
+    position: absolute;
+    align-items: center;
+    display: flex;
+    top: 50%;
+    left: 50%;
+    margin-top: -100px;
+    margin-left: -100px;
+    z-index: 1;
+    width: 200px;
+    height: 200px;
+    /* -webkit-border-radius: 25px;
+    -moz-border-radius: 25px; */
+    border-radius: 100px;
+    background: white;
+}
+
+.leftAdd {
+    background: url("../../Imgs/add-bg.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    transition: 0.3s;
+}
+
+.leftAdd:active {
+    background: url("../../Imgs/add-bg.png");
+    background-color: lightgray;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+}
+
+.rightAdd {
+    background: url("../../Imgs/sub-bg.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    transition: 0.3s;
+}
+
+.rightAdd:active {
+    background: url("../../Imgs/sub-bg.png");
+    background-color: lightgray;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+}
+
+.logTable {
+    margin-top: 5px;
+    max-height: 200px;
+    background-color: #ffffff75!important;
+}
+
+.logHead {
+    background-color: #ffffff75;
+}
