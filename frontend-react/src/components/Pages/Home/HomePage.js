@@ -56,7 +56,7 @@ class HomePage extends Component {
         })
         await this.props.bGet(this.state.userData.email, this.state.userData.token)
         if (this.props.businessData) {
-            this.setState({ businessList: this.props.businessData, registeringBusiness: false }, () => (console.log("BUSINESS DATAX", this.props.businessData)))
+            this.setState({ businessList: this.props.businessData, registeringBusiness: false })
         }
     }
     cancelBReg = () => {
@@ -111,11 +111,11 @@ class HomePage extends Component {
         else
         {
             await this.props.bRegister(this.state.bName, this.state.bAddress, this.state.userData.email, this.state.bPass,this.state.blong, this.state.blat)
-            console.log(this.props.bRegError, "Look at reg info!#################")
+            //console.log(this.props.bRegError, "Look at reg info!#################")
             if (this.props.bRegError === undefined) {
                 await this.props.bGet(this.state.userData.email, this.state.userData.token)
                 if (this.props.businessData) {
-                    this.setState({ businessList: this.props.businessData, registeringBusiness: false }, () => (console.log(this.props.businessData)))
+                    this.setState({ businessList: this.props.businessData, registeringBusiness: false })
                 }
             }
             else this.setState({ registerError: this.props.bRegError })
@@ -129,18 +129,17 @@ class HomePage extends Component {
         else{
             await this.props.bJoin(this.state.userData.email, this.state.bID, this.state.bPass)
             if (this.props.bJoinError) {
-                this.setState({ joinError: this.props.bJoinError }, () => (console.log("This should have ran", this.state.joinError)))
+                this.setState({ joinError: this.props.bJoinError })
             }
             else {
                 await this.props.bGet(this.state.userData.email, this.state.userData.token)
                 if (this.props.businessData) {
-                    this.setState({ businessList: this.props.businessData, joiningBusiness: false }, () => (console.log(this.props.businessData)))
+                    this.setState({ businessList: this.props.businessData, joiningBusiness: false })
                 }
             }
         }
     }
     onSelected = (viewport, item) => {
-        console.log("TESTING",item)
         this.setState({blong:item.center[1],blat:item.center[0],registerError:""})
         this.changeBAddress(item.place_name)
         // this.setState({bAddress: item.place_name})

@@ -17,7 +17,6 @@ class ManagedBusinessTable extends Component {
         businessList: undefined
     }
     componentDidMount() {
-        console.log("UHHH DEBUG PROPS",this.props.businessList)
         this.setState({
             businessList: this.props.businessList,
         })
@@ -31,10 +30,10 @@ class ManagedBusinessTable extends Component {
     joinTracker = (bID, information) => {
         this.props.socket.emit('joinTracker', {businessId:bID,email:this.props.userData.email})
         this.props.socket.once("joinCheck", ({ counter, limit, error }) => {
-            console.log("JOIN Response",counter,limit,error)
+            //console.log("JOIN Response",counter,limit,error)
             if(error!==undefined) this.setState({joinERR:error});
             else if(counter!==undefined&&limit!==undefined) {
-                console.log("Time to reroute")
+                //console.log("Time to reroute")
                     var cInfo = {
                         limit: limit,
                         counter: counter

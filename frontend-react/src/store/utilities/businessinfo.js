@@ -81,7 +81,6 @@ export const bRegisterThunk = (bname, baddress, email, businesspass,blat,blong) 
             long: blong
         })
         .then(res => {
-            console.log("Response from Business Register",res);
             dispatch(bRegister(res));
         })
         .catch(err => {
@@ -103,7 +102,7 @@ export const bJoinThunk = (email,businessid,businesspass) => async (dispatch) =>
             businesspass: businesspass
         })
         .then(res => {
-            console.log("Response from Business join",res.data);
+            //console.log("Response from Business join",res.data);
             dispatch(bJoin(res.data));
         })
         .catch(err => {
@@ -119,13 +118,13 @@ export const bJoinThunk = (email,businessid,businesspass) => async (dispatch) =>
 
 export const bGetThunk = (email,token) => async (dispatch) => {
     try {
-        console.log("UPDATING BUSINESS DATA WITH",email,token)
+        //console.log("UPDATING BUSINESS DATA WITH",email,token)
         await axios.post(`${Endpoint}/getBusinessData`, {
             email: email,
             token: token
         })
         .then(res => {
-            console.log("Response from Business Get",res.data);
+            //console.log("Response from Business Get",res.data);
             dispatch(bGet(res.data));
         })
         .catch(err => {

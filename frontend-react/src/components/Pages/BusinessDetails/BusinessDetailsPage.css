@@ -21,7 +21,9 @@
 .topRight {
     text-align: right;
 }
-
+::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
 .NameDeleteDiv {
     display: flex;
     align-items: flex-end;
@@ -39,6 +41,18 @@
 .businessNameTitle{
     font-size:40px;
     font-weight:bold;
+}
+
+.workdayData {
+    margin-top: 1%;
+    display: flex;
+    color: white!important;
+    justify-content: flex-end;
+}
+
+.datePicker {
+    color: white!important;
+
 }
 
 .workersTableDiv {

@@ -109,6 +109,7 @@ class TrackingPage extends Component {
         //     latitude: business.lat,
         //     longitude: business.long
         // }
+        console.log("This should run...",business)
         this.setState({markerPopupState: true, businessDetails: business,selectedBusiness:business.businessId})
     }
     onSelected = (viewport,item) => {
