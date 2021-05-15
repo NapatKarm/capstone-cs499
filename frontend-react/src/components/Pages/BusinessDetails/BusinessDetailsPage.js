@@ -504,7 +504,7 @@ class BusinessDetailsPage extends Component {
                                 <Button style={{marginLeft:'1%'}}className="searchGraphData clickableButton" onClick={() => this.runGraph(this.state.businessDetails.businessId, this.props.userData.email, this.props.userData.token, this.state.chosenDate)}>Search</Button>
                             </div>
                             <div className="workdayGraph">
-                                <Line height={50} className="lineGraph" redraw={false} data={this.graphPointers(this.state.returnedDateData)} options={options} />
+                                <Line height={35} className="lineGraph" redraw={false} data={this.graphPointers(this.state.returnedDateData)} options={options} />
                             </div>
                             <div className="workersTableDiv">
                                 <TableContainer component={Paper}>
