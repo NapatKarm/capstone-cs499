@@ -67,11 +67,6 @@ const db = admin.firestore();
 const usersdb = db.collection('users'); 
 const busdb = db.collection('business');
 
-app.get('/', function (req, res) {
-  let time = Date();
-  res.send(`Current Time: ${time}`);
-});
-
 /**
  * @swagger
  * /signup:
@@ -1178,7 +1173,6 @@ app.post('/businessGraph', async (req, res) => {
             "average" : average
         }; 
         average_list.push(time_and_average);
-
       }
       i++;
     } // end while
