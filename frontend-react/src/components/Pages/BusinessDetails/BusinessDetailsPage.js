@@ -97,6 +97,7 @@ class BusinessDetailsPage extends Component {
     }
     componentDidMount() {
         this.props.socket.on("kickResponse", ({ success, error }) => {
+            console.log("Kicked logs",success,error)
             if (error !== undefined) {
                 console.log("Kick error: ", error);
                 alert("Something went wrong check the console")
@@ -106,6 +107,7 @@ class BusinessDetailsPage extends Component {
             }
         })
         this.props.socket.on("kicked", ({ businessId }) => {
+            console.log("You are being kicked",businessId)
             if (this.state.businessDetails !== undefined) {
                 if (businessId === this.state.businessDetails.businessId) {
                     this.props.socket.removeAllListeners();
@@ -520,7 +522,7 @@ class BusinessDetailsPage extends Component {
                                         </TableHead>
                                         <TableBody className="workersTable">
                                             {this.state.businessDetails.memberList.map((member) => (
-                                                <TableRow className="workersRow clickableButton" onClick={() => this.runPromote(member.email)} key={member.email}>
+                                                <TableRow className="workersRow clickableButton" key={member.email}>
                                                     <TableCell className="tableText" component="th" scope="row">
                                                         {member.firstname}
                                                     </TableCell>
