@@ -89,7 +89,7 @@ class PopupComponent extends Component {
             </IconButton>
           </div>
         </div>
-        <div>{this.props.businessDetails.businessaddr}</div>
+        <div>{this.props.businessDetails ? (this.props.businessDetails.businessaddr):("")}</div>
         <div className="lineBar">
           <BorderLinearProgress
           variant="determinate" 
@@ -98,14 +98,17 @@ class PopupComponent extends Component {
         </div>
         <div className="lineInfo">
           <div>
-            Occupants: {this.props.businessDetails.counter}
+            Occupants: {this.props.businessDetails ? (this.props.businessDetails.counter):("")}
           </div>
           <div>
-            Capacity: {this.props.businessDetails.limit}
+            Capacity: {this.props.businessDetails ? (this.props.businessDetails.limit):("")}
           </div>
         </div>
         <div className="bottomRow">
-          <Line height={70}className="lineGraph"redraw={false} data={this.graphPointers(this.props.businessDetails.timeCount)} options={options} />
+          {this.props.businessDetails ?
+          (<Line height={70}className="lineGraph"redraw={false} data={this.graphPointers(this.props.businessDetails.timeCount)} options={options} />):("")
+          }
+          
         </div>
         
       </div>
