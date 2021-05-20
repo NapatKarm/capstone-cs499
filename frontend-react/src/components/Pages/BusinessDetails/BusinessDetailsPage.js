@@ -344,6 +344,7 @@ class BusinessDetailsPage extends Component {
         this.setState({ limitNum: event.target.value })
     }
     goBackHome = () => {
+        this.props.socket.removeAllListeners();
         this.props.bClear()
         this.props.history.push("/home")
     }
