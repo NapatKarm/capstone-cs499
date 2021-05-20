@@ -96,6 +96,7 @@ class BusinessDetailsPage extends Component {
         }
     }
     componentDidMount() {
+        this.props.socket.removeAllListeners();
         this.props.socket.on("kickResponse", ({ success, error }) => {
             console.log("Kicked logs",success,error)
             if (error !== undefined) {
