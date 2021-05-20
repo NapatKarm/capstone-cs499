@@ -81,7 +81,7 @@ class PopupComponent extends Component {
       <div className="displayPopup">
         <div className="popupHeader">
           <div>
-            {this.props.businessDetails.businessname}
+            {this.props.businessDetails ? (this.props.businessDetails.businessname):("")}
           </div>
           <div>
             <IconButton aria-label="refresh" onClick={() => this.props.closePop()} style={{ textAlign: "right" }}>
